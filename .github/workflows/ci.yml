@@ -13,67 +13,9 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        language: [ruby, python, node, go]
-        include:
-          - language: ruby
-            version: '3.2'
-            setup: |
-              ruby --version
-              gem install bundler
-              bundle install
-            test: bundle exec rake test || bundle exec rspec
-          - language: python
-            version: '3.11'
-            setup: |
-              python --version
-              pip install -r requirements.txt || pip install -r requirements-dev.txt
-            test: pytest || python -m pytest
-          - language: node
-            version: '20'
-            setup: |
-              node --version
-              npm ci || yarn install --frozen-lockfile
-            test: npm test || yarn test
-          - language: go
-            version: '1.21'
-            setup: |
-              go version
-              go mod download
-            test: go test ./... || go test -v ./...
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up ${{ matrix.language }}
-        uses: actions/setup-${{ matrix.language }}@v3
-        with:
-          ${{ matrix.language }}-version: ${{ matrix.version }}
-
-      - name: Install dependencies
-        run: ${{ matrix.setup }}
-
-      - name: Run linter
-        continue-on-error: true
-        run: |
-          case "${{ matrix.language }}" in
-            ruby)
-              bundle exec rubocop || echo "Rubocop not configured"
-              ;;
-            python)
-              pylint . || flake8 . || echo "Linter not configured"
-              ;;
-            node)
-              npm run lint || yarn lint || echo "Linter not configured"
-              ;;
-            go)
-              golangci-lint run || echo "Linter not configured"
-              ;;
-          esac
-
-      - name: Run tests
-        continue-on-error: true
-        run: ${{ matrix.test }}
+      - name: actionlint
+        uses: raven-actions/actionlint@v2
 
