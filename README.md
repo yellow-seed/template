@@ -82,7 +82,7 @@ chmod +x .github/scripts/setup-branch-auto-delete.sh
 - JavaScript / TypeScript
 - Go
 
-各言語の基本構成については、[LANGUAGE_SETUP.md](LANGUAGE_SETUP.md)を参照してください。
+各言語の基本構成については、[LANGUAGE_SETUP.md](docs/LANGUAGE_SETUP.md)を参照してください。
 
 ## ライセンス
 
