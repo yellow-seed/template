@@ -1,0 +1,36 @@
+name: Custom Setup
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        run: |
+          echo "Add your custom setup steps here"
+          # Example:
+          # - Install dependencies
+          # - Run setup scripts
+          # - Configure environment
+
+      - name: Run custom tasks
+        run: |
+          echo "Add your custom tasks here"
+          # Example:
+          # - Run tests
+          # - Build artifacts
+          # - Deploy to staging
+

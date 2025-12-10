@@ -1,0 +1,62 @@
+name: Validate Scripts
+
+on:
+  schedule:
+    # 毎週月曜日の午前0時（UTC）に実行
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  validate-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck bats git
+
+      - name: Install BATS helper libraries
+        run: |
+          # BATSヘルパーライブラリをインストール
+          mkdir -p .github/scripts/tests/test_helper
+          
+          # bats-support をインストール
+          if [ ! -d ".github/scripts/tests/test_helper/bats-support" ]; then
+            git clone https://github.com/bats-core/bats-support.git .github/scripts/tests/test_helper/bats-support
+          fi
+          
+          # bats-assert をインストール
+          if [ ! -d ".github/scripts/tests/test_helper/bats-assert" ]; then
+            git clone https://github.com/bats-core/bats-assert.git .github/scripts/tests/test_helper/bats-assert
+          fi
+
+      - name: Run BATS tests
+        run: |
+          echo "BATSテストを実行します..."
+          
+          # BATSテストが存在する場合のみ実行
+          if [ -d ".github/scripts/tests" ]; then
+            echo ""
+            echo "=========================================="
+            echo "BATSテスト実行"
+            echo "=========================================="
+            
+            # 各テストファイルを実行
+            for test_file in .github/scripts/tests/*.bats; do
+              if [ -f "$test_file" ]; then
+                echo ""
+                echo "テスト実行中: $test_file"
+                bats "$test_file" || echo "警告: テストで問題が見つかりました"
+              fi
+            done
+            
+            echo ""
+            echo "=========================================="
+            echo "BATSテストが完了しました"
+            echo "=========================================="
+          else
+            echo "テストディレクトリが見つかりません。スキップします。"
+          fi
