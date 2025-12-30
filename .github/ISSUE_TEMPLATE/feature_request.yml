@@ -1,42 +1,42 @@
-name: Feature Request
-description: Suggest an idea for this project
+name: 機能リクエスト
+description: プロジェクトへのアイデアを提案する
 title: "[Feature] "
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to suggest a new feature!
+        新機能の提案をいただきありがとうございます！
 
   - type: textarea
     id: problem
     attributes:
-      label: Problem Statement
-      description: Is your feature request related to a problem? Please describe.
-      placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+      label: 問題提起
+      description: 機能リクエストは問題に関連していますか？説明してください。
+      placeholder: 問題の内容を明確かつ簡潔に説明してください。例：[...] のときにいつも困っています
     validations:
       required: true
 
   - type: textarea
     id: solution
     attributes:
-      label: Proposed Solution
-      description: Describe the solution you'd like
-      placeholder: A clear and concise description of what you want to happen.
+      label: 提案する解決策
+      description: 希望する解決策を説明してください
+      placeholder: 実現したいことを明確かつ簡潔に説明してください。
     validations:
       required: true
 
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives Considered
-      description: Describe any alternative solutions or features you've considered
-      placeholder: A clear and concise description of any alternative solutions or features you've considered.
+      label: 検討した代替案
+      description: 検討した代替案や機能について説明してください
+      placeholder: 検討した代替案や機能について明確かつ簡潔に説明してください。
 
   - type: textarea
     id: additional
     attributes:
-      label: Additional Context
-      description: Add any other context, mockups, or screenshots about the feature request here.
-      placeholder: Any additional information...
+      label: 追加情報
+      description: 機能リクエストに関するその他の情報、モックアップ、スクリーンショットをここに追加してください。
+      placeholder: 追加情報があれば記載してください...
 

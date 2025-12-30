@@ -1,65 +1,65 @@
-name: Bug Report
-description: Create a report to help us improve
+name: バグレポート
+description: 改善のためのバグ報告を作成する
 title: "[Bug] "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        バグレポートを作成いただきありがとうございます！
 
   - type: textarea
     id: description
     attributes:
-      label: Description
-      description: A clear and concise description of what the bug is.
-      placeholder: Describe the bug...
+      label: 説明
+      description: バグの内容を明確かつ簡潔に説明してください。
+      placeholder: バグの内容を記述してください...
     validations:
       required: true
 
   - type: textarea
     id: steps
     attributes:
-      label: Steps to Reproduce
-      description: Steps to reproduce the behavior
+      label: 再現手順
+      description: 動作を再現するための手順
       placeholder: |
-        1. Go to '...'
-        2. Click on '....'
-        3. Scroll down to '....'
-        4. See error
+        1. '...' に移動
+        2. '....' をクリック
+        3. '....' までスクロール
+        4. エラーを確認
     validations:
       required: true
 
   - type: textarea
     id: expected
     attributes:
-      label: Expected Behavior
-      description: A clear and concise description of what you expected to happen.
-      placeholder: What should happen?
+      label: 期待される動作
+      description: 期待していた動作を明確かつ簡潔に説明してください。
+      placeholder: どのような動作を期待していましたか？
     validations:
       required: true
 
   - type: textarea
     id: actual
     attributes:
-      label: Actual Behavior
-      description: A clear and concise description of what actually happened.
-      placeholder: What actually happened?
+      label: 実際の動作
+      description: 実際に起こった動作を明確かつ簡潔に説明してください。
+      placeholder: 実際にはどうなりましたか？
     validations:
       required: true
 
   - type: textarea
     id: screenshots
     attributes:
-      label: Screenshots
-      description: If applicable, add screenshots to help explain your problem.
-      placeholder: Add screenshots here
+      label: スクリーンショット
+      description: 該当する場合は、問題の説明に役立つスクリーンショットを追加してください。
+      placeholder: スクリーンショットをここに追加
 
   - type: dropdown
     id: environment
     attributes:
-      label: Environment
-      description: Please select your environment
+      label: 環境
+      description: 環境を選択してください
       options:
         - Development
         - Staging
@@ -70,7 +70,7 @@ body:
   - type: textarea
     id: additional
     attributes:
-      label: Additional Context
-      description: Add any other context about the problem here.
-      placeholder: Any additional information...
+      label: 追加情報
+      description: 問題に関するその他の情報をここに追加してください。
+      placeholder: 追加情報があれば記載してください...
 

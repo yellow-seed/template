@@ -1,27 +1,27 @@
 name: TODO
-description: Record tasks and future work items
+description: タスクや今後の作業項目を記録する
 title: "[TODO] "
 labels: ["todo"]
 body:
   - type: markdown
     attributes:
       value: |
-        Use this template to record tasks and future work items.
+        このテンプレートを使用してタスクや今後の作業項目を記録してください。
 
   - type: textarea
     id: description
     attributes:
-      label: Description
-      description: A clear and concise description of what needs to be done.
-      placeholder: Describe the task...
+      label: 説明
+      description: 実施すべき内容を明確かつ簡潔に説明してください。
+      placeholder: タスクの内容を記述してください...
     validations:
       required: true
 
   - type: dropdown
     id: priority
     attributes:
-      label: Priority
-      description: Please select the priority of this task
+      label: 優先度
+      description: タスクの優先度を選択してください
       options:
         - Low
         - Medium
@@ -33,8 +33,8 @@ body:
   - type: dropdown
     id: category
     attributes:
-      label: Category
-      description: Please select the category of this task
+      label: カテゴリ
+      description: タスクのカテゴリを選択してください
       options:
         - Feature
         - Enhancement
@@ -49,29 +49,29 @@ body:
   - type: textarea
     id: acceptance-criteria
     attributes:
-      label: Acceptance Criteria
-      description: Define what "done" means for this task
+      label: 受け入れ基準
+      description: このタスクの「完了」の定義を記述してください
       placeholder: |
-        - [ ] Criterion 1
-        - [ ] Criterion 2
-        - [ ] Criterion 3
+        - [ ] 基準 1
+        - [ ] 基準 2
+        - [ ] 基準 3
     validations:
       required: false
 
   - type: textarea
     id: technical-notes
     attributes:
-      label: Technical Notes
-      description: Any technical details, considerations, or implementation notes
-      placeholder: Add technical notes here...
+      label: 技術的メモ
+      description: 技術的な詳細、考慮事項、実装メモなど
+      placeholder: 技術的なメモをここに追加してください...
     validations:
       required: false
 
   - type: textarea
     id: related-issues
     attributes:
-      label: Related Issues
-      description: Link to related issues or pull requests
+      label: 関連Issue
+      description: 関連するIssueやプルリクエストへのリンク
       placeholder: |
         - #123
         - #456
@@ -81,8 +81,8 @@ body:
   - type: textarea
     id: additional
     attributes:
-      label: Additional Context
-      description: Add any other context about the task here.
-      placeholder: Any additional information...
+      label: 追加情報
+      description: タスクに関するその他の情報をここに追加してください。
+      placeholder: 追加情報があれば記載してください...
     validations:
       required: false
