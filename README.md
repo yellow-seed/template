@@ -72,22 +72,3 @@ chmod +x .github/scripts/setup-branch-auto-delete.sh
 ```
 
 詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
-
-## 対応言語
-
-このテンプレートは以下の言語に対応しています：
-
-- Ruby
-- Python
-- JavaScript / TypeScript
-- Go
-
-各言語の基本構成については、[LANGUAGE_SETUP.md](docs/LANGUAGE_SETUP.md)を参照してください。
-
-## ライセンス
-
-MIT License - 詳細は[LICENSE](LICENSE)を参照してください。
-
-## コントリビューション
-
-コントリビューションを歓迎します！詳細は[CONTRIBUTING.md](CONTRIBUTING.md)を参照してください。

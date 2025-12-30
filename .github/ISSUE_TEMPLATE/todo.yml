@@ -1,0 +1,88 @@
+name: TODO
+description: タスクや今後の作業項目を記録する
+title: "[TODO] "
+labels: ["todo"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        このテンプレートを使用してタスクや今後の作業項目を記録してください。
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 説明
+      description: 実施すべき内容を明確かつ簡潔に説明してください。
+      placeholder: タスクの内容を記述してください...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      description: タスクの優先度を選択してください
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: カテゴリ
+      description: タスクのカテゴリを選択してください
+      options:
+        - Feature
+        - Enhancement
+        - Refactoring
+        - Documentation
+        - Testing
+        - Infrastructure
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: 受け入れ基準
+      description: このタスクの「完了」の定義を記述してください
+      placeholder: |
+        - [ ] 基準 1
+        - [ ] 基準 2
+        - [ ] 基準 3
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: 技術的メモ
+      description: 技術的な詳細、考慮事項、実装メモなど
+      placeholder: 技術的なメモをここに追加してください...
+    validations:
+      required: false
+
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: 関連Issue
+      description: 関連するIssueやプルリクエストへのリンク
+      placeholder: |
+        - #123
+        - #456
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 追加情報
+      description: タスクに関するその他の情報をここに追加してください。
+      placeholder: 追加情報があれば記載してください...
+    validations:
+      required: false

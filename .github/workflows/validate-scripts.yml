@@ -11,52 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck bats git
+          sudo apt-get install -y shellcheck bats bats-support bats-assert git
 
-      - name: Install BATS helper libraries
+      - name: Setup GitHub CLI
         run: |
-          # BATSヘルパーライブラリをインストール
-          mkdir -p .github/scripts/tests/test_helper
-          
-          # bats-support をインストール
-          if [ ! -d ".github/scripts/tests/test_helper/bats-support" ]; then
-            git clone https://github.com/bats-core/bats-support.git .github/scripts/tests/test_helper/bats-support
-          fi
-          
-          # bats-assert をインストール
-          if [ ! -d ".github/scripts/tests/test_helper/bats-assert" ]; then
-            git clone https://github.com/bats-core/bats-assert.git .github/scripts/tests/test_helper/bats-assert
-          fi
+          # GitHub CLI が利用可能か確認
+          gh --version
 
       - name: Run BATS tests
+        run: bats .github/scripts/tests/*.bats
+
+      - name: Validate setup-all.sh (Dry-run mode)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: 1
         run: |
-          echo "BATSテストを実行します..."
-          
-          # BATSテストが存在する場合のみ実行
-          if [ -d ".github/scripts/tests" ]; then
-            echo ""
-            echo "=========================================="
-            echo "BATSテスト実行"
-            echo "=========================================="
-            
-            # 各テストファイルを実行
-            for test_file in .github/scripts/tests/*.bats; do
-              if [ -f "$test_file" ]; then
-                echo ""
-                echo "テスト実行中: $test_file"
-                bats "$test_file" || echo "警告: テストで問題が見つかりました"
-              fi
-            done
-            
-            echo ""
-            echo "=========================================="
-            echo "BATSテストが完了しました"
-            echo "=========================================="
-          else
-            echo "テストディレクトリが見つかりません。スキップします。"
-          fi
+          bash .github/scripts/setup-all.sh
