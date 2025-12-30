@@ -2,8 +2,8 @@
 
 # setup-rulesets.sh のテスト
 
-load 'test_helper/bats-support/load'
-load 'test_helper/bats-assert/load'
+load '/usr/lib/bats/bats-support/load'
+load '/usr/lib/bats/bats-assert/load'
 
 setup() {
     # テスト用の一時ディレクトリを作成

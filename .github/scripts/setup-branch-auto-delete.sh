@@ -5,6 +5,9 @@
 
 set -e
 
+# Dry-run モード（環境変数 DRY_RUN=1 で有効化）
+DRY_RUN=${DRY_RUN:-0}
+
 # カラー出力
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -13,6 +16,11 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}ブランチ自動削除設定スクリプト${NC}"
 echo "=================================="
+
+if [ "$DRY_RUN" = "1" ]; then
+    echo -e "${YELLOW}[DRY-RUN モード] 実際の変更は行いません${NC}"
+    echo ""
+fi
 
 # GitHub CLI がインストールされているか確認
 if ! command -v gh &> /dev/null; then
@@ -49,18 +57,23 @@ if [ "$current_setting" = "true" ]; then
 fi
 
 echo -e "${YELLOW}現在の設定: ブランチ自動削除は無効です${NC}"
-read -p "ブランチ自動削除を有効にしますか? (y/N): " -n 1 -r
-echo
 
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    # 設定を更新
-    gh api "repos/$REPO" \
-        --method PATCH \
-        --field delete_branch_on_merge=true \
-        --silent
-    
-    echo -e "${GREEN}ブランチ自動削除を有効にしました${NC}"
-    echo "マージされたプルリクエストのブランチは自動的に削除されます"
+if [ "$DRY_RUN" = "1" ]; then
+    echo -e "${YELLOW}[DRY-RUN] ブランチ自動削除を有効にします（スキップ）${NC}"
 else
-    echo -e "${YELLOW}設定を変更しませんでした${NC}"
+    read -p "ブランチ自動削除を有効にしますか? (y/N): " -n 1 -r
+    echo
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # 設定を更新
+        gh api "repos/$REPO" \
+            --method PATCH \
+            --field delete_branch_on_merge=true \
+            --silent
+
+        echo -e "${GREEN}ブランチ自動削除を有効にしました${NC}"
+        echo "マージされたプルリクエストのブランチは自動的に削除されます"
+    else
+        echo -e "${YELLOW}設定を変更しませんでした${NC}"
+    fi
 fi

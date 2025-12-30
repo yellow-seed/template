@@ -5,6 +5,9 @@
 
 set -e
 
+# Dry-run モード（環境変数 DRY_RUN=1 で有効化）
+DRY_RUN=${DRY_RUN:-0}
+
 # カラー出力
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -17,6 +20,11 @@ RULESETS_DIR="$(cd "$SCRIPT_DIR/../rulesets" && pwd)"
 
 echo -e "${GREEN}GitHub Ruleset セットアップスクリプト${NC}"
 echo "=================================="
+
+if [ "$DRY_RUN" = "1" ]; then
+    echo -e "${YELLOW}[DRY-RUN モード] 実際の変更は行いません${NC}"
+    echo ""
+fi
 
 # GitHub CLI がインストールされているか確認
 if ! command -v gh &> /dev/null; then
@@ -74,24 +82,33 @@ for ruleset_file in "${RULESET_FILES[@]}"; do
 
     if [ -n "$existing_ruleset" ]; then
         echo -e "${YELLOW}既存の Ruleset が見つかりました (ID: $existing_ruleset)${NC}"
-        read -p "更新しますか? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            gh api "repos/$REPO/rulesets/$existing_ruleset" \
-                --method PUT \
-                --input "$ruleset_file" \
-                --silent
-            echo -e "${GREEN}Ruleset を更新しました${NC}"
+
+        if [ "$DRY_RUN" = "1" ]; then
+            echo -e "${YELLOW}[DRY-RUN] Ruleset を更新します（スキップ）${NC}"
         else
-            echo -e "${YELLOW}スキップしました${NC}"
+            read -p "更新しますか? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                gh api "repos/$REPO/rulesets/$existing_ruleset" \
+                    --method PUT \
+                    --input "$ruleset_file" \
+                    --silent
+                echo -e "${GREEN}Ruleset を更新しました${NC}"
+            else
+                echo -e "${YELLOW}スキップしました${NC}"
+            fi
         fi
     else
-        # 新しい Ruleset を作成
-        gh api "repos/$REPO/rulesets" \
-            --method POST \
-            --input "$ruleset_file" \
-            --silent
-        echo -e "${GREEN}Ruleset を作成しました${NC}"
+        if [ "$DRY_RUN" = "1" ]; then
+            echo -e "${YELLOW}[DRY-RUN] 新しい Ruleset を作成します（スキップ）${NC}"
+        else
+            # 新しい Ruleset を作成
+            gh api "repos/$REPO/rulesets" \
+                --method POST \
+                --input "$ruleset_file" \
+                --silent
+            echo -e "${GREEN}Ruleset を作成しました${NC}"
+        fi
     fi
     echo ""
 done

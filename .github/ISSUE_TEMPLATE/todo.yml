@@ -1,0 +1,88 @@
+name: TODO
+description: Record tasks and future work items
+title: "[TODO] "
+labels: ["todo"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to record tasks and future work items.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what needs to be done.
+      placeholder: Describe the task...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Please select the priority of this task
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Please select the category of this task
+      options:
+        - Feature
+        - Enhancement
+        - Refactoring
+        - Documentation
+        - Testing
+        - Infrastructure
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Define what "done" means for this task
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Technical Notes
+      description: Any technical details, considerations, or implementation notes
+      placeholder: Add technical notes here...
+    validations:
+      required: false
+
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: Related Issues
+      description: Link to related issues or pull requests
+      placeholder: |
+        - #123
+        - #456
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the task here.
+      placeholder: Any additional information...
+    validations:
+      required: false
