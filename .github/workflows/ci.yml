@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, feat/*, copilot/* ]
+    branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/* ]
   pull_request:
-    branches: [ main, feat/*, copilot/* ]
+    branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/* ]
 
 jobs:
   lint-and-test:
