@@ -1,4 +1,4 @@
-name: CI
+name: Actionlint
 
 on:
   push:
@@ -7,11 +7,11 @@ on:
     branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/* ]
 
 jobs:
-  lint-and-test:
+  actionlint:
+    name: Lint GitHub Actions
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
       - name: actionlint
         uses: raven-actions/actionlint@v2
-
