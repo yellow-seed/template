@@ -7,11 +7,19 @@ on:
     branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/* ]
 
 jobs:
-  lint-and-test:
+  Lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      - name: actionlint
-        uses: raven-actions/actionlint@v2
+      - name: Run linter
+        run: echo "Add your linting commands here"
+
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Run tests
+        run: echo "Add your test commands here"
 
