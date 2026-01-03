@@ -1,3 +1,6 @@
+# description:
+# Ruleset 作成のためのgh CLIスクリプト検証のためのワークフロー
+# このリポジトリをテンプレートとして読み込んだ他のリポジトリでは不要のため、.github/scriptsと同様に削除してください
 name: Validate Scripts
 
 on:
