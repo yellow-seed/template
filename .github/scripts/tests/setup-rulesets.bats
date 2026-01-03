@@ -2,8 +2,15 @@
 
 # setup-rulesets.sh のテスト
 
-load '/usr/lib/bats/bats-support/load'
-load '/usr/lib/bats/bats-assert/load'
+# batsライブラリを環境に応じて読み込む
+# Ubuntu: /usr/lib/bats, macOS (Homebrew): /usr/local/lib/bats
+for path in /usr/lib/bats /usr/local/lib/bats /opt/homebrew/lib/bats; do
+    if [ -f "$path/bats-support/load" ]; then
+        load "$path/bats-support/load"
+        load "$path/bats-assert/load"
+        break
+    fi
+done
 
 setup() {
     # テスト用の一時ディレクトリを作成
