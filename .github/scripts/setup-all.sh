@@ -28,4 +28,9 @@ echo "2. ブランチ自動削除の設定を実行します..."
 bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
 echo ""
 
+# GitHub Project のセットアップ
+echo "3. GitHub Project のセットアップを実行します..."
+bash "$SCRIPT_DIR/setup-github-project.sh"
+echo ""
+
 echo "すべてのセットアップが完了しました！"
