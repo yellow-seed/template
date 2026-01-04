@@ -46,16 +46,22 @@ teardown() {
 echo "setup-rulesets.sh called"
 EOF
     chmod +x "$TEST_DIR/setup-rulesets.sh"
-    
+
     cat > "$TEST_DIR/setup-branch-auto-delete.sh" <<'EOF'
 #!/bin/bash
 echo "setup-branch-auto-delete.sh called"
 EOF
     chmod +x "$TEST_DIR/setup-branch-auto-delete.sh"
-    
+
+    cat > "$TEST_DIR/setup-labels.sh" <<'EOF'
+#!/bin/bash
+echo "setup-labels.sh called"
+EOF
+    chmod +x "$TEST_DIR/setup-labels.sh"
+
     # スクリプトを実行（実際のスクリプトは呼ばれないようにモックを使用）
     run bash "$SCRIPT_DIR/setup-all.sh"
-    
+
     # 実際のスクリプトはモックを呼び出すため、エラーになる可能性がある
     # このテストはスクリプトの構造を確認するだけ
     assert_success || assert_failure  # どちらでもOK（モックのため）

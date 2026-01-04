@@ -28,4 +28,9 @@ echo "2. ブランチ自動削除の設定を実行します..."
 bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
 echo ""
 
+# ラベルの設定
+echo "3. ラベルの設定を実行します..."
+bash "$SCRIPT_DIR/setup-labels.sh"
+echo ""
+
 echo "すべてのセットアップが完了しました！"

@@ -1,0 +1,138 @@
+#!/usr/bin/env bats
+
+# setup-labels.sh のテスト
+
+# batsライブラリを環境に応じて読み込む
+# Ubuntu: /usr/lib/bats, macOS (Homebrew): /usr/local/lib/bats
+for path in /usr/lib/bats /usr/local/lib/bats /opt/homebrew/lib/bats; do
+    if [ -f "$path/bats-support/load" ]; then
+        load "$path/bats-support/load"
+        load "$path/bats-assert/load"
+        break
+    fi
+done
+
+setup() {
+    # テスト用の一時ディレクトリを作成
+    TEST_DIR=$(mktemp -d)
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+    # モック用のパスを設定
+    export PATH="$TEST_DIR:$PATH"
+
+    # モックのghコマンドを作成
+    cat > "$TEST_DIR/gh" <<'EOF'
+#!/bin/bash
+case "$1" in
+    repo)
+        if [ "$2" = "view" ]; then
+            echo '{"nameWithOwner":"test-owner/test-repo"}'
+        fi
+        ;;
+    label)
+        case "$2" in
+            list)
+                # 既存のラベルをシミュレート（bug と enhancement は存在、todo は未存在）
+                echo '[{"name":"bug"},{"name":"enhancement"}]'
+                ;;
+            create)
+                # ラベル作成のモック
+                exit 0
+                ;;
+            edit)
+                # ラベル編集のモック
+                exit 0
+                ;;
+        esac
+        ;;
+esac
+exit 0
+EOF
+    chmod +x "$TEST_DIR/gh"
+}
+
+teardown() {
+    # 一時ディレクトリを削除
+    rm -rf "$TEST_DIR"
+}
+
+@test "setup-labels.sh が存在する" {
+    assert [ -f "$SCRIPT_DIR/setup-labels.sh" ]
+}
+
+@test "setup-labels.sh が実行可能である" {
+    assert [ -x "$SCRIPT_DIR/setup-labels.sh" ]
+}
+
+@test "setup-labels.sh が正しいshebangを持っている" {
+    run head -n 1 "$SCRIPT_DIR/setup-labels.sh"
+    assert_output "#!/bin/bash"
+}
+
+@test "DRY_RUNモードで実際の変更を行わない" {
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-labels.sh"
+    assert_success
+    assert_output --partial "[DRY-RUN モード]"
+    assert_output --partial "実際の変更は行いません"
+}
+
+@test "リポジトリ情報を正しく取得する" {
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-labels.sh"
+    assert_success
+    assert_output --partial "test-owner/test-repo"
+}
+
+@test "必要なラベルが定義されている" {
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-labels.sh"
+    assert_success
+    assert_output --partial "bug"
+    assert_output --partial "enhancement"
+    assert_output --partial "todo"
+}
+
+@test "既存のラベルを更新する" {
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-labels.sh"
+    assert_success
+    assert_output --partial "既存のラベルが見つかりました"
+}
+
+@test "新規ラベルを作成する" {
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-labels.sh"
+    assert_success
+    assert_output --partial "ラベルが存在しません"
+    assert_output --partial "ラベルを作成します: todo"
+}
+
+@test "リポジトリが見つからない場合にエラーを表示する" {
+    # ghコマンドを更新してリポジトリが見つからないようにする
+    cat > "$TEST_DIR/gh" <<'EOF'
+#!/bin/bash
+case "$1" in
+    repo)
+        if [ "$2" = "view" ]; then
+            exit 1
+        fi
+        ;;
+esac
+exit 1
+EOF
+    chmod +x "$TEST_DIR/gh"
+
+    run bash "$SCRIPT_DIR/setup-labels.sh"
+    assert_failure
+    assert_output --partial "GitHub リポジトリが見つかりません"
+}
+
+@test "ラベルの色が正しく設定されている" {
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-labels.sh"
+    assert_success
+    assert_output --partial "d73a4a"  # bug の色
+    assert_output --partial "a2eeef"  # enhancement の色
+    assert_output --partial "0e8a16"  # todo の色
+}
