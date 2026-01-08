@@ -53,6 +53,12 @@ echo "setup-branch-auto-delete.sh called"
 EOF
     chmod +x "$TEST_DIR/setup-branch-auto-delete.sh"
 
+    cat > "$TEST_DIR/setup-labels.sh" <<'EOF'
+#!/bin/bash
+echo "setup-labels.sh called"
+EOF
+    chmod +x "$TEST_DIR/setup-labels.sh"
+
     cat > "$TEST_DIR/setup-github-project.sh" <<'EOF'
 #!/bin/bash
 echo "setup-github-project.sh called"
