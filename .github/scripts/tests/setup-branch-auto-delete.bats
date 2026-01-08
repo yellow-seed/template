@@ -3,14 +3,20 @@
 # setup-branch-auto-delete.sh のテスト
 
 # batsライブラリを環境に応じて読み込む
-# Ubuntu: /usr/lib/bats, macOS (Homebrew): /usr/local/lib/bats
-for path in /usr/lib/bats /usr/local/lib/bats /opt/homebrew/lib/bats; do
-    if [ -f "$path/bats-support/load" ]; then
-        load "$path/bats-support/load"
-        load "$path/bats-assert/load"
-        break
-    fi
-done
+# Ubuntu: /usr/lib/bats-support, macOS (Homebrew): /usr/local/lib/bats
+if [ -f "/usr/lib/bats-support/load.bash" ]; then
+    # Ubuntu (apt install bats-support bats-assert)
+    load "/usr/lib/bats-support/load.bash"
+    load "/usr/lib/bats-assert/load.bash"
+elif [ -f "/usr/local/lib/bats/bats-support/load" ]; then
+    # macOS Homebrew
+    load "/usr/local/lib/bats/bats-support/load"
+    load "/usr/local/lib/bats/bats-assert/load"
+elif [ -f "/opt/homebrew/lib/bats/bats-support/load" ]; then
+    # macOS Homebrew (Apple Silicon)
+    load "/opt/homebrew/lib/bats/bats-support/load"
+    load "/opt/homebrew/lib/bats/bats-assert/load"
+fi
 
 setup() {
     # テスト用の一時ディレクトリを作成
