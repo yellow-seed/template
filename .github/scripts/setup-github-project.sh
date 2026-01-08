@@ -100,37 +100,44 @@ echo -e "${GREEN}Projectのフィールドを設定中...${NC}"
 # Status フィールド（デフォルトで存在する可能性があるので確認）
 echo "Status フィールドを確認中..."
 STATUS_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --format json 2>/dev/null | jq -r '.fields[] | select(.name == "Status") | .id' || echo "")
+PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
 
-if [ -z "$STATUS_FIELD" ]; then
-    echo "Status フィールドを作成中..."
-    gh project field-create "$PROJECT_NUMBER" --owner "$OWNER" --data-type "SINGLE_SELECT" --name "Status" 2>/dev/null || true
-
-    # フィールドIDを再取得
-    STATUS_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --format json 2>/dev/null | jq -r '.fields[] | select(.name == "Status") | .id' || echo "")
-fi
-
-# Statusフィールドにオプションを追加
 if [ -n "$STATUS_FIELD" ]; then
-    echo "Status フィールドにオプションを追加中..."
-    for option in "Todo" "In Progress" "Done"; do
-        gh api graphql -f query='
-          mutation($projectId: ID!, $fieldId: ID!, $name: String!) {
-            addProjectV2SingleSelectFieldOption(input: {
-              projectId: $projectId
-              fieldId: $fieldId
-              name: $name
-            }) {
-              projectV2SingleSelectFieldOption {
-                id
-                name
-              }
-            }
-          }' -f projectId="$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')" -f fieldId="$STATUS_FIELD" -f name="$option" 2>/dev/null || true
-    done
-    echo -e "${GREEN}Status フィールドを設定しました${NC}"
-else
-    echo -e "${YELLOW}Status フィールドの作成をスキップしました${NC}"
+    # デフォルトのStatusフィールドが存在する場合は削除して再作成
+    echo "既存のStatus フィールドを削除中..."
+    gh api graphql -f query="
+      mutation(\$fieldId: ID!) {
+        deleteProjectV2Field(input: {
+          fieldId: \$fieldId
+        }) {
+          projectV2Field {
+            id
+          }
+        }
+      }" -f fieldId="$STATUS_FIELD" > /dev/null 2>&1 || true
 fi
+
+echo "Status フィールドを作成中..."
+cat > /tmp/gh-project-status.json <<EOF
+{
+  "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
+  "variables": {
+    "projectId": "$PROJECT_ID",
+    "name": "Status",
+    "dataType": "SINGLE_SELECT",
+    "options": [
+      {"name": "Todo", "color": "GRAY", "description": ""},
+      {"name": "Ready", "color": "BLUE", "description": ""},
+      {"name": "In Progress", "color": "YELLOW", "description": ""},
+      {"name": "Done", "color": "GREEN", "description": ""}
+    ]
+  }
+}
+EOF
+gh api graphql --input /tmp/gh-project-status.json > /dev/null 2>&1 || true
+rm -f /tmp/gh-project-status.json
+
+echo -e "${GREEN}Status フィールドを設定しました${NC}"
 
 # Priority フィールド
 echo "Priority フィールドを確認中..."
@@ -138,34 +145,30 @@ PRIORITY_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --form
 
 if [ -z "$PRIORITY_FIELD" ]; then
     echo "Priority フィールドを作成中..."
-    gh project field-create "$PROJECT_NUMBER" --owner "$OWNER" --data-type "SINGLE_SELECT" --name "Priority" 2>/dev/null || true
-
-    # フィールドIDを再取得
-    PRIORITY_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --format json 2>/dev/null | jq -r '.fields[] | select(.name == "Priority") | .id' || echo "")
-fi
-
-# Priorityフィールドにオプションを追加
-if [ -n "$PRIORITY_FIELD" ]; then
-    echo "Priority フィールドにオプションを追加中..."
     PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
-    for option in "Low" "Medium" "High" "Critical"; do
-        gh api graphql -f query='
-          mutation($projectId: ID!, $fieldId: ID!, $name: String!) {
-            addProjectV2SingleSelectFieldOption(input: {
-              projectId: $projectId
-              fieldId: $fieldId
-              name: $name
-            }) {
-              projectV2SingleSelectFieldOption {
-                id
-                name
-              }
-            }
-          }' -f projectId="$PROJECT_ID" -f fieldId="$PRIORITY_FIELD" -f name="$option" 2>/dev/null || true
-    done
+
+    cat > /tmp/gh-project-priority.json <<EOF
+{
+  "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
+  "variables": {
+    "projectId": "$PROJECT_ID",
+    "name": "Priority",
+    "dataType": "SINGLE_SELECT",
+    "options": [
+      {"name": "Low", "color": "GRAY", "description": ""},
+      {"name": "Medium", "color": "YELLOW", "description": ""},
+      {"name": "High", "color": "ORANGE", "description": ""},
+      {"name": "Critical", "color": "RED", "description": ""}
+    ]
+  }
+}
+EOF
+    gh api graphql --input /tmp/gh-project-priority.json > /dev/null 2>&1 || true
+    rm -f /tmp/gh-project-priority.json
+
     echo -e "${GREEN}Priority フィールドを設定しました${NC}"
 else
-    echo -e "${YELLOW}Priority フィールドの作成をスキップしました${NC}"
+    echo -e "${YELLOW}Priority フィールドは既に存在します${NC}"
 fi
 
 # Category フィールド
@@ -174,41 +177,60 @@ CATEGORY_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --form
 
 if [ -z "$CATEGORY_FIELD" ]; then
     echo "Category フィールドを作成中..."
-    gh project field-create "$PROJECT_NUMBER" --owner "$OWNER" --data-type "SINGLE_SELECT" --name "Category" 2>/dev/null || true
-
-    # フィールドIDを再取得
-    CATEGORY_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --format json 2>/dev/null | jq -r '.fields[] | select(.name == "Category") | .id' || echo "")
-fi
-
-# Categoryフィールドにオプションを追加
-if [ -n "$CATEGORY_FIELD" ]; then
-    echo "Category フィールドにオプションを追加中..."
     PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
-    for option in "Feature" "Bug" "Enhancement" "Documentation" "Refactor"; do
-        gh api graphql -f query='
-          mutation($projectId: ID!, $fieldId: ID!, $name: String!) {
-            addProjectV2SingleSelectFieldOption(input: {
-              projectId: $projectId
-              fieldId: $fieldId
-              name: $name
-            }) {
-              projectV2SingleSelectFieldOption {
-                id
-                name
-              }
-            }
-          }' -f projectId="$PROJECT_ID" -f fieldId="$CATEGORY_FIELD" -f name="$option" 2>/dev/null || true
-    done
+
+    cat > /tmp/gh-project-category.json <<EOF
+{
+  "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
+  "variables": {
+    "projectId": "$PROJECT_ID",
+    "name": "Category",
+    "dataType": "SINGLE_SELECT",
+    "options": [
+      {"name": "Feature", "color": "BLUE", "description": ""},
+      {"name": "Bug", "color": "RED", "description": ""},
+      {"name": "Enhancement", "color": "PURPLE", "description": ""},
+      {"name": "Documentation", "color": "GRAY", "description": ""},
+      {"name": "Refactor", "color": "PINK", "description": ""}
+    ]
+  }
+}
+EOF
+    gh api graphql --input /tmp/gh-project-category.json > /dev/null 2>&1 || true
+    rm -f /tmp/gh-project-category.json
+
     echo -e "${GREEN}Category フィールドを設定しました${NC}"
 else
-    echo -e "${YELLOW}Category フィールドの作成をスキップしました${NC}"
+    echo -e "${YELLOW}Category フィールドは既に存在します${NC}"
 fi
 
 echo ""
 echo -e "${GREEN}セットアップが完了しました！${NC}"
 echo -e "Project URL: https://github.com/users/$OWNER/projects/$PROJECT_NUMBER"
 echo ""
+
+# Projectにリポジトリをリンク
+echo "Projectにリポジトリをリンク中..."
+PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
+REPO_ID=$(gh repo view --json id -q .id)
+
+gh api graphql -f query="
+  mutation(\$projectId: ID!, \$repositoryId: ID!) {
+    linkProjectV2ToRepository(input: {
+      projectId: \$projectId
+      repositoryId: \$repositoryId
+    }) {
+      repository {
+        id
+      }
+    }
+  }" -f projectId="$PROJECT_ID" -f repositoryId="$REPO_ID" > /dev/null 2>&1 || echo -e "${YELLOW}リポジトリのリンクをスキップしました（既にリンクされている可能性があります）${NC}"
+
+echo ""
 echo "次のステップ:"
 echo "1. Projectページでビュー（Board/Table）をカスタマイズできます"
-echo "2. リポジトリの設定でIssueの自動追加を有効にできます"
-echo "3. gh project item-add コマンドで既存のIssueを追加できます"
+echo "2. 新しいIssueは自動的にTodoステータスで追加されます"
+echo "3. 既存のIssueを追加: gh project item-add $PROJECT_NUMBER --owner $OWNER --url <issue-url>"
+echo ""
+echo -e "${GREEN}Issueを作成すると、自動的にProjectのTodoステータスに追加されます${NC}"
+echo -e "次に取り掛かるIssueは、TodoからReadyに移動してください"
