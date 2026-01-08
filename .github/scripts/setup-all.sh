@@ -33,4 +33,9 @@ echo "3. ラベルの設定を実行します..."
 bash "$SCRIPT_DIR/setup-labels.sh"
 echo ""
 
+# GitHub Project のセットアップ
+echo "4. GitHub Project のセットアップを実行します..."
+bash "$SCRIPT_DIR/setup-github-project.sh"
+echo ""
+
 echo "すべてのセットアップが完了しました！"

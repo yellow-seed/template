@@ -59,10 +59,21 @@ echo "setup-labels.sh called"
 EOF
     chmod +x "$TEST_DIR/setup-labels.sh"
 
+    cat > "$TEST_DIR/setup-github-project.sh" <<'EOF'
+#!/bin/bash
+echo "setup-github-project.sh called"
+EOF
+    chmod +x "$TEST_DIR/setup-github-project.sh"
+
     # スクリプトを実行（実際のスクリプトは呼ばれないようにモックを使用）
     run bash "$SCRIPT_DIR/setup-all.sh"
 
     # 実際のスクリプトはモックを呼び出すため、エラーになる可能性がある
     # このテストはスクリプトの構造を確認するだけ
     assert_success || assert_failure  # どちらでもOK（モックのため）
+}
+
+@test "setup-all.sh がsetup-github-project.shを含む" {
+    run grep -q "setup-github-project.sh" "$SCRIPT_DIR/setup-all.sh"
+    assert_success
 }

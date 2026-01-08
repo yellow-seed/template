@@ -10,30 +10,42 @@
 
 ### GitHub Actions ワークフロー
 
-- `dependabot.yml` - Dependabotの自動マージ設定
-- `custom_setup.yml` - カスタムセットアップワークフロー
 - `ci.yml` - 複数言語対応のCIワークフロー
+- `actionlint.yml` - GitHub Actions YAMLの構文チェックワークフロー
+- `claude.yml` - Claude AIによるコードレビューワークフロー
+- `copilot-setup-steps.yml` - GitHub Copilotセットアップワークフロー
+- `validate-scripts.yml` - スクリプトの検証ワークフロー
+
+### Dependabot設定
+
+- `.github/dependabot.yml` - 依存関係の自動更新設定
 
 ### Issue/PR テンプレート
 
 - `bug_report.yml` - バグレポートテンプレート
 - `feature_request.yml` - 機能リクエストテンプレート
+- `todo.yml` - TODOタスクテンプレート
 - `PULL_REQUEST_TEMPLATE.md` - プルリクエストテンプレート
 
 ### ドキュメント
 
 - `AGENTS.md` - AIエージェント向けのドキュメント
 - `CLAUDE.md` - Claude向けの設定/ドキュメント
-- `CONTRIBUTING.md` - コントリビューションガイドライン
-- `LICENSE` - ライセンスファイル（MIT）
-- `.github/SECURITY.md` - セキュリティポリシー
-- `LANGUAGE_SETUP.md` - 各言語の基本構成ガイド
+- `docs/GITHUB_RULESET_SETUP.md` - GitHub Rulesetセットアップガイド
 
 ### 設定ファイル
 
 - `.gitignore` - 複数言語対応の.gitignore（Ruby, Python, JavaScript/TypeScript, Go）
-- `.editorconfig` - エディタ設定の統一
-- `.github/CODEOWNERS` - コードオーナー設定
+- `.gitattributes` - Git属性設定
+- `codecov.yml` - Codecovの設定
+
+### Claude Code スキル
+
+- `.claude/skills/test-driven-development/` - TDD開発支援スキル
+- `.claude/skills/github-issue/` - GitHub Issue作成スキル
+- `.claude/skills/code-review/` - コードレビュースキル
+- `.claude/skills/reviewing-security/` - セキュリティレビュースキル
+- `.claude/skills/sample-explaining-code/` - コード説明スキル
 
 ### GitHub Ruleset とブランチ保護設定
 
@@ -43,6 +55,7 @@
 - `.github/scripts/` - セットアップスクリプト
   - `setup-rulesets.sh` - Ruleset を適用するスクリプト
   - `setup-branch-auto-delete.sh` - ブランチ自動削除を有効にするスクリプト
+  - `setup-github-project.sh` - GitHub Project を作成するスクリプト
   - `setup-all.sh` - すべての設定を一括で適用するスクリプト
 
 詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
@@ -69,6 +82,9 @@ chmod +x .github/scripts/setup-rulesets.sh
 
 chmod +x .github/scripts/setup-branch-auto-delete.sh
 ./.github/scripts/setup-branch-auto-delete.sh
+
+chmod +x .github/scripts/setup-github-project.sh
+./.github/scripts/setup-github-project.sh
 ```
 
 詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
