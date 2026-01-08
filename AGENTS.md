@@ -15,7 +15,7 @@
 
 <!-- プロジェクトのディレクトリ構造を説明してください -->
 
-```
+```bash
 project/
 ├── src/
 ├── tests/
@@ -33,6 +33,19 @@ Claude Code on the Web などのリモート環境で GitHub CLI (`gh`) コマ�
 bash .claude/hooks/gh-setup.sh
 ```
 
+### リモート環境での gh コマンド使用方法
+
+gitのremoteがローカルプロキシを経由している環境では、`gh` コマンドがリポジトリを自動認識できない場合があります。その場合は以下の方法を使用してください：
+
+方法: `-R` フラグでリポジトリを明示的に指定
+
+sample
+
+```bash
+gh issue list -R yellow-seed/template
+gh pr view 123 -R yellow-seed/template
+```
+
 ## コーディング規約
 
 <!-- プロジェクトで使用しているコーディング規約を記述してください -->
@@ -43,7 +56,7 @@ bash .claude/hooks/gh-setup.sh
 
 ### 形式
 
-```
+```yml
 <type>: <subject>
 
 <body>
@@ -82,7 +95,7 @@ bash .claude/hooks/gh-setup.sh
 
 ### 例
 
-```
+```git
 feat: add user authentication
 
 Implement JWT-based authentication system with login and logout endpoints.
@@ -90,7 +103,7 @@ Implement JWT-based authentication system with login and logout endpoints.
 Closes #123
 ```
 
-```
+```git
 fix: resolve memory leak in data processing
 
 The issue was caused by not properly releasing resources after processing.
@@ -108,4 +121,3 @@ This fix ensures all resources are cleaned up correctly.
 ## その他の重要な情報
 
 <!-- AIエージェントが知っておくべきその他の情報を記述してください -->
-

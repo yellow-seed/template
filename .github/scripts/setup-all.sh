@@ -28,13 +28,18 @@ echo "2. ブランチ自動削除の設定を実行します..."
 bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
 echo ""
 
+# PRブランチ更新提案の設定
+echo "3. PRブランチ更新提案の設定を実行します..."
+bash "$SCRIPT_DIR/setup-branch-update-suggestion.sh"
+echo ""
+
 # ラベルの設定
-echo "3. ラベルの設定を実行します..."
+echo "4. ラベルの設定を実行します..."
 bash "$SCRIPT_DIR/setup-labels.sh"
 echo ""
 
 # GitHub Project のセットアップ
-echo "4. GitHub Project のセットアップを実行します..."
+echo "5. GitHub Project のセットアップを実行します..."
 bash "$SCRIPT_DIR/setup-github-project.sh"
 echo ""
 
