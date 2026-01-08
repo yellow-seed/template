@@ -169,6 +169,24 @@ This fix ensures all resources are cleaned up correctly.
 
 リモート環境（Claude Code on the Web等）で使用する場合、SessionStart hookとして `.claude/hooks/gh-setup.sh` が実行され、GitHub CLIが自動的にセットアップされます。
 
+#### リモート環境での gh コマンド使用方法
+
+gitのremoteがローカルプロキシを経由している環境では、`gh` コマンドがリポジトリを自動認識できない場合があります。その場合は以下の方法を使用してください：
+
+**方法1: `-R` フラグでリポジトリを明示的に指定**
+```bash
+gh issue list -R yellow-seed/template
+gh pr view 123 -R yellow-seed/template
+```
+
+**方法2: 環境変数 `GITHUB_REPOSITORY` を設定**
+```bash
+export GITHUB_REPOSITORY=yellow-seed/template
+gh issue list
+```
+
+セットアップスクリプトは自動的に `GITHUB_REPOSITORY` 環境変数をサポートしています。
+
 ### GitHub Ruleset
 
 `.github/rulesets/` および `.github/scripts/` にブランチ保護やプロジェクト管理の自動化スクリプトが含まれています。詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
