@@ -30,6 +30,17 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - 要件を理解し、期待する振る舞いを定義
 - テストケースを作成（エッジケース、境界値も考慮）
 - テストを実行して失敗を確認
+
+  ```bash
+  # プロジェクト固有のテストコマンドを実行
+
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
+
+  # 特定のテストファイルのみ実行
+  docker compose run shell-dev bats tests/example.bats
+  ```
+
 - 失敗理由が意図通りであることを確認
 
 ### 2. Green（テストを通す）
@@ -37,15 +48,79 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - テストを通す最小限のコードを実装
 - ハードコードや単純な実装でも可
 - テストが全て通ることを確認
+
+  ```bash
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
+  ```
+
 - 新しいテストで既存テストが壊れていないか確認
 
 ### 3. Refactor（リファクタリング）
+
+#### 3.1. コード改善
 
 - コードの重複を排除
 - 命名を改善
 - 設計パターンの適用
 - パフォーマンス最適化
+
+#### 3.2. ローカルテスト実行
+
 - テストが全て通り続けることを確認
+
+  ```bash
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
+  ```
+
+#### 3.3. ローカルLint/Format実行
+
+- Lintチェックを実行して警告がないことを確認
+
+  ```bash
+  # Shell Script Linting
+  docker compose run shell-dev lint-shell
+  ```
+
+- Lintで問題がある場合には、コードフォーマットを適用する、個別に修正するなどして対応する
+
+  ```bash
+  # Shell Script Formatting (check)
+  docker compose run shell-dev shfmt -d -i 2 .
+
+  # Shell Script Formatting (apply)
+  docker compose run shell-dev shfmt -i 2 -w .
+  ```
+
+- GitHub Actionsワークフローを修正した場合はActionLintを実行
+
+  ```bash
+  # GitHub Actions Linting
+  docker compose run shell-dev actionlint
+  ```
+
+#### 3.4. Git Commit & Push
+
+- すべてのローカルチェックが通ったら、変更をコミット・プッシュ
+
+  ```bash
+  git add .
+  git commit -m "type: description"
+  git push
+  ```
+
+#### 3.5. CI確認
+
+- GitHubでCI/CDパイプラインの実行結果を確認
+- 以下のチェックが全て成功していることを確認:
+  - **Actionlint**: GitHub Actions ワークフローファイルの構文チェック
+  - **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック
+  - **Test**: プロジェクト固有のテスト実行
+- CIが失敗した場合:
+  1. ログを確認してエラー原因を特定
+  2. ローカルで同じコマンドを実行して再現
+  3. 修正後、再度3.2からやり直し
 
 ## テスト品質チェックポイント
 
@@ -75,5 +150,18 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 - リファクタリング内容の説明
 - 改善後のコード
-- テスト実行結果（引き続き成功の確認）
+- ローカルテスト実行結果（引き続き成功の確認）
+- ローカルLint/Formatチェック結果（全て通過）
+- Git Commit & Push の実行
+- CI結果の確認（全てのチェックが成功）
 - 改善のポイント
+
+## GitHub Actions CI
+
+プロジェクトでは以下のCI/CDチェックが自動実行されます:
+
+- **Actionlint**: GitHub Actions ワークフローファイルの構文チェック ([actionlint.yml](.github/workflows/actionlint.yml))
+- **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック ([ci.yml](.github/workflows/ci.yml))
+- **Test**: プロジェクト固有のテスト実行 ([ci.yml](.github/workflows/ci.yml))
+
+CI/CDパイプラインのURL: `https://github.com/{owner}/{repo}/actions`

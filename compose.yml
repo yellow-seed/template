@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  shell-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/workspace
+    working_dir: /workspace

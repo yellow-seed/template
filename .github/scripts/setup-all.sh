@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "GitHub 設定の一括セットアップ"
 echo "=============================="
 if [ "$DRY_RUN" = "1" ]; then
-    echo "[DRY-RUN モード] 実際の変更は行いません"
+  echo "[DRY-RUN モード] 実際の変更は行いません"
 fi
 echo ""
 

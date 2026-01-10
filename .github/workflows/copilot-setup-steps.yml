@@ -10,19 +10,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup project
+      - name: Build Docker environment
         run: |
-          echo "Add your custom setup steps here"
-          # Example:
-          # - Install dependencies
-          # - Run setup scripts
-          # - Configure environment
+          echo "Building Docker Compose environment..."
+          docker compose build
 
-      - name: Run custom tasks
+      - name: Verify environment setup
         run: |
-          echo "Add your custom tasks here"
-          # Example:
-          # - Run tests
-          # - Build artifacts
-          # - Deploy to staging
+          echo "Verifying shell linting tools..."
+          docker compose run --rm shell-dev shellcheck --version
+          docker compose run --rm shell-dev shfmt --version
+          docker compose run --rm shell-dev actionlint --version
+
+      - name: Run shell script linting
+        run: |
+          echo "Running shell linting checks..."
+          docker compose run --rm shell-dev lint-shell
 

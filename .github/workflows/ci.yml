@@ -4,19 +4,36 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/* ]
+    branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/*, claude/* ]
 
 jobs:
   Lint:
-    runs-on: ubuntu-latest
+    name: ShellCheck Lint
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      - name: Run linter
-        run: echo "Add your linting commands here"
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          severity: warning
+          ignore_paths: .git
+
+      - name: Install shfmt
+        run: |
+          curl -sS https://webi.sh/shfmt | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run shfmt check
+        run: |
+          find . -name "*.sh" -type f -print0 | xargs -0 shfmt -d -i 2
 
   Test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
