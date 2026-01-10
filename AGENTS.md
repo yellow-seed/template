@@ -114,6 +114,12 @@ This fix ensures all resources are cleaned up correctly.
 
 <!-- テストの実行方法や戦略を記述してください -->
 
+## Pull Request 作成
+
+このプロジェクトでは、`.github/PULL_REQUEST_TEMPLATE.md`のテンプレート形式に準拠した高品質なPull Requestを作成します。
+
+詳細なガイドラインは [.claude/skills/pull-request/SKILL.md](.claude/skills/pull-request/SKILL.md) を参照してください。
+
 ## デプロイメント
 
 <!-- デプロイメントの手順を記述してください -->

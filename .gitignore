@@ -160,3 +160,6 @@ out/
 *.ipr
 *.iws
 
+# Claude Code
+.claude/settings.local.json
+
