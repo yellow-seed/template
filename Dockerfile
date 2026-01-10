@@ -1,6 +1,6 @@
 # Shell Development Environment
 # This Dockerfile provides a complete shell script development environment
-# with shellcheck, shfmt, and bats-core installed.
+# with shellcheck, shfmt, bats-core, and actionlint installed.
 
 FROM ubuntu:22.04
 
@@ -19,6 +19,12 @@ RUN apt-get update && \
 # Install shfmt
 RUN wget -O /usr/local/bin/shfmt https://github.com/mvdan/sh/releases/download/v3.8.0/shfmt_v3.8.0_linux_amd64 && \
     chmod +x /usr/local/bin/shfmt
+
+# Install actionlint
+RUN wget -O /tmp/actionlint.tar.gz https://github.com/rhysd/actionlint/releases/download/v1.7.4/actionlint_1.7.4_linux_amd64.tar.gz && \
+    tar -xzf /tmp/actionlint.tar.gz -C /usr/local/bin actionlint && \
+    chmod +x /usr/local/bin/actionlint && \
+    rm /tmp/actionlint.tar.gz
 
 # Set working directory
 WORKDIR /workspace

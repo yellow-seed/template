@@ -30,7 +30,7 @@ jobs:
 
       - name: Run shfmt check
         run: |
-          find . -name "*.sh" -type f | xargs shfmt -d -i 2
+          find . -name "*.sh" -type f -print0 | xargs -0 shfmt -d -i 2
 
   Test:
     runs-on: ubuntu-22.04

@@ -58,16 +58,23 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 ### 3. Refactor（リファクタリング）
 
+#### 3.1. コード改善
+
 - コードの重複を排除
 - 命名を改善
 - 設計パターンの適用
 - パフォーマンス最適化
+
+#### 3.2. ローカルテスト実行
+
 - テストが全て通り続けることを確認
 
   ```bash
   # Shell Script Testing (bats)
   docker compose run shell-dev bats tests/
   ```
+
+#### 3.3. ローカルLint/Format実行
 
 - Lintチェックを実行して警告がないことを確認
 
@@ -85,6 +92,35 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   # Shell Script Formatting (apply)
   docker compose run shell-dev shfmt -i 2 -w .
   ```
+
+- GitHub Actionsワークフローを修正した場合はActionLintを実行
+
+  ```bash
+  # GitHub Actions Linting
+  docker compose run shell-dev actionlint
+  ```
+
+#### 3.4. Git Commit & Push
+
+- すべてのローカルチェックが通ったら、変更をコミット・プッシュ
+
+  ```bash
+  git add .
+  git commit -m "type: description"
+  git push
+  ```
+
+#### 3.5. CI確認
+
+- GitHubでCI/CDパイプラインの実行結果を確認
+- 以下のチェックが全て成功していることを確認:
+  - **Actionlint**: GitHub Actions ワークフローファイルの構文チェック
+  - **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック
+  - **Test**: プロジェクト固有のテスト実行
+- CIが失敗した場合:
+  1. ログを確認してエラー原因を特定
+  2. ローカルで同じコマンドを実行して再現
+  3. 修正後、再度3.2からやり直し
 
 ## テスト品質チェックポイント
 
@@ -114,6 +150,18 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 - リファクタリング内容の説明
 - 改善後のコード
-- テスト実行結果（引き続き成功の確認）
-- Lint/Formatチェック結果
+- ローカルテスト実行結果（引き続き成功の確認）
+- ローカルLint/Formatチェック結果（全て通過）
+- Git Commit & Push の実行
+- CI結果の確認（全てのチェックが成功）
 - 改善のポイント
+
+## GitHub Actions CI
+
+プロジェクトでは以下のCI/CDチェックが自動実行されます:
+
+- **Actionlint**: GitHub Actions ワークフローファイルの構文チェック ([actionlint.yml](.github/workflows/actionlint.yml))
+- **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック ([ci.yml](.github/workflows/ci.yml))
+- **Test**: プロジェクト固有のテスト実行 ([ci.yml](.github/workflows/ci.yml))
+
+CI/CDパイプラインのURL: `https://github.com/{owner}/{repo}/actions`
