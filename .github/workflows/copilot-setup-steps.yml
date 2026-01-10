@@ -10,29 +10,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup shell linting environment
+      - name: Build Docker environment
         run: |
-          echo "Installing shell linting tools..."
-          sudo apt-get update
-          sudo apt-get install -y shellcheck wget
+          echo "Building Docker Compose environment..."
+          docker compose build
 
-          # Install shfmt
-          wget -O /usr/local/bin/shfmt https://github.com/mvdan/sh/releases/download/v3.8.0/shfmt_v3.8.0_linux_amd64
-          chmod +x /usr/local/bin/shfmt
-
-          echo "Shell linting environment ready!"
-          shellcheck --version
-          shfmt --version
+      - name: Verify environment setup
+        run: |
+          echo "Verifying shell linting tools..."
+          docker compose run --rm shell-dev shellcheck --version
+          docker compose run --rm shell-dev shfmt --version
+          docker compose run --rm shell-dev actionlint --version
 
       - name: Run shell script linting
         run: |
-          echo "Running shellcheck on all shell scripts..."
-          find . -name "*.sh" -type f -print0 | xargs -0 shellcheck --severity=warning || true
-
-          echo ""
-          echo "Checking shell script formatting with shfmt..."
-          find . -name "*.sh" -type f -print0 | xargs -0 shfmt -i 2 -ci -bn -d || true
-
-          echo ""
-          echo "Shell linting checks completed!"
+          echo "Running shell linting checks..."
+          docker compose run --rm shell-dev lint-shell
 
