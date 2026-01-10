@@ -147,7 +147,7 @@ if [ -z "$PRIORITY_FIELD" ]; then
   echo "Priority フィールドを作成中..."
   PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
 
-  cat >/tmp/gh-project-priority.json <<EOF
+  cat >/tmp/gh-project-priority.json <<-EOF
 {
   "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
   "variables": {
@@ -179,7 +179,7 @@ if [ -z "$CATEGORY_FIELD" ]; then
   echo "Category フィールドを作成中..."
   PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
 
-  cat >/tmp/gh-project-category.json <<EOF
+  cat >/tmp/gh-project-category.json <<-EOF
 {
   "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
   "variables": {

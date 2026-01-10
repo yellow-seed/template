@@ -54,16 +54,16 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 # Detect architecture
 ARCH=$(uname -m)
 case "$ARCH" in
-  x86_64)
-    GH_ARCH="amd64"
-    ;;
-  aarch64 | arm64)
-    GH_ARCH="arm64"
-    ;;
-  *)
-    log "Unsupported architecture: $ARCH"
-    exit 0 # Fail-safe: exit 0 even on failure
-    ;;
+x86_64)
+  GH_ARCH="amd64"
+  ;;
+aarch64 | arm64)
+  GH_ARCH="arm64"
+  ;;
+*)
+  log "Unsupported architecture: $ARCH"
+  exit 0 # Fail-safe: exit 0 even on failure
+  ;;
 esac
 
 # Download and install gh CLI

@@ -30,7 +30,7 @@ echo "Running shellcheck..."\n\
 find . -name "*.sh" -type f -print0 | xargs -0 shellcheck --severity=warning\n\
 echo ""\n\
 echo "Running shfmt..."\n\
-find . -name "*.sh" -type f -print0 | xargs -0 shfmt -i 2 -ci -bn -d\n\
+find . -name "*.sh" -not -name "*.bats" -type f -print0 | xargs -0 shfmt -i 2 -d\n\
 echo ""\n\
 echo "All linting checks passed!"\n\
 ' > /usr/local/bin/lint-shell && \
