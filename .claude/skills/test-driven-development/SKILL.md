@@ -110,17 +110,25 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   git push
   ```
 
-#### 3.5. CI確認
+#### 3.5. Pull Request 作成
 
-- GitHubでCI/CDパイプラインの実行結果を確認
+- Pull Requestを作成（詳細は [.claude/skills/pull-request/SKILL.md](../pull-request/SKILL.md) を参照）
+
+  ```bash
+  gh pr create --title "type: description" --body "..."
+  ```
+
+#### 3.6. CI確認
+
+- Pull Request作成後、GitHubでCI/CDパイプラインが自動実行される
 - 以下のチェックが全て成功していることを確認:
   - **Actionlint**: GitHub Actions ワークフローファイルの構文チェック
   - **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック
   - **Test**: プロジェクト固有のテスト実行
 - CIが失敗した場合:
-  1. ログを確認してエラー原因を特定
+  1. PRページでログを確認してエラー原因を特定
   2. ローカルで同じコマンドを実行して再現
-  3. 修正後、再度3.2からやり直し
+  3. 修正後、コミット・プッシュしてCIが再実行されるのを確認
 
 ## テスト品質チェックポイント
 
@@ -153,7 +161,8 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - ローカルテスト実行結果（引き続き成功の確認）
 - ローカルLint/Formatチェック結果（全て通過）
 - Git Commit & Push の実行
-- CI結果の確認（全てのチェックが成功）
+- Pull Request 作成
+- CI結果の確認（PR作成後に自動実行、全てのチェックが成功）
 - 改善のポイント
 
 ## GitHub Actions CI
