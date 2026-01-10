@@ -1,6 +1,6 @@
-# Shell Linting Environment
-# This Dockerfile provides a complete shell script linting environment
-# with shellcheck and shfmt installed.
+# Shell Development Environment
+# This Dockerfile provides a complete shell script development environment
+# with shellcheck, shfmt, and bats-core installed.
 
 FROM ubuntu:22.04
 
@@ -13,6 +13,7 @@ RUN apt-get update && \
     shellcheck \
     wget \
     git \
+    bats \
     && rm -rf /var/lib/apt/lists/*
 
 # Install shfmt

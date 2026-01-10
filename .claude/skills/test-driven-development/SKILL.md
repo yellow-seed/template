@@ -30,6 +30,17 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - 要件を理解し、期待する振る舞いを定義
 - テストケースを作成（エッジケース、境界値も考慮）
 - テストを実行して失敗を確認
+
+  ```bash
+  # プロジェクト固有のテストコマンドを実行
+
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
+
+  # 特定のテストファイルのみ実行
+  docker compose run shell-dev bats tests/example.bats
+  ```
+
 - 失敗理由が意図通りであることを確認
 
 ### 2. Green（テストを通す）
@@ -37,6 +48,12 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - テストを通す最小限のコードを実装
 - ハードコードや単純な実装でも可
 - テストが全て通ることを確認
+
+  ```bash
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
+  ```
+
 - 新しいテストで既存テストが壊れていないか確認
 
 ### 3. Refactor（リファクタリング）
@@ -46,6 +63,28 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - 設計パターンの適用
 - パフォーマンス最適化
 - テストが全て通り続けることを確認
+
+  ```bash
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
+  ```
+
+- Lintチェックを実行して警告がないことを確認
+
+  ```bash
+  # Shell Script Linting
+  docker compose run shell-dev lint-shell
+  ```
+
+- Lintで問題がある場合には、コードフォーマットを適用する、個別に修正するなどして対応する
+
+  ```bash
+  # Shell Script Formatting (check)
+  docker compose run shell-dev shfmt -d -i 2 .
+
+  # Shell Script Formatting (apply)
+  docker compose run shell-dev shfmt -i 2 -w .
+  ```
 
 ## テスト品質チェックポイント
 
@@ -76,4 +115,5 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - リファクタリング内容の説明
 - 改善後のコード
 - テスト実行結果（引き続き成功の確認）
+- Lint/Formatチェック結果
 - 改善のポイント

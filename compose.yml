@@ -1,11 +1,10 @@
 version: '3.8'
 
 services:
-  shell-linting:
+  shell-dev:
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - .:/workspace
     working_dir: /workspace
-    command: lint-shell
