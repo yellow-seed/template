@@ -14,17 +14,22 @@ RUN apt-get update && \
     wget \
     git \
     bats \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install shfmt
-RUN wget -O /usr/local/bin/shfmt https://github.com/mvdan/sh/releases/download/v3.8.0/shfmt_v3.8.0_linux_amd64 && \
-    chmod +x /usr/local/bin/shfmt
+# Install Go 1.23 (required for shfmt v3.12.0)
+RUN wget -O /tmp/go.tar.gz https://go.dev/dl/go1.23.5.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf /tmp/go.tar.gz && \
+    rm /tmp/go.tar.gz
+ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
 
-# Install actionlint
-RUN wget -O /tmp/actionlint.tar.gz https://github.com/rhysd/actionlint/releases/download/v1.7.4/actionlint_1.7.4_linux_amd64.tar.gz && \
-    tar -xzf /tmp/actionlint.tar.gz -C /usr/local/bin actionlint && \
-    chmod +x /usr/local/bin/actionlint && \
-    rm /tmp/actionlint.tar.gz
+# Install shfmt via go install (secure and maintainable)
+RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.12.0 && \
+    mv /root/go/bin/shfmt /usr/local/bin/shfmt
+
+# Install actionlint via go install (secure and maintainable)
+RUN go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.5 && \
+    mv /root/go/bin/actionlint /usr/local/bin/actionlint
 
 # Set working directory
 WORKDIR /workspace
