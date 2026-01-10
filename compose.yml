@@ -4,7 +4,7 @@ services:
   shell-linting:
     build:
       context: .
-      dockerfile: Dockerfile.shell-linting
+      dockerfile: Dockerfile
     volumes:
       - .:/workspace
     working_dir: /workspace
