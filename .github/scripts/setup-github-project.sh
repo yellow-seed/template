@@ -18,31 +18,31 @@ echo -e "${GREEN}GitHub Project セットアップスクリプト${NC}"
 echo "=================================="
 
 if [ "$DRY_RUN" = "1" ]; then
-    echo -e "${YELLOW}[DRY-RUN モード] 実際の変更は行いません${NC}"
-    echo ""
+  echo -e "${YELLOW}[DRY-RUN モード] 実際の変更は行いません${NC}"
+  echo ""
 fi
 
 # GitHub CLI がインストールされているか確認
-if ! command -v gh &> /dev/null; then
-    echo -e "${RED}エラー: GitHub CLI (gh) がインストールされていません${NC}"
-    echo "インストール方法: https://cli.github.com/"
-    exit 1
+if ! command -v gh &>/dev/null; then
+  echo -e "${RED}エラー: GitHub CLI (gh) がインストールされていません${NC}"
+  echo "インストール方法: https://cli.github.com/"
+  exit 1
 fi
 
 # GitHub CLI にログインしているか確認
-if ! gh auth status &> /dev/null; then
-    echo -e "${YELLOW}GitHub CLI にログインしていません${NC}"
-    echo "ログインを実行します..."
-    gh auth login
+if ! gh auth status &>/dev/null; then
+  echo -e "${YELLOW}GitHub CLI にログインしていません${NC}"
+  echo "ログインを実行します..."
+  gh auth login
 fi
 
 # リポジトリ情報を取得
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "")
 
 if [ -z "$REPO" ]; then
-    echo -e "${RED}エラー: リポジトリ情報を取得できませんでした${NC}"
-    echo "リポジトリのディレクトリで実行してください"
-    exit 1
+  echo -e "${RED}エラー: リポジトリ情報を取得できませんでした${NC}"
+  echo "リポジトリのディレクトリで実行してください"
+  exit 1
 fi
 
 REPO_NAME=$(gh repo view --json name -q .name 2>/dev/null || echo "")
@@ -59,38 +59,38 @@ echo "既存のProjectを確認中..."
 EXISTING_PROJECT=$(gh project list --owner "$OWNER" --format json 2>/dev/null | jq -r ".projects[] | select(.title == \"$PROJECT_TITLE\") | .number" || echo "")
 
 if [ -n "$EXISTING_PROJECT" ]; then
-    echo -e "${YELLOW}既存のProject「$PROJECT_TITLE」が見つかりました (番号: $EXISTING_PROJECT)${NC}"
+  echo -e "${YELLOW}既存のProject「$PROJECT_TITLE」が見つかりました (番号: $EXISTING_PROJECT)${NC}"
 
-    if [ "$DRY_RUN" = "1" ]; then
-        echo -e "${YELLOW}[DRY-RUN] Projectは既に存在します（スキップ）${NC}"
-        exit 0
+  if [ "$DRY_RUN" = "1" ]; then
+    echo -e "${YELLOW}[DRY-RUN] Projectは既に存在します（スキップ）${NC}"
+    exit 0
+  else
+    read -p "既存のProjectを使用しますか? (Y/n): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+      PROJECT_NUMBER="$EXISTING_PROJECT"
+      echo -e "${GREEN}既存のProjectを使用します${NC}"
     else
-        read -p "既存のProjectを使用しますか? (Y/n): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-            PROJECT_NUMBER="$EXISTING_PROJECT"
-            echo -e "${GREEN}既存のProjectを使用します${NC}"
-        else
-            echo -e "${YELLOW}スクリプトを終了します${NC}"
-            exit 0
-        fi
+      echo -e "${YELLOW}スクリプトを終了します${NC}"
+      exit 0
     fi
+  fi
 else
-    if [ "$DRY_RUN" = "1" ]; then
-        echo -e "${YELLOW}[DRY-RUN] 新しいProject「$PROJECT_TITLE」を作成します（スキップ）${NC}"
-        exit 0
-    else
-        # 新しいProjectを作成
-        echo -e "${GREEN}新しいProject「$PROJECT_TITLE」を作成中...${NC}"
-        PROJECT_NUMBER=$(gh project create --owner "$OWNER" --title "$PROJECT_TITLE" --format json 2>/dev/null | jq -r '.number')
+  if [ "$DRY_RUN" = "1" ]; then
+    echo -e "${YELLOW}[DRY-RUN] 新しいProject「$PROJECT_TITLE」を作成します（スキップ）${NC}"
+    exit 0
+  else
+    # 新しいProjectを作成
+    echo -e "${GREEN}新しいProject「$PROJECT_TITLE」を作成中...${NC}"
+    PROJECT_NUMBER=$(gh project create --owner "$OWNER" --title "$PROJECT_TITLE" --format json 2>/dev/null | jq -r '.number')
 
-        if [ -z "$PROJECT_NUMBER" ]; then
-            echo -e "${RED}エラー: Projectの作成に失敗しました${NC}"
-            exit 1
-        fi
-
-        echo -e "${GREEN}Project #$PROJECT_NUMBER を作成しました${NC}"
+    if [ -z "$PROJECT_NUMBER" ]; then
+      echo -e "${RED}エラー: Projectの作成に失敗しました${NC}"
+      exit 1
     fi
+
+    echo -e "${GREEN}Project #$PROJECT_NUMBER を作成しました${NC}"
+  fi
 fi
 
 # Projectのフィールドを設定
@@ -103,9 +103,9 @@ STATUS_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --format
 PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
 
 if [ -n "$STATUS_FIELD" ]; then
-    # デフォルトのStatusフィールドが存在する場合は削除して再作成
-    echo "既存のStatus フィールドを削除中..."
-    gh api graphql -f query="
+  # デフォルトのStatusフィールドが存在する場合は削除して再作成
+  echo "既存のStatus フィールドを削除中..."
+  gh api graphql -f query="
       mutation(\$fieldId: ID!) {
         deleteProjectV2Field(input: {
           fieldId: \$fieldId
@@ -114,11 +114,11 @@ if [ -n "$STATUS_FIELD" ]; then
             id
           }
         }
-      }" -f fieldId="$STATUS_FIELD" > /dev/null 2>&1 || true
+      }" -f fieldId="$STATUS_FIELD" >/dev/null 2>&1 || true
 fi
 
 echo "Status フィールドを作成中..."
-cat > /tmp/gh-project-status.json <<EOF
+cat >/tmp/gh-project-status.json <<EOF
 {
   "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
   "variables": {
@@ -134,7 +134,7 @@ cat > /tmp/gh-project-status.json <<EOF
   }
 }
 EOF
-gh api graphql --input /tmp/gh-project-status.json > /dev/null 2>&1 || true
+gh api graphql --input /tmp/gh-project-status.json >/dev/null 2>&1 || true
 rm -f /tmp/gh-project-status.json
 
 echo -e "${GREEN}Status フィールドを設定しました${NC}"
@@ -144,10 +144,10 @@ echo "Priority フィールドを確認中..."
 PRIORITY_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --format json 2>/dev/null | jq -r '.fields[] | select(.name == "Priority") | .id' || echo "")
 
 if [ -z "$PRIORITY_FIELD" ]; then
-    echo "Priority フィールドを作成中..."
-    PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
+  echo "Priority フィールドを作成中..."
+  PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
 
-    cat > /tmp/gh-project-priority.json <<EOF
+  cat >/tmp/gh-project-priority.json <<EOF
 {
   "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
   "variables": {
@@ -163,12 +163,12 @@ if [ -z "$PRIORITY_FIELD" ]; then
   }
 }
 EOF
-    gh api graphql --input /tmp/gh-project-priority.json > /dev/null 2>&1 || true
-    rm -f /tmp/gh-project-priority.json
+  gh api graphql --input /tmp/gh-project-priority.json >/dev/null 2>&1 || true
+  rm -f /tmp/gh-project-priority.json
 
-    echo -e "${GREEN}Priority フィールドを設定しました${NC}"
+  echo -e "${GREEN}Priority フィールドを設定しました${NC}"
 else
-    echo -e "${YELLOW}Priority フィールドは既に存在します${NC}"
+  echo -e "${YELLOW}Priority フィールドは既に存在します${NC}"
 fi
 
 # Category フィールド
@@ -176,10 +176,10 @@ echo "Category フィールドを確認中..."
 CATEGORY_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --format json 2>/dev/null | jq -r '.fields[] | select(.name == "Category") | .id' || echo "")
 
 if [ -z "$CATEGORY_FIELD" ]; then
-    echo "Category フィールドを作成中..."
-    PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
+  echo "Category フィールドを作成中..."
+  PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
 
-    cat > /tmp/gh-project-category.json <<EOF
+  cat >/tmp/gh-project-category.json <<EOF
 {
   "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
   "variables": {
@@ -196,12 +196,12 @@ if [ -z "$CATEGORY_FIELD" ]; then
   }
 }
 EOF
-    gh api graphql --input /tmp/gh-project-category.json > /dev/null 2>&1 || true
-    rm -f /tmp/gh-project-category.json
+  gh api graphql --input /tmp/gh-project-category.json >/dev/null 2>&1 || true
+  rm -f /tmp/gh-project-category.json
 
-    echo -e "${GREEN}Category フィールドを設定しました${NC}"
+  echo -e "${GREEN}Category フィールドを設定しました${NC}"
 else
-    echo -e "${YELLOW}Category フィールドは既に存在します${NC}"
+  echo -e "${YELLOW}Category フィールドは既に存在します${NC}"
 fi
 
 echo ""
@@ -224,7 +224,7 @@ gh api graphql -f query="
         id
       }
     }
-  }" -f projectId="$PROJECT_ID" -f repositoryId="$REPO_ID" > /dev/null 2>&1 || echo -e "${YELLOW}リポジトリのリンクをスキップしました（既にリンクされている可能性があります）${NC}"
+  }" -f projectId="$PROJECT_ID" -f repositoryId="$REPO_ID" >/dev/null 2>&1 || echo -e "${YELLOW}リポジトリのリンクをスキップしました（既にリンクされている可能性があります）${NC}"
 
 echo ""
 echo "次のステップ:"
