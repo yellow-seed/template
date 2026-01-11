@@ -1,0 +1,21 @@
+name: Add to Project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Add to project
+        uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/yellow-seed/projects/16
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
