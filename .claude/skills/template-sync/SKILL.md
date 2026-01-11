@@ -25,14 +25,18 @@ templateリポジトリの更新内容を、このテンプレートを基に作
 
 | 要素 | ファイルパス | 同期戦略 |
 | ----- | ------------- | ------------- |
-| GitHub Actions | `.github/workflows/` | 新規ワークフローを追加、既存は保持 |
-| CI/CD設定 | `.github/` | テンプレートの新機能を提案 |
+| GitHub設定全般 | `.github/` | **全ての内容をベース**として使用。新規ファイル・ディレクトリを追加、既存は保持 |
+| ├─ Workflows | `.github/workflows/` | 新規ワークフローを追加、既存は保持 |
+| ├─ Issueテンプレート | `.github/ISSUE_TEMPLATE/` | 新規テンプレートを追加、既存は保持 |
+| ├─ PRテンプレート | `.github/PULL_REQUEST_TEMPLATE.md` | 新規追加、既存は保持 |
+| └─ その他（将来追加） | `.github/skills/`, `.github/configs/`等 | 新規ディレクトリ・ファイルを自動的に追加 |
 | Skills | `.claude/skills/` | 新規skillを追加、既存は保持 |
 | Hooks | `.claude/hooks/` | 新規hookを追加、既存は更新確認 |
 | ドキュメント | `AGENTS.md`, `CLAUDE.md` | セクション単位でマージ |
 | コーディング規約 | `.editorconfig`, `.eslintrc`等 | 競合時はユーザー確認 |
 | Git設定 | `.gitignore`, `.gitattributes` | 行単位でマージ |
-| Issue/PRテンプレート | `.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE.md` | 新規追加、既存は保持 |
+
+**重要**: `.github/` 配下は将来的に新しいディレクトリやファイルが追加される可能性があります（例: `.github/skills/`, `.github/configs/` など）。これらは全て自動的に同期対象となり、テンプレートから新規リポジトリへ反映されます。
 
 ## 同期手順
 
@@ -63,8 +67,9 @@ ls package.json pyproject.toml Cargo.toml go.mod Gemfile pom.xml build.gradle 2>
 # 既存のskills確認
 ls -la .claude/skills/ 2>/dev/null
 
-# 既存のworkflows確認
-ls -la .github/workflows/ 2>/dev/null
+# 既存の.github/設定確認（全体）
+ls -la .github/ 2>/dev/null
+find .github/ -type f 2>/dev/null
 
 # 既存のドキュメント確認
 ls AGENTS.md CLAUDE.md README.md 2>/dev/null
@@ -82,7 +87,7 @@ git diff HEAD template/main --name-only
 
 # 特定ディレクトリの差分を詳細確認
 git diff HEAD template/main -- .claude/skills/
-git diff HEAD template/main -- .github/workflows/
+git diff HEAD template/main -- .github/
 git diff HEAD template/main -- AGENTS.md
 ```
 
@@ -90,8 +95,10 @@ git diff HEAD template/main -- AGENTS.md
 
 **自動適用可能な変更**:
 - `.claude/skills/`内の新規skillファイル
-- `.github/workflows/`内の新規ワークフローファイル
-- `.github/ISSUE_TEMPLATE/`内の新規テンプレート
+- `.github/`配下の全ての新規ファイル・ディレクトリ
+  - `.github/workflows/`内の新規ワークフローファイル
+  - `.github/ISSUE_TEMPLATE/`内の新規テンプレート
+  - `.github/skills/`, `.github/configs/`等、将来追加される新規ディレクトリ
 
 **確認が必要な変更**:
 - 既存ファイルの更新
@@ -145,8 +152,16 @@ fi
 ### 6. 変更を適用
 
 ```bash
+# .github/配下の新規ファイル・ディレクトリの追加例
+# テンプレートから取得して適用
+git show template/main:.github/workflows/new-workflow.yml > .github/workflows/new-workflow.yml
+
+# 新規ディレクトリごと追加する例（.github/skills/など）
+mkdir -p .github/skills
+git archive --remote=$TEMPLATE_REPO HEAD:.github/skills/ | tar -x -C .github/skills/
+
 # 新規skillファイルの追加例
-cp /path/to/template/.claude/skills/new-skill/SKILL.md .claude/skills/new-skill/SKILL.md
+git show template/main:.claude/skills/new-skill/SKILL.md > .claude/skills/new-skill/SKILL.md
 
 # ドキュメントの部分更新例（セクション追加）
 # 手動でセクションを追加、または既存内容を保持してマージ
@@ -209,6 +224,25 @@ git remote remove template
 1. ファイルコピー: テンプレートから取得
 2. 動作確認: ワークフローの設定が現在のリポジトリに適合するか確認
 3. コミット: `git commit -m "chore: add shell linting workflow from template"`
+```
+
+### シナリオ2-2: .github/配下の新規ディレクトリ追加（将来的な例）
+
+```markdown
+**検出された変更**:
+- `.github/skills/` (新規ディレクトリ)
+  - `.github/skills/auto-review.yml`
+  - `.github/skills/auto-label.yml`
+
+**適用戦略**:
+- `.github/`配下の全ての内容はベースとして使用
+- 新規ディレクトリとその内容を自動的に追加
+
+**実行**:
+1. ディレクトリ作成: `mkdir -p .github/skills`
+2. ファイルコピー: テンプレートから全ファイルを取得
+3. 動作確認: 設定が現在のリポジトリに適合するか確認
+4. コミット: `git commit -m "chore: add GitHub skills from template"`
 ```
 
 ### シナリオ3: AGENTS.mdの更新
