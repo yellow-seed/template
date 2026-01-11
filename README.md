@@ -45,11 +45,13 @@ Rulesetの適用、ブランチ自動削除、GitHub Project作成など、リ�
 ### `.github/dependabot.yml`
 依存関係の自動更新設定です。
 
-### `.claude/skills/`
+### `.github/skills/`
 TDD開発、Issue作成、コードレビュー、セキュリティレビューなど、Claude Code用の開発支援スキルを格納しています。
 
+**注意**: `.claude/skills/`は`.github/skills/`へのシンボリックリンクです。シンボリックリンクが機能しない環境（Windows管理者権限なしなど）では、`.claude/hooks/skills-setup.sh`を実行してください。
+
 ### `.claude/hooks/`
-Claude Code on the Webでのセットアップスクリプトを格納しています。
+Claude Code on the Webでのセットアップスクリプトやスキルディレクトリのセットアップスクリプトを格納しています。
 
 ### `docs/`
 プロジェクトのドキュメントを格納しています。
