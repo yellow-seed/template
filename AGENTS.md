@@ -46,6 +46,23 @@ gh issue list -R yellow-seed/template
 gh pr view 123 -R yellow-seed/template
 ```
 
+### スキルディレクトリのセットアップ（Windows環境など）
+
+このリポジトリでは、`.claude/skills`は`.github/skills`へのシンボリックリンクとして構成されています。
+
+**シンボリックリンクが機能しない環境**（Windows管理者権限なし、`core.symlinks=false`など）では、以下のスクリプトを実行してください：
+
+```bash
+bash .claude/hooks/skills-setup.sh
+```
+
+このスクリプトは`.github/skills`を`.claude/skills`にコピーします。
+
+**注意事項**:
+- シンボリックリンク環境では、両ディレクトリは自動的に同期されます
+- コピー環境では、`.github/skills`を変更した場合、再度`skills-setup.sh`を実行して同期する必要があります
+- 新しいスキルを追加する際は、必ず`.github/skills/`に配置してください
+
 ## コーディング規約
 
 <!-- プロジェクトで使用しているコーディング規約を記述してください -->
@@ -109,6 +126,19 @@ fix: resolve memory leak in data processing
 The issue was caused by not properly releasing resources after processing.
 This fix ensures all resources are cleaned up correctly.
 ```
+
+## コミット粒度
+
+適切なコミット粒度を保つことで、レビューが容易になり、問題発生時の原因特定や安全なrevertが可能になります。
+
+### 基本原則
+
+- **機能の意味のある単位でコミット**: 実装とそれが通るテストコードなど、機能的に独立した単位でコミットする
+- **Pull Requestのすべての変更を一つのコミットにまとめない**: 複数の異なる目的の変更は別々のコミットに分割する
+
+### 詳細なガイドライン
+
+コミット分割の判断基準や実践例については、[.claude/skills/git-commit/SKILL.md](.claude/skills/git-commit/SKILL.md) を参照してください。
 
 ## テスト戦略
 
