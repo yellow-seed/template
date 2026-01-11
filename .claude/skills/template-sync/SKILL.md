@@ -1,17 +1,17 @@
 ---
 name: template-sync
-description: "テンプレート同期スキル。templateリポジトリの更新を他のリポジトリに反映。Use when: テンプレート更新の反映、template同期、既存リポジトリへの変更適用を依頼された時。"
+description: "テンプレート同期スキル。yellow-seed/template の更新を他のリポジトリに反映。Use when: テンプレート更新の反映、template同期、既存リポジトリへの変更適用を依頼された時。"
 ---
 
 # テンプレート同期
 
-templateリポジトリの更新内容を、このテンプレートを基に作成された他のリポジトリに反映するためのスキルです。
+yellow-seed/template の更新内容を、このテンプレートを基に作成された他のリポジトリに反映するためのスキルです。
 
 ## 背景
 
-- このリポジトリはテンプレート用途で、新しいリポジトリ作成時のベースとして使用される
-- templateを更新した際、これを基にした既存リポジトリにも変更を追随させたい
-- 多くのリポジトリがこのtemplateをベースにしているため、効率的な同期メカニズムが必要
+- yellow-seed/template はテンプレート用途で、新しいリポジトリ作成時のベースとして使用される
+- yellow-seed/template を更新した際、これを基にした既存リポジトリにも変更を追随させたい
+- 多くのリポジトリが yellow-seed/template をベースにしているため、効率的な同期メカニズムが必要
 
 ## 同期原則
 
@@ -36,17 +36,17 @@ templateリポジトリの更新内容を、このテンプレートを基に作
 | コーディング規約 | `.editorconfig`, `.eslintrc`等 | 競合時はユーザー確認 |
 | Git設定 | `.gitignore`, `.gitattributes` | 行単位でマージ |
 
-**重要**: `.github/` 配下は将来的に新しいディレクトリやファイルが追加される可能性があります（例: `.github/skills/`, `.github/configs/` など）。これらは全て自動的に同期対象となり、テンプレートから新規リポジトリへ反映されます。
+**重要**: `.github/` 配下は将来的に新しいディレクトリやファイルが追加される可能性があります（例: `.github/skills/`, `.github/configs/` など）。これらは全て自動的に同期対象となり、yellow-seed/template から他のリポジトリへ反映されます。
 
 ## 同期手順
 
-### 1. テンプレートリポジトリの情報確認
+### 1. yellow-seed/template の情報確認
 
 ```bash
-# テンプレートリポジトリのURL（デフォルト）
+# yellow-seed/template のURL（デフォルト）
 TEMPLATE_REPO="https://github.com/yellow-seed/template.git"
 
-# テンプレートの最新情報を取得
+# yellow-seed/template の最新情報を取得
 git ls-remote --heads $TEMPLATE_REPO
 ```
 
@@ -75,10 +75,10 @@ find .github/ -type f 2>/dev/null
 ls AGENTS.md CLAUDE.md README.md 2>/dev/null
 ```
 
-### 3. テンプレートとの差分を検出
+### 3. yellow-seed/template との差分を検出
 
 ```bash
-# テンプレートリポジトリをリモートとして追加（一時的）
+# yellow-seed/template をリモートとして追加（一時的）
 git remote add template $TEMPLATE_REPO 2>/dev/null || true
 git fetch template main
 
@@ -135,7 +135,7 @@ fi
 ## プロジェクト概要
 [既存の内容]
 
-# テンプレートからの新規セクション
+# yellow-seed/template からの新規セクション
 ## 開発環境のセットアップ
 ### Claude Code での GitHub CLI (gh) のセットアップ
 [新規内容を追加]
@@ -152,15 +152,14 @@ fi
 ### 6. 変更を適用
 
 ```bash
-# .github/配下の新規ファイル・ディレクトリの追加例
-# テンプレートから取得して適用
+# yellow-seed/template の .github/workflows/new-workflow.yml を追加
 git show template/main:.github/workflows/new-workflow.yml > .github/workflows/new-workflow.yml
 
-# 新規ディレクトリごと追加する例（.github/skills/など）
+# yellow-seed/template の .github/skills/ を追加する例
 mkdir -p .github/skills
 git archive --remote=$TEMPLATE_REPO HEAD:.github/skills/ | tar -x -C .github/skills/
 
-# 新規skillファイルの追加例
+# yellow-seed/template の .claude/skills/new-skill/SKILL.md を追加
 git show template/main:.claude/skills/new-skill/SKILL.md > .claude/skills/new-skill/SKILL.md
 
 # ドキュメントの部分更新例（セクション追加）
@@ -176,14 +175,14 @@ git diff
 
 # 変更をコミット
 git add .
-git commit -m "chore: sync updates from template repository
+git commit -m "chore: sync updates from yellow-seed/template
 
 Applied changes:
 - Added new skill: xxx
 - Added new workflow: yyy
 - Updated AGENTS.md with new sections
 
-Template source: yellow-seed/template@<commit-hash>"
+Source: yellow-seed/template@<commit-hash>"
 ```
 
 ### 8. クリーンアップ
@@ -199,40 +198,40 @@ git remote remove template
 
 ```markdown
 **検出された変更**:
-- `.claude/skills/template-sync/SKILL.md` (新規)
+- yellow-seed/template の `.claude/skills/template-sync/SKILL.md` (新規)
 
 **適用戦略**:
 - このファイルは新規skillなので、そのまま追加可能
 
 **実行**:
 1. ディレクトリ作成: `mkdir -p .claude/skills/template-sync`
-2. ファイルコピー: テンプレートから内容を取得
-3. コミット: `git commit -m "chore: add template-sync skill from template"`
+2. ファイルコピー: yellow-seed/template から内容を取得
+3. コミット: `git commit -m "chore: add template-sync skill from yellow-seed/template"`
 ```
 
 ### シナリオ2: GitHub Actionsワークフローの追加
 
 ```markdown
 **検出された変更**:
-- `.github/workflows/shell-linting.yml` (新規)
+- yellow-seed/template の `.github/workflows/shell-linting.yml` (新規)
 
 **適用戦略**:
 - このプロジェクトはシェルスクリプトを含むため、このワークフローは有用
 - そのまま追加可能
 
 **実行**:
-1. ファイルコピー: テンプレートから取得
+1. ファイルコピー: yellow-seed/template から取得
 2. 動作確認: ワークフローの設定が現在のリポジトリに適合するか確認
-3. コミット: `git commit -m "chore: add shell linting workflow from template"`
+3. コミット: `git commit -m "chore: add shell linting workflow from yellow-seed/template"`
 ```
 
 ### シナリオ2-2: .github/配下の新規ディレクトリ追加（将来的な例）
 
 ```markdown
 **検出された変更**:
-- `.github/skills/` (新規ディレクトリ)
-  - `.github/skills/auto-review.yml`
-  - `.github/skills/auto-label.yml`
+- yellow-seed/template の `.github/skills/` (新規ディレクトリ)
+  - yellow-seed/template の `.github/skills/auto-review.yml`
+  - yellow-seed/template の `.github/skills/auto-label.yml`
 
 **適用戦略**:
 - `.github/`配下の全ての内容はベースとして使用
@@ -240,16 +239,16 @@ git remote remove template
 
 **実行**:
 1. ディレクトリ作成: `mkdir -p .github/skills`
-2. ファイルコピー: テンプレートから全ファイルを取得
+2. ファイルコピー: yellow-seed/template から全ファイルを取得
 3. 動作確認: 設定が現在のリポジトリに適合するか確認
-4. コミット: `git commit -m "chore: add GitHub skills from template"`
+4. コミット: `git commit -m "chore: add GitHub skills from yellow-seed/template"`
 ```
 
 ### シナリオ3: AGENTS.mdの更新
 
 ```markdown
 **検出された変更**:
-- `AGENTS.md`: 新規セクション「開発環境のセットアップ」
+- yellow-seed/template の `AGENTS.md`: 新規セクション「開発環境のセットアップ」
 
 **適用戦略**:
 - 既存のAGENTS.mdに新規セクションを追加
@@ -259,14 +258,14 @@ git remote remove template
 1. 現在のAGENTS.mdを読み込み
 2. 新規セクションを適切な位置に挿入
 3. フォーマット調整
-4. コミット: `git commit -m "docs: add development setup section from template"`
+4. コミット: `git commit -m "docs: add development setup section from yellow-seed/template"`
 ```
 
 ### シナリオ4: 競合が発生する場合
 
 ```markdown
 **検出された変更**:
-- `.gitignore`: 複数の新規エントリ
+- yellow-seed/template の `.gitignore`: 複数の新規エントリ
 
 **現在の.gitignore**:
 ```
@@ -275,7 +274,7 @@ node_modules/
 dist/
 ```
 
-**テンプレートの.gitignore**:
+**yellow-seed/template の .gitignore**:
 ```
 # Node
 node_modules/
@@ -301,12 +300,12 @@ Thumbs.db
 **実行**:
 1. `.gitignore`に新規セクションを追加
 2. 既存の内容は変更しない
-3. コミット: `git commit -m "chore: update .gitignore from template"`
+3. コミット: `git commit -m "chore: update .gitignore from yellow-seed/template"`
 ```
 
 ## 同期時のチェックリスト
 
-- [ ] テンプレートリポジトリの最新情報を取得した
+- [ ] yellow-seed/template の最新情報を取得した
 - [ ] 現在のリポジトリの設定を分析した
 - [ ] 差分を確認し、適用すべき変更を選択した
 - [ ] プロジェクト固有の設定を保持する戦略を確認した
@@ -333,7 +332,7 @@ Thumbs.db
 
 ## トラブルシューティング
 
-### 問題: テンプレートリポジトリにアクセスできない
+### 問題: yellow-seed/template にアクセスできない
 
 **解決策**:
 ```bash
@@ -361,25 +360,25 @@ TEMPLATE_REPO="https://github.com/yellow-seed/template.git"
 ### commit-message スキルとの連携
 
 - 同期によるコミットは `chore:` タイプを使用
-- コミットメッセージにテンプレートのコミットハッシュを含める
+- コミットメッセージに yellow-seed/template のコミットハッシュを含める
 
 ### pull-request スキルとの連携
 
 - 大規模な同期の場合、PRを作成して変更をレビュー
-- PR概要でテンプレートからの変更内容を明確に説明
+- PR概要で yellow-seed/template からの変更内容を明確に説明
 
 ### github-issue スキルとの連携
 
 - 適用できなかった変更や要検討事項をIssueとして記録
-- テンプレート同期の定期実施をtodoとして管理
+- yellow-seed/template 同期の定期実施をtodoとして管理
 
 ## ベストプラクティス
 
-1. **定期的な同期**: テンプレートの更新を定期的にチェック
+1. **定期的な同期**: yellow-seed/template の更新を定期的にチェック
 2. **選択的適用**: 全ての変更を盲目的に適用せず、必要なもののみを選択
 3. **ドキュメント化**: 適用した変更と理由をドキュメント化
 4. **テスト重視**: 適用後は必ずテストを実施
-5. **コミュニティ貢献**: テンプレートへの改善提案も検討
+5. **コミュニティ貢献**: yellow-seed/template への改善提案も検討
 
 ## 実装の最小化
 
@@ -392,19 +391,19 @@ TEMPLATE_REPO="https://github.com/yellow-seed/template.git"
 **使用方法**:
 ```bash
 # AI Agentに依頼するだけ
-"テンプレートリポジトリの最新の変更を同期してください"
+"yellow-seed/template の最新の変更を同期してください"
 ```
 
 AI Agentが自動的に：
-1. テンプレートの変更を検出
+1. yellow-seed/template の変更を検出
 2. 現在のリポジトリ設定を分析
 3. 適用可能な変更を提案
 4. ユーザーの確認後、変更を適用
 5. 適切なコミットメッセージでコミット
 
-## テンプレートリポジトリ情報
+## yellow-seed/template 情報
 
-- **デフォルトテンプレート**: `yellow-seed/template`
+- **リポジトリ**: `yellow-seed/template`
 - **ブランチ**: `main`
 - **URL**: `https://github.com/yellow-seed/template.git`
 
