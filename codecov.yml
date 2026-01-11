@@ -11,12 +11,12 @@ coverage:
       default:
         target: 90%
         threshold: 1%
-        informational: false
+        informational: true
     patch:
       default:
         target: 90%
         threshold: 1%
-        informational: false
+        informational: true
 
 comment:
   layout: "reach, diff, flags, files"

@@ -15,10 +15,6 @@
 [![GitHub issues](https://img.shields.io/github/issues/yellow-seed/template)](https://github.com/yellow-seed/template/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/yellow-seed/template)](https://github.com/yellow-seed/template/pulls)
 
-<!-- Other Workflows -->
-[![Claude Code](https://github.com/yellow-seed/template/workflows/Claude%20Code/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/claude.yml)
-[![Copilot Setup Steps](https://github.com/yellow-seed/template/workflows/Copilot%20Setup%20Steps/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/copilot-setup-steps.yml)
-
 汎用的な開発プロジェクト用のテンプレートリポジトリです。
 
 ## 概要
