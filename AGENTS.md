@@ -110,6 +110,19 @@ The issue was caused by not properly releasing resources after processing.
 This fix ensures all resources are cleaned up correctly.
 ```
 
+## コミット粒度
+
+適切なコミット粒度を保つことで、レビューが容易になり、問題発生時の原因特定や安全なrevertが可能になります。
+
+### 基本原則
+
+- **機能の意味のある単位でコミット**: 実装とそれが通るテストコードなど、機能的に独立した単位でコミットする
+- **Pull Requestのすべての変更を一つのコミットにまとめない**: 複数の異なる目的の変更は別々のコミットに分割する
+
+### 詳細なガイドライン
+
+コミット分割の判断基準や実践例については、[.claude/skills/git-commit/SKILL.md](.claude/skills/git-commit/SKILL.md) を参照してください。
+
 ## テスト戦略
 
 <!-- テストの実行方法や戦略を記述してください -->
