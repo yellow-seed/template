@@ -1,5 +1,24 @@
 # Template Repository
 
+<!-- CI/CD & Code Quality -->
+[![CI](https://github.com/yellow-seed/template/workflows/CI/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/ci.yml)
+[![Actionlint](https://github.com/yellow-seed/template/workflows/Actionlint/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/actionlint.yml)
+[![codecov](https://codecov.io/gh/yellow-seed/template/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/template)
+
+<!-- Project Info -->
+[![License](https://img.shields.io/github/license/yellow-seed/template)](https://github.com/yellow-seed/template/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/yellow-seed/template)](https://github.com/yellow-seed/template/commits/main)
+
+<!-- Repository Activity -->
+[![GitHub stars](https://img.shields.io/github/stars/yellow-seed/template)](https://github.com/yellow-seed/template/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/yellow-seed/template)](https://github.com/yellow-seed/template/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/yellow-seed/template)](https://github.com/yellow-seed/template/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/yellow-seed/template)](https://github.com/yellow-seed/template/pulls)
+
+<!-- Other Workflows -->
+[![Claude Code](https://github.com/yellow-seed/template/workflows/Claude%20Code/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/claude.yml)
+[![Copilot Setup Steps](https://github.com/yellow-seed/template/workflows/Copilot%20Setup%20Steps/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/copilot-setup-steps.yml)
+
 汎用的な開発プロジェクト用のテンプレートリポジトリです。
 
 ## 概要
