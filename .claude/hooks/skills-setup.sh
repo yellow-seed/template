@@ -19,20 +19,20 @@ echo "Checking .claude/skills setup..."
 
 # Check if .claude/skills exists and is a directory
 if [ -d "${CLAUDE_SKILLS}" ]; then
-    echo "✓ .claude/skills is already a directory (symlink or real directory)"
-    exit 0
+  echo "✓ .claude/skills is already a directory (symlink or real directory)"
+  exit 0
 fi
 
 # Check if .github/skills exists
 if [ ! -d "${GITHUB_SKILLS}" ]; then
-    echo "✗ Error: .github/skills directory not found"
-    exit 1
+  echo "✗ Error: .github/skills directory not found"
+  exit 1
 fi
 
 # Remove the file if it exists (e.g., text file from failed symlink)
 if [ -e "${CLAUDE_SKILLS}" ]; then
-    echo "⚠ Removing non-directory .claude/skills..."
-    rm -f "${CLAUDE_SKILLS}"
+  echo "⚠ Removing non-directory .claude/skills..."
+  rm -f "${CLAUDE_SKILLS}"
 fi
 
 # Copy .github/skills to .claude/skills
