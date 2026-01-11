@@ -117,6 +117,7 @@ jobs:
             issue_id=$(gh issue view "$issue_number" -R "$REPO" --json id -q '.id')
 
             # Get issue project item ID
+            # shellcheck disable=SC2016
             item_id="$( gh api graphql -f query='
               query($issue_id: ID!) {
                 node(id: $issue_id) {
@@ -136,6 +137,7 @@ jobs:
             fi
 
             # Update issue status to Done
+            # shellcheck disable=SC2016
             gh api graphql -f query='
               mutation($project_id: ID!, $item_id: ID!, $status_field_id: ID!, $done_option_id: String!) {
                 updateProjectV2ItemFieldValue(input: {
