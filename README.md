@@ -27,57 +27,40 @@
 
 ## 含まれる内容
 
-### GitHub Actions ワークフロー
+### `.github/workflows/`
+CI/CD、コードレビュー、コード品質チェックなどの自動化ワークフローを格納しています。
 
-- `ci.yml` - 複数言語対応のCIワークフロー
-- `actionlint.yml` - GitHub Actions YAMLの構文チェックワークフロー
-- `claude.yml` - Claude AIによるコードレビューワークフロー
-- `copilot-setup-steps.yml` - GitHub Copilotセットアップワークフロー
-- `validate-scripts.yml` - スクリプトの検証ワークフロー
+### `.github/ISSUE_TEMPLATE/`
+バグレポート、機能リクエスト、タスク管理など、様々な用途のIssueテンプレートを格納しています。
 
-### Dependabot設定
+### `.github/PULL_REQUEST_TEMPLATE.md`
+統一されたPull Request形式を提供するテンプレートです。
 
-- `.github/dependabot.yml` - 依存関係の自動更新設定
+### `.github/rulesets/`
+ブランチ保護ルールやフィーチャーブランチルールなど、GitHub Ruleset用のJSONテンプレートを格納しています。
 
-### Issue/PR テンプレート
+### `.github/scripts/`
+Rulesetの適用、ブランチ自動削除、GitHub Project作成など、リポジトリセットアップを自動化するスクリプトを格納しています。詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
 
-- `bug_report.yml` - バグレポートテンプレート
-- `feature_request.yml` - 機能リクエストテンプレート
-- `todo.yml` - TODOタスクテンプレート
-- `PULL_REQUEST_TEMPLATE.md` - プルリクエストテンプレート
+### `.github/dependabot.yml`
+依存関係の自動更新設定です。
 
-### ドキュメント
+### `.claude/skills/`
+TDD開発、Issue作成、コードレビュー、セキュリティレビューなど、Claude Code用の開発支援スキルを格納しています。
 
-- `AGENTS.md` - AIエージェント向けのドキュメント
-- `CLAUDE.md` - Claude向けの設定/ドキュメント
-- `docs/GITHUB_RULESET_SETUP.md` - GitHub Rulesetセットアップガイド
+### `.claude/hooks/`
+Claude Code on the Webでのセットアップスクリプトを格納しています。
 
-### 設定ファイル
+### `docs/`
+プロジェクトのドキュメントを格納しています。
 
-- `.gitignore` - 複数言語対応の.gitignore（Ruby, Python, JavaScript/TypeScript, Go）
+### ルートレベルの設定ファイル
+- `AGENTS.md` - AIエージェント向けのプロジェクト情報
+- `CLAUDE.md` - Claude向けの設定とドキュメント参照
+- `.gitignore` - 複数言語対応（Ruby, Python, JavaScript/TypeScript, Go）
 - `.gitattributes` - Git属性設定
-- `codecov.yml` - Codecovの設定
-
-### Claude Code スキル
-
-- `.claude/skills/test-driven-development/` - TDD開発支援スキル
-- `.claude/skills/github-issue/` - GitHub Issue作成スキル
-- `.claude/skills/code-review/` - コードレビュースキル
-- `.claude/skills/reviewing-security/` - セキュリティレビュースキル
-- `.claude/skills/sample-explaining-code/` - コード説明スキル
-
-### GitHub Ruleset とブランチ保護設定
-
-- `.github/rulesets/` - Ruleset の JSON テンプレート
-  - `branch-protection-ruleset.json` - メインブランチ用の保護ルール
-  - `feature-branch-ruleset.json` - フィーチャーブランチ用のルール
-- `.github/scripts/` - セットアップスクリプト
-  - `setup-rulesets.sh` - Ruleset を適用するスクリプト
-  - `setup-branch-auto-delete.sh` - ブランチ自動削除を有効にするスクリプト
-  - `setup-github-project.sh` - GitHub Project を作成するスクリプト
-  - `setup-all.sh` - すべての設定を一括で適用するスクリプト
-
-詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
+- `codecov.yml` - コードカバレッジ設定
+- `LICENSE` - MITライセンス
 
 ## 使用方法
 
