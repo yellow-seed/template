@@ -44,11 +44,13 @@ jobs:
                   }
                 }
               }
-            }' -f org=$ORGANIZATION -F number=$PROJECT_NUMBER > project_data.json
+            }' -f org="$ORGANIZATION" -F number="$PROJECT_NUMBER" > project_data.json
 
-          echo 'PROJECT_ID='$(jq '.data.organization.projectV2.id' project_data.json) >> $GITHUB_ENV
-          echo 'STATUS_FIELD_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
-          echo 'DONE_OPTION_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .options[] | select(.name=="Done") | .id' project_data.json) >> $GITHUB_ENV
+          {
+            echo "PROJECT_ID=$(jq '.data.organization.projectV2.id' project_data.json)"
+            echo "STATUS_FIELD_ID=$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .id' project_data.json)"
+            echo "DONE_OPTION_ID=$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .options[] | select(.name=="Done") | .id' project_data.json)"
+          } >> "$GITHUB_ENV"
 
       - name: Get PR project item ID
         env:
@@ -66,9 +68,9 @@ jobs:
                   }
                 }
               }
-            }' -f pr_id=$PR_ID --jq '.data.node.projectItems.nodes.[].id')"
+            }' -f pr_id="$PR_ID" --jq '.data.node.projectItems.nodes.[].id')"
 
-          echo 'ITEM_ID='$item_id >> $GITHUB_ENV
+          echo "ITEM_ID=$item_id" >> "$GITHUB_ENV"
 
       - name: Update status to Done
         env:
@@ -88,7 +90,7 @@ jobs:
                   id
                 }
               }
-            }' -f project_id=$PROJECT_ID -f item_id=$ITEM_ID -f status_field_id=$STATUS_FIELD_ID -f done_option_id=$DONE_OPTION_ID
+            }' -f project_id="$PROJECT_ID" -f item_id="$ITEM_ID" -f status_field_id="$STATUS_FIELD_ID" -f done_option_id="$DONE_OPTION_ID"
 
       - name: Update linked issues status
         env:
@@ -97,7 +99,7 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           # Get linked issues from PR body
-          linked_issues=$(gh pr view $PR_NUMBER -R $REPO --json body -q '.body' | grep -oP '(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#\K\d+' || true)
+          linked_issues=$(gh pr view "$PR_NUMBER" -R "$REPO" --json body -q '.body' | grep -oP '(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#\K\d+' || true)
 
           if [ -z "$linked_issues" ]; then
             echo "No linked issues found"
@@ -108,7 +110,7 @@ jobs:
             echo "Processing issue #$issue_number"
 
             # Get issue node ID
-            issue_id=$(gh issue view $issue_number -R $REPO --json id -q '.id')
+            issue_id=$(gh issue view "$issue_number" -R "$REPO" --json id -q '.id')
 
             # Get issue project item ID
             item_id="$( gh api graphql -f query='
@@ -122,7 +124,7 @@ jobs:
                     }
                   }
                 }
-              }' -f issue_id=$issue_id --jq '.data.node.projectItems.nodes.[].id')"
+              }' -f issue_id="$issue_id" --jq '.data.node.projectItems.nodes.[].id')"
 
             if [ -z "$item_id" ]; then
               echo "Issue #$issue_number is not in the project"
@@ -144,7 +146,7 @@ jobs:
                     id
                   }
                 }
-              }' -f project_id=$PROJECT_ID -f item_id=$item_id -f status_field_id=$STATUS_FIELD_ID -f done_option_id=$DONE_OPTION_ID
+              }' -f project_id="$PROJECT_ID" -f item_id="$item_id" -f status_field_id="$STATUS_FIELD_ID" -f done_option_id="$DONE_OPTION_ID"
 
             echo "Updated issue #$issue_number status to Done"
           done
