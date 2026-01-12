@@ -122,3 +122,102 @@ teardown() {
     run bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
     assert_output --partial "GitHub Project" || true
 }
+
+@test "gh repo viewが失敗した場合にgit configから取得する" {
+    # gh repo viewを失敗させるモック
+    cat > "$TEST_DIR/gh" <<'EOF'
+#!/bin/bash
+case "$1" in
+    auth)
+        if [ "$2" = "status" ]; then
+            exit 0
+        fi
+        ;;
+    repo)
+        if [ "$2" = "view" ]; then
+            # -R フラグ付きの場合は成功させる
+            if echo "$*" | grep -q "\-R"; then
+                if echo "$*" | grep -q "nameWithOwner"; then
+                    echo '{"nameWithOwner":"fallback-owner/fallback-repo"}'
+                elif echo "$*" | grep -q "\"name\""; then
+                    echo '{"name":"fallback-repo"}'
+                elif echo "$*" | grep -q "owner"; then
+                    echo '{"owner":{"login":"fallback-owner"}}'
+                elif echo "$*" | grep -q "id"; then
+                    echo '{"id":"R_test123"}'
+                fi
+            else
+                exit 1  # -R フラグなしは失敗
+            fi
+        fi
+        ;;
+    project)
+        case "$2" in
+            list)
+                echo '{"projects":[]}'
+                ;;
+            create)
+                echo '{"number":456}'
+                ;;
+            field-list)
+                echo '{"fields":[]}'
+                ;;
+            view)
+                echo '{"id":"PVT_fallback"}'
+                ;;
+        esac
+        ;;
+    api)
+        if [[ "$*" == *"graphql"* ]]; then
+            echo '{"data":{}}'
+        fi
+        ;;
+esac
+exit 0
+EOF
+    chmod +x "$TEST_DIR/gh"
+
+    # git configのモックを作成
+    cat > "$TEST_DIR/git" <<'EOF'
+#!/bin/bash
+if [ "$1" = "config" ] && [ "$2" = "--get" ] && [ "$3" = "remote.origin.url" ]; then
+    echo "https://github.com/fallback-owner/fallback-repo.git"
+fi
+exit 0
+EOF
+    chmod +x "$TEST_DIR/git"
+
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
+    assert_output --partial "fallback-owner/fallback-repo"
+}
+
+@test "gh repo viewとgit configの両方が失敗した場合にエラー" {
+    # gh repo viewを失敗させるモック
+    cat > "$TEST_DIR/gh" <<'EOF'
+#!/bin/bash
+case "$1" in
+    auth)
+        if [ "$2" = "status" ]; then
+            exit 0
+        fi
+        ;;
+    *)
+        exit 1
+        ;;
+esac
+exit 1
+EOF
+    chmod +x "$TEST_DIR/gh"
+
+    # git configも失敗させる
+    cat > "$TEST_DIR/git" <<'EOF'
+#!/bin/bash
+exit 1
+EOF
+    chmod +x "$TEST_DIR/git"
+
+    run bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
+    assert_failure
+    assert_output --partial "リポジトリ情報を取得できませんでした"
+}

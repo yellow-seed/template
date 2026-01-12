@@ -49,8 +49,12 @@ if ! gh auth status &>/dev/null; then
   gh auth login
 fi
 
-# リポジトリ情報を取得
+# リポジトリ名を取得（まず gh repo view を試し、失敗したら git remote URL から取得）
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "")
+
+if [ -z "$REPO" ]; then
+  REPO=$(git config --get remote.origin.url 2>/dev/null | sed -E 's|^.*github\.com[/:]||; s|\.git$||' || echo "")
+fi
 
 if [ -z "$REPO" ]; then
   echo -e "${RED}エラー: リポジトリ情報を取得できませんでした${NC}"

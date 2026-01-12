@@ -36,8 +36,12 @@ if ! gh auth status &>/dev/null; then
   gh auth login
 fi
 
-# リポジトリ情報を取得
+# リポジトリ名を取得（まず gh repo view を試し、失敗したら git remote URL から取得）
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "")
+
+if [ -z "$REPO" ]; then
+  REPO=$(git config --get remote.origin.url 2>/dev/null | sed -E 's|^.*github\.com[/:]||; s|\.git$||' || echo "")
+fi
 
 if [ -z "$REPO" ]; then
   echo -e "${RED}エラー: リポジトリ情報を取得できませんでした${NC}"
@@ -45,8 +49,9 @@ if [ -z "$REPO" ]; then
   exit 1
 fi
 
-REPO_NAME=$(gh repo view --json name -q .name 2>/dev/null || echo "")
-OWNER=$(gh repo view --json owner -q .owner.login 2>/dev/null || echo "")
+# gh repo view が使える場合は直接取得、使えない場合は -R フラグで取得
+REPO_NAME=$(gh repo view --json name -q .name 2>/dev/null || gh repo view -R "$REPO" --json name -q .name 2>/dev/null || echo "")
+OWNER=$(gh repo view --json owner -q .owner.login 2>/dev/null || gh repo view -R "$REPO" --json owner -q .owner.login 2>/dev/null || echo "")
 
 echo -e "${GREEN}リポジトリ: $REPO${NC}"
 echo ""
@@ -212,7 +217,7 @@ echo ""
 # Projectにリポジトリをリンク
 echo "Projectにリポジトリをリンク中..."
 PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
-REPO_ID=$(gh repo view --json id -q .id)
+REPO_ID=$(gh repo view --json id -q .id 2>/dev/null || gh repo view -R "$REPO" --json id -q .id)
 
 gh api graphql -f query="
   mutation(\$projectId: ID!, \$repositoryId: ID!) {
