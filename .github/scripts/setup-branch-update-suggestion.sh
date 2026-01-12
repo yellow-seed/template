@@ -38,11 +38,11 @@ fi
 
 # リポジトリ情報を取得
 # 環境変数 GITHUB_REPOSITORY が設定されている場合はそれを使用
-# 設定されていない場合は gh repo view で取得を試みる
+# 設定されていない場合は git remote URL から取得を試みる
 REPO="${GITHUB_REPOSITORY:-}"
 
 if [ -z "$REPO" ]; then
-  REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "")
+  REPO=$(git config --get remote.origin.url 2>/dev/null | sed -E 's|^.*github\.com[/:]||; s|\.git$||' || echo "")
 fi
 
 if [ -z "$REPO" ]; then
