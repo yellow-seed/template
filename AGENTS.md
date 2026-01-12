@@ -48,7 +48,7 @@ gh pr view 123 -R yellow-seed/template
 
 ### スキルディレクトリのセットアップ（Windows環境など）
 
-このリポジトリでは、`.claude/skills`は`.github/skills`へのシンボリックリンクとして構成されています。
+このリポジトリでは、`.claude/skills` と `.codex/skills` は `.github/skills` へのシンボリックリンクとして構成されています。
 
 **シンボリックリンクが機能しない環境**（Windows管理者権限なし、`core.symlinks=false`など）では、以下のスクリプトを実行してください：
 
@@ -56,10 +56,10 @@ gh pr view 123 -R yellow-seed/template
 bash .claude/hooks/skills-setup.sh
 ```
 
-このスクリプトは`.github/skills`を`.claude/skills`にコピーします。
+このスクリプトは`.github/skills`を`.claude/skills`と`.codex/skills`にコピーします。
 
 **注意事項**:
-- シンボリックリンク環境では、両ディレクトリは自動的に同期されます
+- シンボリックリンク環境では、すべてのディレクトリは自動的に同期されます
 - コピー環境では、`.github/skills`を変更した場合、再度`skills-setup.sh`を実行して同期する必要があります
 - 新しいスキルを追加する際は、必ず`.github/skills/`に配置してください
 
