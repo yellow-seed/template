@@ -33,6 +33,7 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 | Skills | `.claude/skills/` | 新規skillを追加、既存は保持 |
 | Hooks | `.claude/hooks/` | 新規hookを追加、既存は更新確認 |
 | ドキュメント | `AGENTS.md`, `CLAUDE.md` | セクション単位でマージ |
+| README | `README.md` | shield設定などを含む構造を同期、プロジェクト固有の内容は保持 |
 | コーディング規約 | `.editorconfig`, `.eslintrc`等 | 競合時はユーザー確認 |
 | Git設定 | `.gitignore`, `.gitattributes` | 行単位でマージ |
 
@@ -89,6 +90,7 @@ git diff HEAD template/main --name-only
 git diff HEAD template/main -- .claude/skills/
 git diff HEAD template/main -- .github/
 git diff HEAD template/main -- AGENTS.md
+git diff HEAD template/main -- README.md
 ```
 
 ### 4. 適用すべき変更を選択
@@ -106,7 +108,7 @@ git diff HEAD template/main -- AGENTS.md
 - ドキュメントファイルの更新（`AGENTS.md`, `CLAUDE.md`）
 
 **適用しない変更**:
-- プロジェクト固有のファイル（`README.md`のプロジェクト名等）
+
 - カスタマイズされた設定
 - プロジェクト固有のworkflows
 
@@ -261,7 +263,25 @@ git remote remove template
 4. コミット: `git commit -m "docs: add development setup section from yellow-seed/template"`
 ```
 
-### シナリオ4: 競合が発生する場合
+### シナリオ4: README.mdの同期
+
+```markdown
+**検出された変更**:
+- yellow-seed/template の `README.md`: shield設定の更新
+
+**適用戦略**:
+- shieldバッジのセクション構造を同期
+- プロジェクト固有の内容（プロジェクト名、説明など）は保持
+- リポジトリ名を現在のリポジトリに置換
+
+**実行**:
+1. yellow-seed/template のshield設定構造を取得
+2. リポジトリ名を `yellow-seed/template` から現在のリポジトリ名に置換
+3. 既存のプロジェクト説明やドキュメントは保持
+4. コミット: `git commit -m "docs: update README shields from yellow-seed/template"`
+```
+
+### シナリオ5: 競合が発生する場合
 
 ```markdown
 **検出された変更**:
