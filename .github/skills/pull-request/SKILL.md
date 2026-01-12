@@ -53,7 +53,18 @@ git diff main...HEAD --name-only
 git diff main...HEAD
 ```
 
-### 2. Summary を生成
+### 2. セルフレビュー（ブランチ差分チェック）
+
+**PR作成前の必須プロセス**として、自分の変更内容を客観的に確認します。
+
+```bash
+# self-review スキルを使用
+"実装が完了しました。セルフレビューをお願いします"
+```
+
+詳細な手順とチェックリストは [self-review/SKILL.md](../self-review/SKILL.md) を参照してください。
+
+### 3. Summary を生成
 
 **目的**: PRの「何を」「なぜ」「効果」を2-3文で説明
 
@@ -70,7 +81,7 @@ git diff main...HEAD
 シェルスクリプトの品質を保証するため、shellcheck と shfmt を使用したリンティング環境を構築します。これにより、バグの早期発見とコードスタイルの統一が可能になります。
 ```
 
-### 3. Type of Change を選択
+### 4. Type of Change を選択
 
 変更の性質に応じて適切な種別を選択:
 
@@ -82,7 +93,7 @@ git diff main...HEAD
 - Performance improvement
 - Test update
 
-### 4. Related Issues を記載
+### 5. Related Issues を記載
 
 Issue番号を正確に記載:
 
@@ -98,7 +109,7 @@ Closes #20
 Related to #15
 ```
 
-### 5. Changes を構成
+### 6. Changes を構成
 
 **目的**: 「何を」「どのように」変更したかを詳細に説明
 
@@ -125,7 +136,7 @@ Related to #15
   - docs/shell-linting.md: ユーザー向けガイド
 ```
 
-### 6. Test Plan を生成
+### 7. Test Plan を生成
 
 **目的**: テスト方法と確認事項を明確にする
 
@@ -144,7 +155,7 @@ Related to #15
 - [ ] Docker 環境でリンティングが実行できる
 ```
 
-### 7. Checklist を確認
+### 8. Checklist を確認
 
 PR提出前に以下を確認:
 
@@ -156,7 +167,7 @@ PR提出前に以下を確認:
 - テストを追加/更新した
 - すべてのテストが通過する
 
-### 8. PR作成コマンドを実行
+### 9. PR作成コマンドを実行
 
 ```bash
 # PRを作成（タイトルと本文を指定）
