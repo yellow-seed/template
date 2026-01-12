@@ -129,6 +129,13 @@ exit 1
 EOF
     chmod +x "$TEST_DIR/gh"
 
+    # git configも失敗させる
+    cat > "$TEST_DIR/git" <<'EOF'
+#!/bin/bash
+exit 1
+EOF
+    chmod +x "$TEST_DIR/git"
+
     run bash "$SCRIPT_DIR/setup-labels.sh"
     assert_failure
     assert_output --partial "GitHub リポジトリが見つかりません"
@@ -141,4 +148,45 @@ EOF
     assert_output --partial "d73a4a"  # bug の色
     assert_output --partial "a2eeef"  # enhancement の色
     assert_output --partial "0e8a16"  # todo の色
+}
+
+@test "gh repo viewが失敗した場合にgit configから取得する" {
+    # gh repo viewを失敗させるモック
+    cat > "$TEST_DIR/gh" <<'EOF'
+#!/bin/bash
+case "$1" in
+    repo)
+        if [ "$2" = "view" ]; then
+            exit 1  # 失敗させる
+        fi
+        ;;
+    label)
+        case "$2" in
+            list)
+                echo '[{"name":"bug"},{"name":"enhancement"}]'
+                ;;
+            create|edit)
+                exit 0
+                ;;
+        esac
+        ;;
+esac
+exit 0
+EOF
+    chmod +x "$TEST_DIR/gh"
+
+    # git configのモックを作成
+    cat > "$TEST_DIR/git" <<'EOF'
+#!/bin/bash
+if [ "$1" = "config" ] && [ "$2" = "--get" ] && [ "$3" = "remote.origin.url" ]; then
+    echo "git@github.com:fallback-owner/fallback-repo.git"
+fi
+exit 0
+EOF
+    chmod +x "$TEST_DIR/git"
+
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-labels.sh"
+    assert_success
+    assert_output --partial "fallback-owner/fallback-repo"
 }
