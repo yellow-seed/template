@@ -523,92 +523,31 @@ git remote remove template
 
 ## 実行例
 
-### シナリオ1: 新規skillの追加
+### シナリオ1: 新規ファイル・ディレクトリの自動追加（完全同期）
 
 ```markdown
 **検出された変更**:
-- yellow-seed/template の `.claude/skills/template-sync/SKILL.md` (新規)
+- `.claude/skills/template-sync/SKILL.md` (新規スキル)
+- `.github/workflows/shell-linting.yml` (新規ワークフロー)
+- `.codex/` (新規AIエージェント設定ディレクトリ、自動検出)
+
+**自動検出の流れ**:
+1. ドット始まりのディレクトリ `.codex/` を検出
+2. サブディレクトリ `skills/`, `config/` を確認
+3. AIエージェント設定と判定
 
 **適用戦略**:
-- このファイルは新規skillなので、そのまま追加可能
+- パターンベースで自動的に追加対象と判定
+- 新規ファイル・ディレクトリをそのままコピー
 
 **実行**:
-1. ディレクトリ作成: `mkdir -p .claude/skills/template-sync`
-2. ファイルコピー: yellow-seed/template から内容を取得
-3. コミット: `git commit -m "chore: add template-sync skill from yellow-seed/template"`
+1. 新規ディレクトリを作成
+2. yellow-seed/template からファイルをコピー
+3. 動作確認
+4. コミット: `git commit -m "chore: add new files and directories from template"`
 ```
 
-### シナリオ2: GitHub Actionsワークフローの追加
-
-```markdown
-**検出された変更**:
-- yellow-seed/template の `.github/workflows/shell-linting.yml` (新規)
-
-**適用戦略**:
-- このプロジェクトはシェルスクリプトを含むため、このワークフローは有用
-- そのまま追加可能
-
-**実行**:
-1. ファイルコピー: yellow-seed/template から取得
-2. 動作確認: ワークフローの設定が現在のリポジトリに適合するか確認
-3. コミット: `git commit -m "chore: add shell linting workflow from yellow-seed/template"`
-```
-
-### シナリオ2-2: .github/配下の新規ディレクトリ追加（将来的な例）
-
-```markdown
-**検出された変更**:
-- yellow-seed/template の `.github/skills/` (新規ディレクトリ)
-  - yellow-seed/template の `.github/skills/auto-review.yml`
-  - yellow-seed/template の `.github/skills/auto-label.yml`
-
-**適用戦略**:
-- `.github/`配下の全ての内容はベースとして使用
-- 新規ディレクトリとその内容を自動的に追加
-
-**実行**:
-1. ディレクトリ作成: `mkdir -p .github/skills`
-2. ファイルコピー: yellow-seed/template から全ファイルを取得
-3. 動作確認: 設定が現在のリポジトリに適合するか確認
-4. コミット: `git commit -m "chore: add GitHub skills from yellow-seed/template"`
-```
-
-### シナリオ3: AGENTS.mdの更新
-
-```markdown
-**検出された変更**:
-- yellow-seed/template の `AGENTS.md`: 新規セクション「開発環境のセットアップ」
-
-**適用戦略**:
-- 既存のAGENTS.mdに新規セクションを追加
-- プロジェクト固有の内容は保持
-
-**実行**:
-1. 現在のAGENTS.mdを読み込み
-2. 新規セクションを適切な位置に挿入
-3. フォーマット調整
-4. コミット: `git commit -m "docs: add development setup section from yellow-seed/template"`
-```
-
-### シナリオ4: README.mdの同期
-
-```markdown
-**検出された変更**:
-- yellow-seed/template の `README.md`: shield設定の更新
-
-**適用戦略**:
-- shieldバッジのセクション構造を同期
-- プロジェクト固有の内容（プロジェクト名、説明など）は保持
-- リポジトリ名を現在のリポジトリに置換
-
-**実行**:
-1. yellow-seed/template のshield設定構造を取得
-2. リポジトリ名を `yellow-seed/template` から現在のリポジトリ名に置換
-3. 既存のプロジェクト説明やドキュメントは保持
-4. コミット: `git commit -m "docs: update README shields from yellow-seed/template"`
-```
-
-### シナリオ5: 競合が発生する場合
+### シナリオ2: .gitignoreのマージ（マージ同期）
 
 ```markdown
 **検出された変更**:
@@ -650,13 +589,14 @@ Thumbs.db
 3. コミット: `git commit -m "chore: update .gitignore from yellow-seed/template"`
 ```
 
-### シナリオ6: ドキュメント構造のリファクタリング
+### シナリオ3: ドキュメント構造のリファクタリング（構造同期）
 
 ```markdown
 **検出された変更**:
-- yellow-seed/template の `AGENTS.md`: 構造の整理と新規セクション追加
+- `AGENTS.md`: 構造の整理と新規セクション追加
+- `README.md`: バッジセクションの更新
 
-**構造比較結果**:
+**AGENTS.md 構造比較結果**:
 ```diff
 # 現在のターゲットリポジトリ
 ## プロジェクト概要
@@ -677,23 +617,26 @@ Thumbs.db
 ## その他の重要な情報
 ```
 
+**README.md バッジセクション**:
+- コメントブロック `<!-- CI/CD & Code Quality -->` で囲まれた範囲を同期
+- リポジトリ名を自動置換（`yellow-seed/template` → `yellow-seed/target-repo`）
+
 **適用戦略**:
-- ターゲットリポジトリの既存内容を保持しつつ、セクション構造をテンプレートに合わせる
-- 新規セクション「技術スタック」「ディレクトリ構造」などを追加
-- 「セットアップ手順」を「開発環境のセットアップ」に統合
+- AGENTS.md: 既存内容を保持しつつ、セクション構造をテンプレートに合わせる
+- README.md: バッジセクションのみ選択的に同期
 
 **実行**:
 1. 見出し構造を抽出して比較
 2. リファクタリング提案を生成
 3. ユーザー確認後、構造を再編成
-4. コミット: `git commit -m "docs: restructure AGENTS.md to match template"`
+4. コミット: `git commit -m "docs: restructure documents to match template"`
 ```
 
-### シナリオ7: ワークフロー構造の同期
+### シナリオ4: ワークフロー構造の同期（構造同期）
 
 ```markdown
 **検出された変更**:
-- yellow-seed/template の `.github/workflows/ci.yml`: 構造パターンの改善
+- `.github/workflows/ci.yml`: 構造パターンの改善
 
 **構造比較結果**:
 ```diff
@@ -732,46 +675,14 @@ jobs:
 4. コミット: `git commit -m "ci: refactor workflow structure to match template"`
 ```
 
-### シナリオ8: READMEバッジセクションの同期
+### シナリオ5: 設定ファイル値の基準化（値同期）
 
 ```markdown
 **検出された変更**:
-- yellow-seed/template の `README.md`: 新規ワークフローバッジの追加
+- `.codecov.yml`: カバレッジ目標値の更新
+- `.renovate.json`: スケジュール設定の更新
 
-**バッジセクション比較**:
-```diff
-# 現在のターゲットリポジトリ
-<!-- CI/CD & Code Quality -->
-[![CI - macOS](https://github.com/yellow-seed/target-repo/workflows/CI%20-%20macOS/badge.svg)](...)
-<!-- /CI/CD & Code Quality -->
-
-# yellow-seed/template
-<!-- CI/CD & Code Quality -->
-[![CI - macOS](https://github.com/yellow-seed/template/workflows/CI%20-%20macOS/badge.svg)](...)
-[![CI - Ubuntu](https://github.com/yellow-seed/template/workflows/CI%20-%20Ubuntu/badge.svg)](...)
-[![Shell Linting](https://github.com/yellow-seed/template/workflows/Shell%20Linting/badge.svg)](...)
-<!-- /CI/CD & Code Quality -->
-```
-
-**適用戦略**:
-- コメントブロック `<!-- CI/CD & Code Quality -->` で囲まれたバッジセクションを同期
-- リポジトリ名を `yellow-seed/template` から `yellow-seed/target-repo` に置換
-- 既存のバッジを保持しつつ、新しいバッジを追加
-
-**実行**:
-1. テンプレートのバッジセクションを抽出
-2. リポジトリ名を置換
-3. ターゲットリポジトリのREADMEにマージ
-4. コミット: `git commit -m "docs: add workflow badges to README from template"`
-```
-
-### シナリオ9: 設定ファイル値の基準化
-
-```markdown
-**検出された変更**:
-- yellow-seed/template の `.codecov.yml`: カバレッジ目標値の更新
-
-**値比較結果**:
+**codecov.yml 値比較結果**:
 ```diff
 # 現在のターゲットリポジトリ
 coverage:
@@ -799,30 +710,7 @@ coverage:
 1. 設定値を比較
 2. テンプレート基準値を適用
 3. 除外パスをマージ
-4. コミット: `git commit -m "chore: align codecov config with template standards"`
-```
-
-### シナリオ10: AIエージェント設定ディレクトリの自動検出
-
-```markdown
-**検出された変更**:
-- yellow-seed/template の `.codex/` (新規ディレクトリ)
-  - `.codex/skills/`
-  - `.codex/config/`
-
-**自動検出結果**:
-- ドット始まりのディレクトリ `.codex/` を検出
-- サブディレクトリ `skills/`, `config/` を確認
-- AIエージェント設定と判定
-
-**適用戦略**:
-- `.codex/` ディレクトリ全体を新規追加
-- 既存の `.claude/` と同様の扱い
-
-**実行**:
-1. AIエージェント設定ディレクトリを自動検出
-2. ディレクトリ作成とファイルコピー
-3. コミット: `git commit -m "chore: add .codex config from template"`
+4. コミット: `git commit -m "chore: align config values with template standards"`
 ```
 
 ## 同期時のチェックリスト
