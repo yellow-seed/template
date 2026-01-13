@@ -20,24 +20,351 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 3. **カスタマイズ保持**: プロジェクト固有のカスタマイズを保護
 4. **透明性**: 適用される変更を明確に説明
 5. **安全性**: 適用前に確認プロセスを提供
+6. **パターンベース**: ファイルの性質や役割に基づいた分類と同期
 
-## 同期可能な要素
+## パターンベースの同期戦略
 
-| 要素 | ファイルパス | 同期戦略 |
-| ----- | ------------- | ------------- |
-| GitHub設定全般 | `.github/` | **全ての内容をベース**として使用。新規ファイル・ディレクトリを追加、既存は保持 |
-| ├─ Workflows | `.github/workflows/` | 新規ワークフローを追加、既存は保持 |
-| ├─ Issueテンプレート | `.github/ISSUE_TEMPLATE/` | 新規テンプレートを追加、既存は保持 |
-| ├─ PRテンプレート | `.github/PULL_REQUEST_TEMPLATE.md` | 新規追加、既存は保持 |
-| └─ その他（将来追加） | `.github/skills/`, `.github/configs/`等 | 新規ディレクトリ・ファイルを自動的に追加 |
-| Skills | `.claude/skills/` | 新規skillを追加、既存は保持 |
-| Hooks | `.claude/hooks/` | 新規hookを追加、既存は更新確認 |
-| ドキュメント | `AGENTS.md`, `CLAUDE.md` | セクション単位でマージ |
-| README | `README.md` | shield設定などを含む構造を同期、プロジェクト固有の内容は保持 |
-| コーディング規約 | `.editorconfig`, `.eslintrc`等 | 競合時はユーザー確認 |
-| Git設定 | `.gitignore`, `.gitattributes` | 行単位でマージ |
+このスキルは、具体的なファイルパスではなく、ファイルの**性質**や**役割**に基づいた分類を使用します。これにより、将来追加されるファイルやディレクトリにも自動的に対応できます。
 
-**重要**: `.github/` 配下は将来的に新しいディレクトリやファイルが追加される可能性があります（例: `.github/skills/`, `.github/configs/` など）。これらは全て自動的に同期対象となり、yellow-seed/template から他のリポジトリへ反映されます。
+### A. GitHub設定ファイル群（`.github/` 配下）
+
+**対象パターン**:
+```bash
+.github/**/*
+```
+
+**同期戦略**:
+- `.github/workflows/`: 新規ファイルは追加、既存ファイルは構造比較後に更新提案
+- `.github/ISSUE_TEMPLATE/`: 新規テンプレートを追加
+- `.github/PULL_REQUEST_TEMPLATE.md`: 新規追加または内容比較
+- `.github/actions/`: 新規カスタムアクションを追加
+- `.github/configs/`, `.github/skills/`: 将来追加される任意のディレクトリに自動対応
+
+### B. AIエージェント設定ファイル群
+
+**対象パターン**:
+```bash
+# 既知のAIエージェント設定ディレクトリ
+.claude/**/*
+.codex/**/*
+.cursor/**/*
+.aider/**/*
+.codeium/**/*
+.copilot/**/*
+```
+
+**自動検出ロジック**:
+テンプレート側でドット始まりの新しいディレクトリを検出した場合、以下の条件でAIエージェント設定と判定：
+- ディレクトリ名が `.{claude,codex,cursor,aider,codeium,copilot}` のパターンに一致
+- `skills/`, `prompts/`, `config/`, `hooks/` などのサブディレクトリを含む
+
+**同期戦略**:
+- **skills/**: 新規スキル追加、既存スキルは更新確認
+- **hooks/**: 新規フック追加、既存フックは内容比較後に更新提案
+- **config/**, **prompts/**: 新規ファイル追加、既存ファイルは内容比較
+
+### C. 開発環境設定ファイル群
+
+**対象パターン**:
+```bash
+# エディタ・フォーマッタ設定
+.editorconfig
+.prettierrc*
+.eslintrc*
+.markdownlint*
+.shellcheckrc
+
+# CI/CD設定
+.codecov.yml
+.renovate.json
+.dependabot/**/*
+```
+
+**同期戦略**:
+- 新規ファイル: そのまま追加
+- 既存ファイル: 内容差分を表示し、マージ方法を提案
+- 設定値: テンプレート値を基準に（詳細は「設定ファイル値の基準化」セクション参照）
+
+### D. Git設定ファイル群
+
+**対象パターン**:
+```bash
+.gitignore
+.gitattributes
+.gitmodules
+```
+
+**同期戦略**:
+- 行単位でマージ（重複を避けて新規エントリを追加）
+- コメントブロック単位で整理
+
+### E. ドキュメントファイル（構造同期を含む）
+
+**対象パターン**:
+```markdown
+README.md
+AGENTS.md
+CLAUDE.md
+CONTRIBUTING.md
+```
+
+**同期戦略**:
+- `README.md`: バッジセクション（先頭の `<!-- ... -->` コメントで囲まれた範囲）を同期
+- `AGENTS.md`, `CLAUDE.md`: セクション構造をテンプレートに合わせてリファクタリング提案
+- **構造同期の重要性**: skillsへの適切な委譲は、ドキュメント構造の質に依存するため、テンプレートのお手本構造を維持
+
+## 同期ルールの明確化
+
+| 同期タイプ | 対象ファイル | 動作 |
+|------------|-------------|------|
+| **完全同期** | `.github/workflows/` (新規), `.github/ISSUE_TEMPLATE/`, `.github/actions/` | テンプレートから完全コピー |
+| **構造同期** | README.md, AGENTS.md, CLAUDE.md, `.github/workflows/` (既存) | 構造をテンプレートに合わせる |
+| **マージ同期** | `.gitignore`, `.gitattributes` | 既存内容を保持しつつ新規内容を追加 |
+| **値同期** | `.codecov.yml`, `.renovate.json`, `.editorconfig` | テンプレート値を基準に |
+| **選択的同期** | README.md (バッジセクションのみ) | 特定セクションのみを置換 |
+| **スキップ** | プロジェクト固有ファイル (`package.json`, `Cargo.toml`, `pyproject.toml` など) | 同期対象外 |
+
+## ドキュメント構造同期
+
+### 目的
+
+テンプレートのお手本構造を維持し、AIエージェントが理解しやすいドキュメントを保つことで、skillsへの適切な委譲精度を向上させます。
+
+### ドキュメント構造の比較
+
+```bash
+# 見出し構造を抽出
+grep "^#" template/README.md > /tmp/template_structure.txt
+grep "^#" target/README.md > /tmp/target_structure.txt
+diff -u /tmp/target_structure.txt /tmp/template_structure.txt
+```
+
+### テンプレート推奨構造
+
+**README.md**:
+1. タイトルとバッジ
+2. 概要・説明
+3. 特徴（Features）
+4. 前提条件（Prerequisites）
+5. インストール（Installation）
+6. 使い方（Usage）
+7. 設定（Configuration）
+8. テスト（Testing）
+9. 貢献（Contributing）
+10. ライセンス（License）
+
+**AGENTS.md**:
+1. プロジェクト概要
+2. 技術スタック
+3. ディレクトリ構造
+4. 開発環境のセットアップ
+5. コーディング規約
+6. コミットメッセージ規約
+7. コミット粒度
+8. テスト戦略
+9. Pull Request 作成
+10. デプロイメント
+11. その他の重要な情報
+
+### リファクタリング提案の生成
+
+構造比較結果から、ターゲットリポジトリのドキュメント構造をテンプレートに合わせるための提案を生成します。
+
+```diff
+- ## セットアップ
+- ## 使い方
++ ## インストール方法
++   ### 前提条件
++   ### 手順
++ ## 使い方
+
+→ 提案: セクション「セットアップ」を「インストール方法」に統合し、
+         「前提条件」「手順」のサブセクションに再編成
+```
+
+## ワークフロー構造同期
+
+### 目的
+
+テンプレートの整理されたワークフロー構造は、適切なCI/CDのベストプラクティスを反映しています。トリガー条件、ジョブの分離、依存関係、ステップ順序などの構造パターンは、技術スタックに依存せず共通化できます。
+
+### 同期する要素と同期しない要素
+
+**同期する要素**:
+
+| 要素 | 同期方法 | 理由 |
+|-----|---------|------|
+| **トリガー条件** | テンプレート値を採用 | CI/CD戦略の統一 |
+| **ブランチ条件** | テンプレート値を採用 | `branches: [main]` |
+| **パス条件** | テンプレート値を採用 | `paths-ignore: ['**.md']` でCI最適化 |
+| **ジョブ分離** | 構造パターンを採用 | lint → test → coverage の分離 |
+| **依存関係** | 構造パターンを採用 | `needs: lint` |
+| **ステップ順序** | 構造パターンを採用 | checkout → setup → action |
+
+**同期しない要素**:
+
+| 要素 | 理由 |
+|-----|------|
+| **具体的なコマンド** | 技術スタック依存（`npm test` vs `pytest` vs `cargo test`） |
+| **環境変数値** | プロジェクト固有（`NODE_VERSION`, `PYTHON_VERSION` など） |
+
+### テンプレート推奨トリガー条件
+
+```yaml
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
+  pull_request:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
+  workflow_dispatch:  # 手動実行を許可
+```
+
+### ワークフロー構造パターン
+
+**パターンA: 基本CI（lint → test）**
+
+```yaml
+jobs:
+  lint:
+    steps: [checkout, setup-tools, run-linter]
+
+  test:
+    needs: lint
+    steps: [checkout, setup-env, run-tests]
+```
+
+**パターンB: カバレッジ付きCI（lint → test → coverage）**
+
+```yaml
+jobs:
+  lint:
+    steps: [checkout, setup-tools, run-linter]
+
+  test:
+    needs: lint
+    steps: [checkout, setup-env, run-tests]
+
+  coverage:
+    needs: test
+    steps: [checkout, setup-coverage, generate, upload]
+```
+
+### 構造リファクタリング提案の例
+
+```markdown
+# ci-macos.yml 構造リファクタリング提案
+
+## 1. トリガー条件の修正
+
+現在: `on: [push, pull_request]`
+修正後: テンプレート推奨条件（branches指定、paths-ignore、workflow_dispatch追加）
+
+## 2. ジョブ構成の修正
+
+現在: test ジョブのみ（lint と test が混在）
+修正後: lint と test を分離、依存関係を明示（`test: needs: lint`）
+
+## 3. ステップ順序の整理
+
+各ジョブで checkout → setup → action の順序を維持
+```
+
+## 設定ファイル値の基準化
+
+### 対象ファイル
+
+`.codecov.yml`, `.renovate.json`, `.editorconfig`, `.prettierrc` など
+
+### 同期ルール
+
+**codecov.yml の例**:
+
+```yaml
+# テンプレート基準値
+coverage:
+  status:
+    project:
+      default:
+        target: 80%      # ← この値を基準に
+        threshold: 5%    # ← この値を基準に
+```
+
+**適用方法**:
+- カバレッジ目標値: テンプレート値を採用（プロジェクト全体で統一）
+- 除外パス: マージ（テンプレート + プロジェクト固有）
+
+**renovate.json の例**:
+
+```json
+{
+  "extends": ["config:base"],
+  "schedule": ["after 10pm every weekday"],
+  "automerge": true
+}
+```
+
+**適用方法**:
+- スケジュール設定: テンプレート値を採用
+- automerge設定: テンプレート値を採用
+- パッケージ固有ルール: マージ
+
+## READMEバッジセクションの同期
+
+### 目的
+
+テンプレート側でワークフローを追加した場合、対応するバッジもターゲットリポジトリのREADMEに反映します。
+
+### 実装方法
+
+1. テンプレート側のREADME先頭のコメントブロック（`<!-- ... -->`）で囲まれたバッジセクションを識別
+
+```markdown
+<!-- CI/CD & Code Quality -->
+[![CI - macOS](https://github.com/yellow-seed/template/workflows/CI%20-%20macOS/badge.svg)](...)
+[![CI - Ubuntu](https://github.com/yellow-seed/template/workflows/CI%20-%20Ubuntu/badge.svg)](...)
+<!-- /CI/CD & Code Quality -->
+```
+
+2. ターゲット側のREADMEで同じコメントブロックパターンを検索
+3. リポジトリ名を置換して適用（`yellow-seed/template` → `yellow-seed/{target-repo}`）
+4. 既存のバッジを保持しつつ、新しいバッジを追加
+
+### 注意事項
+
+- プロジェクト固有のバッジ（言語固有、フレームワーク固有）は保持
+- コメントブロックで囲まれていないバッジは変更しない
+
+## ファイル構造の体系的な差分検出
+
+### ディレクトリツリー比較
+
+```bash
+# ディレクトリツリー比較
+git ls-tree -r --name-only template/main | grep -E "^\.(github|claude|codex)/" | sort > /tmp/template_structure.txt
+git ls-tree -r --name-only HEAD | grep -E "^\.(github|claude|codex)/" | sort > /tmp/target_structure.txt
+diff /tmp/template_structure.txt /tmp/target_structure.txt
+```
+
+### 新規ファイルタイプの自動検出
+
+```bash
+# テンプレートの設定ファイルを検出
+find template -maxdepth 1 -type f \( -name ".*rc" -o -name ".*ignore" -o -name ".*yml" -o -name ".*json" \) | sort
+```
+
+### AIエージェント設定ディレクトリの自動検出
+
+```bash
+# ドット始まりのディレクトリを検出
+find template -maxdepth 1 -type d -name ".*" | while read dir; do
+  # skills/, hooks/, config/, prompts/ のいずれかを含むか確認
+  if find "$dir" -maxdepth 1 -type d \( -name "skills" -o -name "hooks" -o -name "config" -o -name "prompts" \) | grep -q .; then
+    echo "AIエージェント設定ディレクトリを検出: $dir"
+  fi
+done
+```
 
 ## 同期手順
 
@@ -321,6 +648,181 @@ Thumbs.db
 1. `.gitignore`に新規セクションを追加
 2. 既存の内容は変更しない
 3. コミット: `git commit -m "chore: update .gitignore from yellow-seed/template"`
+```
+
+### シナリオ6: ドキュメント構造のリファクタリング
+
+```markdown
+**検出された変更**:
+- yellow-seed/template の `AGENTS.md`: 構造の整理と新規セクション追加
+
+**構造比較結果**:
+```diff
+# 現在のターゲットリポジトリ
+## プロジェクト概要
+## 使い方
+## セットアップ手順
+
+# yellow-seed/template の推奨構造
+## プロジェクト概要
+## 技術スタック
+## ディレクトリ構造
+## 開発環境のセットアップ
+## コーディング規約
+## コミットメッセージ規約
+## コミット粒度
+## テスト戦略
+## Pull Request 作成
+## デプロイメント
+## その他の重要な情報
+```
+
+**適用戦略**:
+- ターゲットリポジトリの既存内容を保持しつつ、セクション構造をテンプレートに合わせる
+- 新規セクション「技術スタック」「ディレクトリ構造」などを追加
+- 「セットアップ手順」を「開発環境のセットアップ」に統合
+
+**実行**:
+1. 見出し構造を抽出して比較
+2. リファクタリング提案を生成
+3. ユーザー確認後、構造を再編成
+4. コミット: `git commit -m "docs: restructure AGENTS.md to match template"`
+```
+
+### シナリオ7: ワークフロー構造の同期
+
+```markdown
+**検出された変更**:
+- yellow-seed/template の `.github/workflows/ci.yml`: 構造パターンの改善
+
+**構造比較結果**:
+```diff
+# 現在のターゲットリポジトリ
+on: [push, pull_request]
+jobs:
+  test:
+    steps: [checkout, setup, lint, test]
+
+# yellow-seed/template の推奨構造
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
+  pull_request:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
+  workflow_dispatch:
+jobs:
+  lint:
+    steps: [checkout, setup-tools, run-linter]
+  test:
+    needs: lint
+    steps: [checkout, setup-env, run-tests]
+```
+
+**適用戦略**:
+- トリガー条件をテンプレート値に更新（branches指定、paths-ignore、workflow_dispatch追加）
+- ジョブを lint と test に分離、依存関係を明示
+- 具体的なコマンド（npm test など）は変更しない
+
+**実行**:
+1. ワークフロー構造を比較
+2. トリガー条件を更新
+3. ジョブ構造をリファクタリング（コマンドは保持）
+4. コミット: `git commit -m "ci: refactor workflow structure to match template"`
+```
+
+### シナリオ8: READMEバッジセクションの同期
+
+```markdown
+**検出された変更**:
+- yellow-seed/template の `README.md`: 新規ワークフローバッジの追加
+
+**バッジセクション比較**:
+```diff
+# 現在のターゲットリポジトリ
+<!-- CI/CD & Code Quality -->
+[![CI - macOS](https://github.com/yellow-seed/target-repo/workflows/CI%20-%20macOS/badge.svg)](...)
+<!-- /CI/CD & Code Quality -->
+
+# yellow-seed/template
+<!-- CI/CD & Code Quality -->
+[![CI - macOS](https://github.com/yellow-seed/template/workflows/CI%20-%20macOS/badge.svg)](...)
+[![CI - Ubuntu](https://github.com/yellow-seed/template/workflows/CI%20-%20Ubuntu/badge.svg)](...)
+[![Shell Linting](https://github.com/yellow-seed/template/workflows/Shell%20Linting/badge.svg)](...)
+<!-- /CI/CD & Code Quality -->
+```
+
+**適用戦略**:
+- コメントブロック `<!-- CI/CD & Code Quality -->` で囲まれたバッジセクションを同期
+- リポジトリ名を `yellow-seed/template` から `yellow-seed/target-repo` に置換
+- 既存のバッジを保持しつつ、新しいバッジを追加
+
+**実行**:
+1. テンプレートのバッジセクションを抽出
+2. リポジトリ名を置換
+3. ターゲットリポジトリのREADMEにマージ
+4. コミット: `git commit -m "docs: add workflow badges to README from template"`
+```
+
+### シナリオ9: 設定ファイル値の基準化
+
+```markdown
+**検出された変更**:
+- yellow-seed/template の `.codecov.yml`: カバレッジ目標値の更新
+
+**値比較結果**:
+```diff
+# 現在のターゲットリポジトリ
+coverage:
+  status:
+    project:
+      default:
+        target: 70%
+        threshold: 10%
+
+# yellow-seed/template の基準値
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 5%
+```
+
+**適用戦略**:
+- カバレッジ目標値をテンプレート基準値（80%、5%）に更新
+- 除外パスはマージ（テンプレート + プロジェクト固有）
+- プロジェクト全体で統一された基準を維持
+
+**実行**:
+1. 設定値を比較
+2. テンプレート基準値を適用
+3. 除外パスをマージ
+4. コミット: `git commit -m "chore: align codecov config with template standards"`
+```
+
+### シナリオ10: AIエージェント設定ディレクトリの自動検出
+
+```markdown
+**検出された変更**:
+- yellow-seed/template の `.codex/` (新規ディレクトリ)
+  - `.codex/skills/`
+  - `.codex/config/`
+
+**自動検出結果**:
+- ドット始まりのディレクトリ `.codex/` を検出
+- サブディレクトリ `skills/`, `config/` を確認
+- AIエージェント設定と判定
+
+**適用戦略**:
+- `.codex/` ディレクトリ全体を新規追加
+- 既存の `.claude/` と同様の扱い
+
+**実行**:
+1. AIエージェント設定ディレクトリを自動検出
+2. ディレクトリ作成とファイルコピー
+3. コミット: `git commit -m "chore: add .codex config from template"`
 ```
 
 ## 同期時のチェックリスト
