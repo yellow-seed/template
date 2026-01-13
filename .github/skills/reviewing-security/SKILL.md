@@ -26,7 +26,9 @@ OWASP API Security Top 10 (2023) と {開発言語をここに書く} セキュ�
 
 ## バージョン管理チェック
 
-バージョン指定されているツールやライブラリの更新可否をチェックします。古いバージョンの使用はセキュリティリスクやパフォーマンス問題につながる可能性があります。
+dependabotやrenovateで自動検証できないバージョン指定をチェックします。Dockerfile内の直接指定、GitHub Actionsのバージョン、設定ファイルで指定されたツールバージョンなどが対象です。古いバージョンの使用はセキュリティリスクやパフォーマンス問題につながる可能性があります。
+
+**注意**: `package.json`、`requirements.txt`、`go.mod`などの依存関係管理ファイルはdependabot/renovateで検証されるため、このチェックの対象外です。
 
 ### チェック対象ファイルとパターン
 
@@ -34,10 +36,8 @@ OWASP API Security Top 10 (2023) と {開発言語をここに書く} セキュ�
 | -------------- | ------------------- | ------------ |
 | Dockerfile | `Dockerfile`, `*.dockerfile`, `Dockerfile.*` | `FROM` イメージとタグ、`RUN apt-get install`、`RUN apk add` でのパッケージバージョン |
 | GitHub Actions | `.github/workflows/*.yml`, `.github/workflows/*.yaml` | `uses:` でのアクションバージョン、`setup-*` アクションの `*-version` 指定 |
-| Node.js | `.nvmrc`, `package.json` (engines) | Node.js バージョン指定 |
-| Python | `.python-version`, `runtime.txt`, `Dockerfile` | Python バージョン指定 |
-| Go | `go.mod`, `.go-version` | Go バージョン指定 |
-| その他 | `.tool-versions` (asdf), `Makefile` | 各種ツールのバージョン指定 |
+| ツールバージョン設定 | `.nvmrc`, `.python-version`, `.go-version`, `.tool-versions` | 開発環境のツールバージョン指定 |
+| その他の設定 | `Makefile`, `runtime.txt` | ビルドスクリプトや実行環境のバージョン指定 |
 
 ### チェック手順
 
@@ -68,14 +68,17 @@ OWASP API Security Top 10 (2023) と {開発言語をここに書く} セキュ�
 
 | 優先度 | ファイル | ツール/パッケージ | 現在のバージョン | 最新版 | 状態 | 備考 |
 |--------|----------|-------------------|------------------|--------|------|------|
-| 🔴 | Dockerfile | python | 3.8.0 | 3.12.1 | EOL | Python 3.8は2024年10月でEOL |
+| 🔴 | Dockerfile | python (FROM) | 3.8.0 | 3.12.1 | EOL | Python 3.8は2024年10月でEOL |
 | 🟡 | .github/workflows/ci.yml | actions/checkout | v3 | v4 | 更新可 | メジャーバージョンアップ |
-| 🟡 | Dockerfile | node | 18.12.0 | 18.19.0 | 更新可 | セキュリティアップデート含む |
+| 🟡 | Dockerfile | apt-get: postgresql-client | 12 | 16 | 更新可 | メジャーバージョンアップ |
 | 🟢 | .nvmrc | node | 20.10.0 | 20.11.0 | 最新に近い | パッチバージョンのみの差 |
 ```
 
+**注意**: この表に表示されるのは、dependabot/renovateで自動チェックされないバージョン指定のみです。
+
 ### チェック実施の注意点
 
+- **対象の明確化**: このチェックはdependabot/renovateで自動検証できないバージョン指定が対象です。`package.json`、`requirements.txt`、`go.mod`などの依存関係管理ファイルは対象外です
 - **破壊的変更**: メジャーバージョン更新時は破壊的変更の可能性があるため、リリースノートの確認を推奨
 - **互換性**: 特にDockerイメージやCI/CDツールは、更新により既存の動作に影響する可能性あり
 - **テスト**: バージョン更新後は必ずテストを実行
