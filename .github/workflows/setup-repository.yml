@@ -57,9 +57,9 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
         run: |
           echo "Starting repository setup..."
-          echo "DRY_RUN: $DRY_RUN"
+          echo "DRY_RUN: ${DRY_RUN}"
 
-          if [ "$DRY_RUN" = "1" ]; then
+          if [ "${DRY_RUN}" = "1" ]; then
             echo "⚠️  Running in DRY-RUN mode - no actual changes will be made"
           else
             echo "⚠️  Running in LIVE mode - changes will be applied"
@@ -71,11 +71,15 @@ jobs:
         if: always()
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "### Setup completed (DRY-RUN mode) ✓" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "No actual changes were made. Review the logs to see what would be changed." >> $GITHUB_STEP_SUMMARY
+            {
+              echo "### Setup completed (DRY-RUN mode) ✓"
+              echo ""
+              echo "No actual changes were made. Review the logs to see what would be changed."
+            } >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "### Setup completed ✓" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "All repository settings have been configured." >> $GITHUB_STEP_SUMMARY
+            {
+              echo "### Setup completed ✓"
+              echo ""
+              echo "All repository settings have been configured."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
