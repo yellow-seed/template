@@ -21,98 +21,27 @@ TDD開発を開始する前の設計フェーズを支援します。実装前�
 
 ## 開発タイプ別ガイド
 
-このスキルは5つの開発タイプをサポートしています。詳細は各リンク先を参照してください。
+開発タイプに応じた詳細ガイドを参照してください。
 
-### 1. CLI開発
-
-コマンドライン インターフェース の設計
-
-**補助ツール**: --help, man, CLIフレームワーク (oclif, cobra, clap, click等)
-
-→ **詳細**: [resources/cli_design_desc.md](./resources/cli_design_desc.md)
-
-### 2. API開発
-
-RESTful API または GraphQL API の設計
-
-**補助ツール（基本）**: **Swagger UI / OpenAPI Specification**
-
-→ **詳細**: [resources/api_design_desc.md](./resources/api_design_desc.md)
-
-### 3. 画面開発（Web/フロントエンド）
-
-Webアプリケーション の UI/UX 設計
-
-**補助ツール（基本）**: **Storybook**
-
-→ **詳細**: [resources/ui_design_desc.md](./resources/ui_design_desc.md)
-
-### 4. モバイルアプリ開発
-
-iOS/Android モバイルアプリ の設計
-
-**補助ツール**: Figma, React Native Storybook, Flutter DevTools/Widgetbook
-
-→ **詳細**: [resources/mobile_design_desc.md](./resources/mobile_design_desc.md)
-
-### 5. クラウドインフラ構築
-
-AWS/Azure/GCP などのクラウドインフラ設計
-
-**補助ツール（基本）**: **Terraform / OpenTofu**
-
-→ **詳細**: [resources/infrastructure_design_desc.md](./resources/infrastructure_design_desc.md)
-
-## 設計ドキュメントの配置
-
-```
-docs/design/
-├── README.md                           # 設計ドキュメント全体の概要
-├── [type]-specification.md             # 各タイプの仕様書
-└── [補助ツールの設定ファイル]          # openapi.yaml, terraform/ 等
-```
-
-詳細なディレクトリ構造は [REFERENCE.md](./REFERENCE.md) を参照してください。
-
-## クイックスタート
-
-### API設計の例
-
-```bash
-mkdir -p docs/design
-touch docs/design/openapi.yaml
-# API仕様を記述（resources/api_design_desc.md 参照）
-npx @stoplight/prism-cli mock docs/design/openapi.yaml
-```
-
-### 画面設計の例
-
-```bash
-touch docs/design/ui-specification.md
-npx storybook@latest init
-npm run storybook
-```
-
-### インフラ設計の例
-
-```bash
-mkdir -p docs/design/terraform
-# Terraform設定を記述（resources/infrastructure_design_desc.md 参照）
-cd docs/design/terraform
-terraform init
-terraform plan
-```
+| 開発タイプ | 基本補助ツール | 詳細ガイド |
+|-----------|--------------|-----------|
+| **CLI開発** | CLIフレームワーク (oclif, cobra, clap, click等) | [resources/cli_design_desc.md](./resources/cli_design_desc.md) |
+| **API開発** | **Swagger UI / OpenAPI Specification** | [resources/api_design_desc.md](./resources/api_design_desc.md) |
+| **画面開発** | **Storybook** | [resources/ui_design_desc.md](./resources/ui_design_desc.md) |
+| **モバイルアプリ開発** | Figma, React Native Storybook, Flutter DevTools | [resources/mobile_design_desc.md](./resources/mobile_design_desc.md) |
+| **クラウドインフラ構築** | **Terraform / OpenTofu** | [resources/infrastructure_design_desc.md](./resources/infrastructure_design_desc.md) |
 
 ## 詳細情報
 
-より詳細な情報は [REFERENCE.md](./REFERENCE.md) を参照してください：
+以下の詳細情報は [REFERENCE.md](./REFERENCE.md) を参照してください：
 
 - 設計計画の目的と原則
 - 設計フェーズの実施手順
+- 設計ドキュメントの配置構造
 - 設計品質チェックポイント
 - 他のスキルとの連携
 - 補助ツールの選定基準
-- カスタマイズとプロジェクト固有の調整
+- カスタマイズガイド
 - 注意事項とFAQ
 
 ---

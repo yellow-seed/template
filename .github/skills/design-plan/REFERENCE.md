@@ -486,6 +486,50 @@ docs/design/
 **ステータス**: 現行版
 ```
 
+## クイックスタート
+
+開発タイプ別のクイックスタート例です。詳細は各 resources/ 配下のガイドを参照してください。
+
+### API設計の例
+
+```bash
+# 1. OpenAPI仕様ファイルを作成
+mkdir -p docs/design
+touch docs/design/openapi.yaml
+
+# 2. API仕様を記述（resources/api_design_desc.md 参照）
+
+# 3. Swagger UIで確認
+npx @stoplight/prism-cli mock docs/design/openapi.yaml
+```
+
+### 画面設計の例
+
+```bash
+# 1. UI仕様書を作成
+touch docs/design/ui-specification.md
+
+# 2. Storybookをセットアップ
+npx storybook@latest init
+
+# 3. Storybookを起動
+npm run storybook
+```
+
+### インフラ設計の例
+
+```bash
+# 1. Terraformディレクトリを作成
+mkdir -p docs/design/terraform
+
+# 2. Terraform設定を記述（resources/infrastructure_design_desc.md 参照）
+
+# 3. プラン確認
+cd docs/design/terraform
+terraform init
+terraform plan
+```
+
 ## よくある質問（FAQ）
 
 ### Q1: 設計にどのくらい時間をかけるべきですか？
