@@ -2,8 +2,6 @@
 
 # すべての GitHub 設定を一括でセットアップするスクリプト
 
-set -e
-
 # Dry-run モード（環境変数 DRY_RUN=1 で有効化）
 DRY_RUN=${DRY_RUN:-0}
 export DRY_RUN
@@ -18,29 +16,49 @@ if [ "$DRY_RUN" = "1" ]; then
 fi
 echo ""
 
-# Ruleset のセットアップ
-echo "1. Ruleset のセットアップを実行します..."
-bash "$SCRIPT_DIR/setup-rulesets.sh"
-echo ""
+declare -a SUCCESS_SCRIPTS=()
+declare -a FAILED_SCRIPTS=()
 
-# ブランチ自動削除の設定
-echo "2. ブランチ自動削除の設定を実行します..."
-bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
-echo ""
+run_script() {
+  local number="$1"
+  local name="$2"
+  local script="$3"
 
-# PRブランチ更新提案の設定
-echo "3. PRブランチ更新提案の設定を実行します..."
-bash "$SCRIPT_DIR/setup-branch-update-suggestion.sh"
-echo ""
+  echo "${number}. ${name} を実行します..."
+  if bash "$script"; then
+    SUCCESS_SCRIPTS+=("$name")
+    echo "✓ ${name} が完了しました"
+  else
+    FAILED_SCRIPTS+=("$name")
+    echo "✗ ${name} が失敗しました"
+  fi
+  echo ""
+}
 
-# ラベルの設定
-echo "4. ラベルの設定を実行します..."
-bash "$SCRIPT_DIR/setup-labels.sh"
-echo ""
+run_script "1" "Ruleset のセットアップ" "$SCRIPT_DIR/setup-rulesets.sh"
+run_script "2" "ブランチ自動削除の設定" "$SCRIPT_DIR/setup-branch-auto-delete.sh"
+run_script "3" "PRブランチ更新提案の設定" "$SCRIPT_DIR/setup-branch-update-suggestion.sh"
+run_script "4" "ラベルの設定" "$SCRIPT_DIR/setup-labels.sh"
+run_script "5" "GitHub Project のセットアップ" "$SCRIPT_DIR/setup-github-project.sh"
 
-# GitHub Project のセットアップ
-echo "5. GitHub Project のセットアップを実行します..."
-bash "$SCRIPT_DIR/setup-github-project.sh"
-echo ""
+echo "=============================="
+echo "実行結果サマリー"
+echo "=============================="
+echo "成功: ${#SUCCESS_SCRIPTS[@]}"
+for script in "${SUCCESS_SCRIPTS[@]}"; do
+  echo "  ✓ ${script}"
+done
 
+if [ ${#FAILED_SCRIPTS[@]} -gt 0 ]; then
+  echo ""
+  echo "失敗: ${#FAILED_SCRIPTS[@]}"
+  for script in "${FAILED_SCRIPTS[@]}"; do
+    echo "  ✗ ${script}"
+  done
+  echo ""
+  echo "一部のセットアップが失敗しました"
+  exit 1
+fi
+
+echo ""
 echo "すべてのセットアップが完了しました！"
