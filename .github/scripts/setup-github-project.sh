@@ -107,23 +107,12 @@ echo "Status フィールドを確認中..."
 STATUS_FIELD=$(gh project field-list "$PROJECT_NUMBER" --owner "$OWNER" --format json 2>/dev/null | jq -r '.fields[] | select(.name == "Status") | .id' || echo "")
 PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json | jq -r '.id')
 
-if [ -n "$STATUS_FIELD" ]; then
-  # デフォルトのStatusフィールドが存在する場合は削除して再作成
-  echo "既存のStatus フィールドを削除中..."
-  gh api graphql -f query="
-      mutation(\$fieldId: ID!) {
-        deleteProjectV2Field(input: {
-          fieldId: \$fieldId
-        }) {
-          projectV2Field {
-            id
-          }
-        }
-      }" -f fieldId="$STATUS_FIELD" >/dev/null 2>&1 || true
-fi
-
-echo "Status フィールドを作成中..."
-cat >/tmp/gh-project-status.json <<EOF
+if [ -z "$STATUS_FIELD" ]; then
+  if [ "$DRY_RUN" = "1" ]; then
+    echo -e "${YELLOW}[DRY-RUN] Status フィールドを作成します（スキップ）${NC}"
+  else
+    echo "Status フィールドを作成中..."
+    cat >/tmp/gh-project-status.json <<EOF
 {
   "query": "mutation(\$projectId: ID!, \$name: String!, \$dataType: ProjectV2CustomFieldType!, \$options: [ProjectV2SingleSelectFieldOptionInput!]) { createProjectV2Field(input: { projectId: \$projectId dataType: \$dataType name: \$name singleSelectOptions: \$options }) { projectV2Field { ... on ProjectV2SingleSelectField { id name } } } }",
   "variables": {
@@ -139,10 +128,14 @@ cat >/tmp/gh-project-status.json <<EOF
   }
 }
 EOF
-gh api graphql --input /tmp/gh-project-status.json >/dev/null 2>&1 || true
-rm -f /tmp/gh-project-status.json
+    gh api graphql --input /tmp/gh-project-status.json >/dev/null 2>&1 || true
+    rm -f /tmp/gh-project-status.json
 
-echo -e "${GREEN}Status フィールドを設定しました${NC}"
+    echo -e "${GREEN}Status フィールドを設定しました${NC}"
+  fi
+else
+  echo -e "${YELLOW}Status フィールドは既に存在します${NC}"
+fi
 
 # Priority フィールド
 echo "Priority フィールドを確認中..."
