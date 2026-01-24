@@ -150,8 +150,12 @@ This fix ensures all resources are cleaned up correctly.
 
 - ドキュメント/設定ファイルは Prettier で整形します。
   - 対象: Markdown, YAML, JSON
-  - チェック: `npm run lint`
-  - 自動整形: `npm run format`
+  - Prettier は Docker 経由で実行します
+  - チェック:
+    - `docker run --rm -v "$PWD:/workspace" -w /workspace node:20 npm ci`
+    - `docker run --rm -v "$PWD:/workspace" -w /workspace node:20 npm run lint`
+  - 自動整形:
+    - `docker run --rm -v "$PWD:/workspace" -w /workspace node:20 npm run format`
   - 設定は Prettier のデフォルトを使用します
 
 ## Pull Request 作成
