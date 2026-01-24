@@ -9,11 +9,11 @@ description: "GitHub Issue作成スキル。.github/ISSUE_TEMPLATE/のテンプ�
 
 ## 利用可能なテンプレート
 
-| テンプレート | 用途 | ラベル |
-| ----- | ------------- | ------------- |
-| bug_report.yml | バグ報告 | `bug` |
-| feature_request.yml | 機能リクエスト | `enhancement` |
-| todo.yml | タスク・作業項目 | `todo` |
+| テンプレート        | 用途             | ラベル        |
+| ------------------- | ---------------- | ------------- |
+| bug_report.yml      | バグ報告         | `bug`         |
+| feature_request.yml | 機能リクエスト   | `enhancement` |
+| todo.yml            | タスク・作業項目 | `todo`        |
 
 ## Issue作成原則
 
@@ -100,6 +100,7 @@ description: "GitHub Issue作成スキル。.github/ISSUE_TEMPLATE/のテンプ�
 ```
 
 例:
+
 - `#123 ユーザー認証APIの実装`
 - `#123 認証ミドルウェアの追加`
 - `#123 認証機能のフロントエンド統合`

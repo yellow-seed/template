@@ -1,0 +1,15 @@
+{
+  "name": "template",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\" \".github/**/*.json\"",
+    "format:check": "prettier --check \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\" \".github/**/*.json\"",
+    "format:md": "prettier --check \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\"",
+    "format:yaml": "prettier --check \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\"",
+    "format:json": "prettier --check \".github/**/*.json\""
+  },
+  "devDependencies": {
+    "prettier": "3.4.2"
+  }
+}

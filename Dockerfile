@@ -15,6 +15,8 @@ RUN apt-get update && \
     git \
     bats \
     curl \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Go 1.23 (required for shfmt v3.12.0)
@@ -31,6 +33,9 @@ RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.12.0 && \
 RUN go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.5 && \
     mv /root/go/bin/actionlint /usr/local/bin/actionlint
 
+# Install Prettier
+RUN npm install -g prettier@3.4.2
+
 # Set working directory
 WORKDIR /workspace
 
@@ -46,6 +51,22 @@ echo ""\n\
 echo "All linting checks passed!"\n\
 ' > /usr/local/bin/lint-shell && \
     chmod +x /usr/local/bin/lint-shell
+
+# Create a script to run document formatting checks
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo \"Running Prettier (Markdown)...\"\n\
+prettier --check \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\"\n\
+echo \"\"\n\
+echo \"Running Prettier (YAML)...\"\n\
+prettier --check \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\"\n\
+echo \"\"\n\
+echo \"Running Prettier (JSON)...\"\n\
+prettier --check \".github/**/*.json\"\n\
+echo \"\"\n\
+echo \"All document linting checks passed!\"\n\
+' > /usr/local/bin/lint-docs && \
+    chmod +x /usr/local/bin/lint-docs
 
 # Default command
 CMD ["lint-shell"]

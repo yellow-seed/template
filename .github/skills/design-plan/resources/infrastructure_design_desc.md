@@ -522,37 +522,37 @@ python architecture_diagram.py
 
 ## 環境
 
-| 環境 | 用途 | URL |
-|------|------|-----|
-| Development | 開発環境 | https://dev.example.com |
-| Staging | ステージング環境 | https://staging.example.com |
-| Production | 本番環境 | https://example.com |
+| 環境        | 用途             | URL                         |
+| ----------- | ---------------- | --------------------------- |
+| Development | 開発環境         | https://dev.example.com     |
+| Staging     | ステージング環境 | https://staging.example.com |
+| Production  | 本番環境         | https://example.com         |
 
 ## リソース構成
 
 ### コンピュート
 
-| リソース | スペック | 数量 | 用途 |
-|---------|---------|------|------|
-| EC2 (Web) | t3.medium (2vCPU, 4GB RAM) | 2-10 (Auto Scaling) | Webアプリケーション |
-| EC2 (Batch) | t3.large (2vCPU, 8GB RAM) | 1 | バッチ処理 |
-| ECS Fargate | 0.5vCPU, 1GB RAM | 動的 | マイクロサービス |
+| リソース    | スペック                   | 数量                | 用途                |
+| ----------- | -------------------------- | ------------------- | ------------------- |
+| EC2 (Web)   | t3.medium (2vCPU, 4GB RAM) | 2-10 (Auto Scaling) | Webアプリケーション |
+| EC2 (Batch) | t3.large (2vCPU, 8GB RAM)  | 1                   | バッチ処理          |
+| ECS Fargate | 0.5vCPU, 1GB RAM           | 動的                | マイクロサービス    |
 
 ### ストレージ
 
-| リソース | 容量 | 用途 |
-|---------|------|------|
-| EBS (gp3) | 100GB × サーバー数 | OS・アプリケーション |
-| S3 Standard | 無制限 | 静的ファイル、バックアップ |
-| S3 Glacier | 無制限 | 長期アーカイブ |
+| リソース    | 容量               | 用途                       |
+| ----------- | ------------------ | -------------------------- |
+| EBS (gp3)   | 100GB × サーバー数 | OS・アプリケーション       |
+| S3 Standard | 無制限             | 静的ファイル、バックアップ |
+| S3 Glacier  | 無制限             | 長期アーカイブ             |
 
 ### データベース
 
-| リソース | スペック | 構成 | 用途 |
-|---------|---------|------|------|
-| RDS PostgreSQL | db.t3.medium (2vCPU, 4GB RAM) | Multi-AZ | メインデータベース |
-| RDS Read Replica | db.t3.medium | 2台 | 読み取り専用レプリカ |
-| ElastiCache Redis | cache.t3.micro | 2ノード（レプリケーション） | セッション・キャッシュ |
+| リソース          | スペック                      | 構成                        | 用途                   |
+| ----------------- | ----------------------------- | --------------------------- | ---------------------- |
+| RDS PostgreSQL    | db.t3.medium (2vCPU, 4GB RAM) | Multi-AZ                    | メインデータベース     |
+| RDS Read Replica  | db.t3.medium                  | 2台                         | 読み取り専用レプリカ   |
+| ElastiCache Redis | cache.t3.micro                | 2ノード（レプリケーション） | セッション・キャッシュ |
 
 ## ネットワーク設計
 
@@ -564,21 +564,23 @@ python architecture_diagram.py
 
 ### サブネット
 
-| 名前 | CIDR | AZ | 用途 |
-|------|------|----|----|
-| public-subnet-1 | 10.0.0.0/24 | 1a | ALB, NAT Gateway |
-| public-subnet-2 | 10.0.1.0/24 | 1c | ALB, NAT Gateway |
-| private-subnet-1 | 10.0.10.0/24 | 1a | Web Server, App Server |
-| private-subnet-2 | 10.0.11.0/24 | 1c | Web Server, App Server |
-| database-subnet-1 | 10.0.20.0/24 | 1a | RDS, ElastiCache |
-| database-subnet-2 | 10.0.21.0/24 | 1c | RDS, ElastiCache |
+| 名前              | CIDR         | AZ  | 用途                   |
+| ----------------- | ------------ | --- | ---------------------- |
+| public-subnet-1   | 10.0.0.0/24  | 1a  | ALB, NAT Gateway       |
+| public-subnet-2   | 10.0.1.0/24  | 1c  | ALB, NAT Gateway       |
+| private-subnet-1  | 10.0.10.0/24 | 1a  | Web Server, App Server |
+| private-subnet-2  | 10.0.11.0/24 | 1c  | Web Server, App Server |
+| database-subnet-1 | 10.0.20.0/24 | 1a  | RDS, ElastiCache       |
+| database-subnet-2 | 10.0.21.0/24 | 1c  | RDS, ElastiCache       |
 
 ### ルーティング
 
 **パブリックルートテーブル**:
+
 - 0.0.0.0/0 → Internet Gateway
 
 **プライベートルートテーブル**:
+
 - 0.0.0.0/0 → NAT Gateway
 
 ## セキュリティ設計
@@ -587,11 +589,11 @@ python architecture_diagram.py
 
 #### ロール一覧
 
-| ロール名 | 信頼エンティティ | ポリシー | 用途 |
-|---------|----------------|---------|------|
-| ec2-web-role | EC2 | S3ReadOnly, SecretsManagerRead | Webサーバー |
-| ecs-task-role | ECS Task | DynamoDBFullAccess | ECSタスク |
-| lambda-execution-role | Lambda | CloudWatchLogs, S3ReadWrite | Lambda関数 |
+| ロール名              | 信頼エンティティ | ポリシー                       | 用途        |
+| --------------------- | ---------------- | ------------------------------ | ----------- |
+| ec2-web-role          | EC2              | S3ReadOnly, SecretsManagerRead | Webサーバー |
+| ecs-task-role         | ECS Task         | DynamoDBFullAccess             | ECSタスク   |
+| lambda-execution-role | Lambda           | CloudWatchLogs, S3ReadWrite    | Lambda関数  |
 
 #### ポリシー原則
 
@@ -601,22 +603,22 @@ python architecture_diagram.py
 
 ### セキュリティグループ
 
-| 名前 | インバウンド | アウトバウンド | 用途 |
-|------|------------|--------------|------|
-| alb-sg | 80 (0.0.0.0/0), 443 (0.0.0.0/0) | All | ALB |
-| web-sg | 80 (alb-sg), 443 (alb-sg) | All | Webサーバー |
-| app-sg | 8080 (web-sg) | All | Appサーバー |
-| db-sg | 5432 (app-sg) | All | データベース |
-| redis-sg | 6379 (app-sg) | All | Redis |
+| 名前     | インバウンド                    | アウトバウンド | 用途         |
+| -------- | ------------------------------- | -------------- | ------------ |
+| alb-sg   | 80 (0.0.0.0/0), 443 (0.0.0.0/0) | All            | ALB          |
+| web-sg   | 80 (alb-sg), 443 (alb-sg)       | All            | Webサーバー  |
+| app-sg   | 8080 (web-sg)                   | All            | Appサーバー  |
+| db-sg    | 5432 (app-sg)                   | All            | データベース |
+| redis-sg | 6379 (app-sg)                   | All            | Redis        |
 
 ### 暗号化
 
-| リソース | 暗号化方式 | 鍵管理 |
-|---------|-----------|-------|
-| EBS | AES-256 | AWS KMS |
-| S3 | AES-256 | AWS KMS |
-| RDS | AES-256 | AWS KMS |
-| データ転送 | TLS 1.3 | ACM（証明書） |
+| リソース   | 暗号化方式 | 鍵管理        |
+| ---------- | ---------- | ------------- |
+| EBS        | AES-256    | AWS KMS       |
+| S3         | AES-256    | AWS KMS       |
+| RDS        | AES-256    | AWS KMS       |
+| データ転送 | TLS 1.3    | ACM（証明書） |
 
 ### WAF（Web Application Firewall）
 
@@ -628,11 +630,11 @@ python architecture_diagram.py
 
 ### 高可用性
 
-| コンポーネント | 冗長化 | RPO | RTO |
-|--------------|-------|-----|-----|
-| Webサーバー | Multi-AZ + Auto Scaling | - | 5分 |
-| データベース | Multi-AZ + Read Replica | 5分 | 15分 |
-| ストレージ | S3（標準で11 9's） | - | - |
+| コンポーネント | 冗長化                  | RPO | RTO  |
+| -------------- | ----------------------- | --- | ---- |
+| Webサーバー    | Multi-AZ + Auto Scaling | -   | 5分  |
+| データベース   | Multi-AZ + Read Replica | 5分 | 15分 |
+| ストレージ     | S3（標準で11 9's）      | -   | -    |
 
 - **RPO（Recovery Point Objective）**: データ損失許容時間
 - **RTO（Recovery Time Objective）**: サービス復旧目標時間
@@ -640,13 +642,16 @@ python architecture_diagram.py
 ### Auto Scaling
 
 **スケールアウト条件**:
+
 - CPU使用率 > 70% が 5分継続
 - または、リクエスト数 > 1000/分
 
 **スケールイン条件**:
+
 - CPU使用率 < 30% が 10分継続
 
 **設定**:
+
 - 最小: 2台
 - 最大: 10台
 - 希望: 2台
@@ -661,17 +666,17 @@ python architecture_diagram.py
 
 ### 月額コスト（本番環境）
 
-| リソース | 詳細 | 月額コスト（USD） |
-|---------|------|------------------|
-| EC2 (Web) | t3.medium × 2台 (平均) | $60 |
-| RDS (PostgreSQL) | db.t3.medium (Multi-AZ) | $150 |
-| RDS Read Replica | db.t3.medium × 2台 | $150 |
-| ElastiCache | cache.t3.micro × 2ノード | $30 |
-| ALB | 1台 | $20 |
-| S3 | 100GB ストレージ + 転送 | $10 |
-| データ転送 | 500GB/月 | $45 |
-| CloudWatch | ログ・メトリクス | $15 |
-| **合計** | | **$480** |
+| リソース         | 詳細                     | 月額コスト（USD） |
+| ---------------- | ------------------------ | ----------------- |
+| EC2 (Web)        | t3.medium × 2台 (平均)   | $60               |
+| RDS (PostgreSQL) | db.t3.medium (Multi-AZ)  | $150              |
+| RDS Read Replica | db.t3.medium × 2台       | $150              |
+| ElastiCache      | cache.t3.micro × 2ノード | $30               |
+| ALB              | 1台                      | $20               |
+| S3               | 100GB ストレージ + 転送  | $10               |
+| データ転送       | 500GB/月                 | $45               |
+| CloudWatch       | ログ・メトリクス         | $15               |
+| **合計**         |                          | **$480**          |
 
 ### コスト削減策
 
@@ -683,40 +688,40 @@ python architecture_diagram.py
 
 ### ログ管理
 
-| ログタイプ | 保存先 | 保存期間 |
-|-----------|-------|---------|
-| アプリケーションログ | CloudWatch Logs | 30日 |
-| アクセスログ | S3 | 90日 |
-| VPC Flow Logs | CloudWatch Logs | 7日 |
-| CloudTrail（監査ログ） | S3 | 7年 |
+| ログタイプ             | 保存先          | 保存期間 |
+| ---------------------- | --------------- | -------- |
+| アプリケーションログ   | CloudWatch Logs | 30日     |
+| アクセスログ           | S3              | 90日     |
+| VPC Flow Logs          | CloudWatch Logs | 7日      |
+| CloudTrail（監査ログ） | S3              | 7年      |
 
 ### メトリクス
 
-| メトリクス | 収集間隔 | アラート閾値 |
-|-----------|---------|------------|
-| CPU使用率 | 1分 | > 80% |
-| メモリ使用率 | 1分 | > 90% |
-| ディスク使用率 | 5分 | > 85% |
-| RDSコネクション数 | 1分 | > 80% (最大数の) |
-| ALBエラーレート | 1分 | > 5% |
-| レスポンスタイム | 1分 | > 1秒 (P95) |
+| メトリクス        | 収集間隔 | アラート閾値     |
+| ----------------- | -------- | ---------------- |
+| CPU使用率         | 1分      | > 80%            |
+| メモリ使用率      | 1分      | > 90%            |
+| ディスク使用率    | 5分      | > 85%            |
+| RDSコネクション数 | 1分      | > 80% (最大数の) |
+| ALBエラーレート   | 1分      | > 5%             |
+| レスポンスタイム  | 1分      | > 1秒 (P95)      |
 
 ### アラート
 
-| アラート名 | 条件 | 通知先 | アクション |
-|-----------|------|-------|----------|
-| High CPU | CPU > 80% (5分) | Slack, Email | Auto Scaling |
-| Database Down | RDS Unavailable | PagerDuty, Phone | 即時対応 |
-| High Error Rate | Error Rate > 5% | Slack | 調査 |
-| Disk Full | Disk > 85% | Email | ディスク拡張 |
+| アラート名      | 条件            | 通知先           | アクション   |
+| --------------- | --------------- | ---------------- | ------------ |
+| High CPU        | CPU > 80% (5分) | Slack, Email     | Auto Scaling |
+| Database Down   | RDS Unavailable | PagerDuty, Phone | 即時対応     |
+| High Error Rate | Error Rate > 5% | Slack            | 調査         |
+| Disk Full       | Disk > 85%      | Email            | ディスク拡張 |
 
 ### バックアップ
 
-| リソース | バックアップ方法 | 頻度 | 保持期間 |
-|---------|----------------|------|---------|
-| RDS | 自動スナップショット | 毎日 | 30日 |
-| EBS | AWS Backup | 毎日 | 7日 |
-| S3 | バージョニング | リアルタイム | 90日 |
+| リソース | バックアップ方法     | 頻度         | 保持期間 |
+| -------- | -------------------- | ------------ | -------- |
+| RDS      | 自動スナップショット | 毎日         | 30日     |
+| EBS      | AWS Backup           | 毎日         | 7日      |
+| S3       | バージョニング       | リアルタイム | 90日     |
 
 ## ディザスタリカバリ
 
@@ -775,13 +780,17 @@ terraform destroy
 ### セキュリティスキャン
 
 \`\`\`bash
+
 # Checkov
+
 checkov -d .
 
 # tfsec
+
 tfsec .
 
 # terrascan
+
 terrascan scan
 \`\`\`
 
@@ -801,14 +810,17 @@ terraform-docs markdown table . > README.md
 ## テスト設計の考慮事項
 
 1. **構文チェック**
+
    - `terraform validate`: Terraform構文チェック
    - `terraform fmt`: フォーマットチェック
 
 2. **セキュリティテスト**
+
    - Checkov, tfsec, terrascan でスキャン
    - IAMポリシーの最小権限確認
 
 3. **コストテスト**
+
    - Infracost でコスト見積もり
    - 予算を超えていないか確認
 

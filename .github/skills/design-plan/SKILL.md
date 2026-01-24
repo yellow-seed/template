@@ -23,13 +23,13 @@ TDD開発を開始する前の設計フェーズを支援します。実装前�
 
 開発タイプに応じた詳細ガイドを参照してください。
 
-| 開発タイプ | 基本補助ツール | 詳細ガイド |
-|-----------|--------------|-----------|
-| **CLI開発** | CLIフレームワーク (oclif, cobra, clap, click等) | [resources/cli_design_desc.md](./resources/cli_design_desc.md) |
-| **API開発** | **Swagger UI / OpenAPI Specification** | [resources/api_design_desc.md](./resources/api_design_desc.md) |
-| **画面開発** | **Storybook** | [resources/ui_design_desc.md](./resources/ui_design_desc.md) |
-| **モバイルアプリ開発** | Figma, React Native Storybook, Flutter DevTools | [resources/mobile_design_desc.md](./resources/mobile_design_desc.md) |
-| **クラウドインフラ構築** | **Terraform / OpenTofu** | [resources/infrastructure_design_desc.md](./resources/infrastructure_design_desc.md) |
+| 開発タイプ               | 基本補助ツール                                  | 詳細ガイド                                                                           |
+| ------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **CLI開発**              | CLIフレームワーク (oclif, cobra, clap, click等) | [resources/cli_design_desc.md](./resources/cli_design_desc.md)                       |
+| **API開発**              | **Swagger UI / OpenAPI Specification**          | [resources/api_design_desc.md](./resources/api_design_desc.md)                       |
+| **画面開発**             | **Storybook**                                   | [resources/ui_design_desc.md](./resources/ui_design_desc.md)                         |
+| **モバイルアプリ開発**   | Figma, React Native Storybook, Flutter DevTools | [resources/mobile_design_desc.md](./resources/mobile_design_desc.md)                 |
+| **クラウドインフラ構築** | **Terraform / OpenTofu**                        | [resources/infrastructure_design_desc.md](./resources/infrastructure_design_desc.md) |
 
 ## 詳細情報
 

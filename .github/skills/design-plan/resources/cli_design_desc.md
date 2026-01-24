@@ -30,18 +30,22 @@ CLI（Command Line Interface）開発における設計ドキュメントの作�
 # CLI仕様: [コマンド名]
 
 ## 概要
+
 [コマンドの目的と基本的な使い方]
 
 ## 構文
+
 \`\`\`
 command [options] <arguments>
 \`\`\`
 
 ## 引数
+
 - `<arg1>`: [説明]
 - `[arg2]`: [説明]（任意）
 
 ## オプション
+
 - `-f, --flag`: [説明]
 - `-o, --output <file>`: [説明]
 - `-v, --verbose`: 詳細な出力を表示
@@ -50,41 +54,55 @@ command [options] <arguments>
 ## 使用例
 
 ### 基本的な使用
+
 \`\`\`bash
+
 # 最小限の実行例
+
 command input.txt
 
 # 期待される出力
+
 Processing input.txt...
 Done.
 \`\`\`
 
 ### オプション付きの使用
+
 \`\`\`bash
+
 # 出力ファイルを指定
+
 command -o output.txt input.txt
 
 # 詳細モードで実行
+
 command -v input.txt
 \`\`\`
 
 ### 複合的な使用
+
 \`\`\`bash
+
 # 複数のオプションを組み合わせ
+
 command -v -f -o output.txt input.txt
 \`\`\`
 
 ## 期待される出力
 
 ### 通常出力
+
 \`\`\`
 Processing input.txt...
+
 - Found 100 items
 - Processed 100 items
-Done. Output written to output.txt
-\`\`\`
+  Done. Output written to output.txt
+  \`\`\`
 
 ### 詳細モード出力
+
 \`\`\`
 [INFO] Starting process...
 [DEBUG] Reading input.txt
@@ -96,12 +114,12 @@ Done. Output written to output.txt
 
 ## エラーケース
 
-| エラー状況 | エラーメッセージ | 終了コード |
-|-----------|------------------|-----------|
-| ファイルが見つからない | `Error: File not found: input.txt` | 1 |
-| 権限エラー | `Error: Permission denied: input.txt` | 2 |
-| 無効な引数 | `Error: Invalid argument: --invalid` | 3 |
-| 構文エラー | `Error: Missing required argument: <input>` | 4 |
+| エラー状況             | エラーメッセージ                            | 終了コード |
+| ---------------------- | ------------------------------------------- | ---------- |
+| ファイルが見つからない | `Error: File not found: input.txt`          | 1          |
+| 権限エラー             | `Error: Permission denied: input.txt`       | 2          |
+| 無効な引数             | `Error: Invalid argument: --invalid`        | 3          |
+| 構文エラー             | `Error: Missing required argument: <input>` | 4          |
 
 ## 終了コード
 
@@ -114,20 +132,29 @@ Done. Output written to output.txt
 ## ユースケース
 
 ### ユースケース1: データ変換
+
 \`\`\`bash
+
 # JSON を CSV に変換
+
 command convert --from json --to csv data.json -o data.csv
 \`\`\`
 
 ### ユースケース2: バッチ処理
+
 \`\`\`bash
+
 # 複数ファイルを一括処理
-command batch *.txt -o output/
+
+command batch \*.txt -o output/
 \`\`\`
 
 ### ユースケース3: パイプライン処理
+
 \`\`\`bash
+
 # 他のコマンドと組み合わせ
+
 cat input.txt | command process | grep "ERROR"
 \`\`\`
 ```
@@ -166,16 +193,16 @@ For more information, see: https://example.com/docs/command
 ### Node.js (commander.js)
 
 ```javascript
-const { program } = require('commander');
+const { program } = require("commander");
 
 program
-  .name('command')
-  .description('[コマンドの説明]')
-  .version('1.0.0')
-  .argument('<input>', 'Input file path')
-  .option('-o, --output <file>', 'Output file path')
-  .option('-f, --force', 'Force overwrite')
-  .option('-v, --verbose', 'Verbose output')
+  .name("command")
+  .description("[コマンドの説明]")
+  .version("1.0.0")
+  .argument("<input>", "Input file path")
+  .option("-o, --output <file>", "Output file path")
+  .option("-f, --force", "Force overwrite")
+  .option("-v, --verbose", "Verbose output")
   .action((input, options) => {
     // 実装
   });
@@ -250,16 +277,19 @@ def command(input, output, force, verbose):
 CLIコマンドのテストで確認すべき項目:
 
 1. **正常系テスト**
+
    - 基本的な実行が成功する
    - オプションが正しく動作する
    - 出力が期待通りである
 
 2. **異常系テスト**
+
    - 不正な引数でエラーが返る
    - ファイルが存在しない場合のエラー処理
    - 権限エラーの処理
 
 3. **境界値テスト**
+
    - 空ファイルの処理
    - 大容量ファイルの処理
    - 特殊文字を含むファイル名
