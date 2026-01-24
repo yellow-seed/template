@@ -1,0 +1,19 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "Multi-language development template repository",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:md": "prettier --write '**/*.md'",
+    "format:yaml": "prettier --write '**/*.{yml,yaml}'",
+    "format:json": "prettier --write '**/*.json'"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
