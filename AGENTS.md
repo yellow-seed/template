@@ -149,7 +149,7 @@ This fix ensures all resources are cleaned up correctly.
 ## テスト戦略
 
 - ドキュメント/設定ファイルは Prettier で整形します。
-  - 対象: Markdown, YAML, JSON
+  - 対象: `.github/` 配下、`AGENTS.md`、`README.md`
   - Prettier は Docker 経由で実行します
   - チェック:
     - `docker run --rm -v "$PWD:/workspace" -w /workspace node:20 npm ci`

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "format": "prettier --write .",
-    "lint": "prettier --check ."
+    "format": "prettier --write .github AGENTS.md README.md",
+    "lint": "prettier --check .github AGENTS.md README.md"
   },
   "devDependencies": {
     "prettier": "^3.3.3"
