@@ -152,6 +152,7 @@ This fix ensures all resources are cleaned up correctly.
   - 対象: Markdown, YAML, JSON
   - チェック: `npm run lint`
   - 自動整形: `npm run format`
+  - 設定は Prettier のデフォルトを使用します
 
 ## Pull Request 作成
 
