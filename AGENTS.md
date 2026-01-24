@@ -154,6 +154,7 @@ This fix ensures all resources are cleaned up correctly.
   - チェック:
     - `docker run --rm -v "$PWD:/workspace" -w /workspace node:20 npm ci`
     - `docker run --rm -v "$PWD:/workspace" -w /workspace node:20 npm run lint`
+    - `docker compose run --rm prettier`
   - 自動整形:
     - `docker run --rm -v "$PWD:/workspace" -w /workspace node:20 npm run format`
   - 設定は Prettier のデフォルトを使用します

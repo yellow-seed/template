@@ -8,3 +8,11 @@ services:
     volumes:
       - .:/workspace
     working_dir: /workspace
+  prettier:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["lint-prettier"]
+    volumes:
+      - .:/workspace
+    working_dir: /workspace

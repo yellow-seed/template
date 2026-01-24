@@ -15,6 +15,8 @@ RUN apt-get update && \
     git \
     bats \
     curl \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Go 1.23 (required for shfmt v3.12.0)
@@ -46,6 +48,19 @@ echo ""\n\
 echo "All linting checks passed!"\n\
 ' > /usr/local/bin/lint-shell && \
     chmod +x /usr/local/bin/lint-shell
+
+# Create a script to run Prettier checks
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "Installing dependencies..."\n\
+npm ci\n\
+echo ""\n\
+echo "Running Prettier..."\n\
+npm run lint\n\
+echo ""\n\
+echo "Prettier checks passed!"\n\
+' > /usr/local/bin/lint-prettier && \
+    chmod +x /usr/local/bin/lint-prettier
 
 # Default command
 CMD ["lint-shell"]
