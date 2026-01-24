@@ -59,6 +59,7 @@ bash .claude/hooks/skills-setup.sh
 このスクリプトは`.github/skills`を`.claude/skills`と`.codex/skills`にコピーします。
 
 **注意事項**:
+
 - シンボリックリンク環境では、すべてのディレクトリは自動的に同期されます
 - コピー環境では、`.github/skills`を変更した場合、再度`skills-setup.sh`を実行して同期する必要があります
 - 新しいスキルを追加する際は、必ず`.github/skills/`に配置してください
@@ -142,7 +143,16 @@ This fix ensures all resources are cleaned up correctly.
 
 ## テスト戦略
 
-<!-- テストの実行方法や戦略を記述してください -->
+### ドキュメント/設定ファイルのフォーマット
+
+- PrettierでMarkdown/YAML/JSONをフォーマットします
+- ローカル実行:
+  - `npm install`
+  - `npm run format:check` (チェック)
+  - `npm run format` (自動フォーマット)
+- Docker実行:
+  - `docker build -t dev-env .`
+  - `docker run --rm -v $(pwd):/workspace dev-env lint-docs`
 
 ## Pull Request 作成
 

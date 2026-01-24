@@ -121,17 +121,17 @@ export const WithIcon: Story = {
 `src/components/Button/Button.stories.ts`:
 
 ```typescript
-import type { Meta, StoryObj } from '@storybook/vue3';
-import Button from './Button.vue';
+import type { Meta, StoryObj } from "@storybook/vue3";
+import Button from "./Button.vue";
 
 const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
+  title: "Components/Button",
   component: Button,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'danger'],
+      control: "select",
+      options: ["primary", "secondary", "danger"],
     },
   },
 };
@@ -141,8 +141,8 @@ type Story = StoryObj<typeof Button>;
 
 export const Primary: Story = {
   args: {
-    variant: 'primary',
-    label: 'Primary Button',
+    variant: "primary",
+    label: "Primary Button",
   },
 };
 ```
@@ -169,31 +169,31 @@ export const Primary: Story = {
 \`\`\`
 Page
 ├── Header
-│   ├── Logo
-│   ├── Navigation
-│   └── UserMenu
+│ ├── Logo
+│ ├── Navigation
+│ └── UserMenu
 ├── MainContent
-│   ├── Sidebar
-│   │   ├── FilterPanel
-│   │   └── QuickActions
-│   └── ContentArea
-│       ├── SearchBar
-│       ├── DataTable
-│       └── Pagination
+│ ├── Sidebar
+│ │ ├── FilterPanel
+│ │ └── QuickActions
+│ └── ContentArea
+│ ├── SearchBar
+│ ├── DataTable
+│ └── Pagination
 └── Footer
-    ├── Links
-    └── Copyright
+├── Links
+└── Copyright
 \`\`\`
 
 ### コンポーネント一覧
 
-| コンポーネント | 説明 | 状態 | Props |
-|--------------|------|------|-------|
-| Header | ページヘッダー | ログイン状態 | user, onLogout |
-| Navigation | ナビゲーションメニュー | アクティブページ | items, activePath |
-| DataTable | データ表示テーブル | ソート、選択 | data, columns, onSort |
-| SearchBar | 検索バー | 検索クエリ | onSearch, placeholder |
-| Pagination | ページネーション | 現在ページ | total, current, onChange |
+| コンポーネント | 説明                   | 状態             | Props                    |
+| -------------- | ---------------------- | ---------------- | ------------------------ |
+| Header         | ページヘッダー         | ログイン状態     | user, onLogout           |
+| Navigation     | ナビゲーションメニュー | アクティブページ | items, activePath        |
+| DataTable      | データ表示テーブル     | ソート、選択     | data, columns, onSort    |
+| SearchBar      | 検索バー               | 検索クエリ       | onSearch, placeholder    |
+| Pagination     | ページネーション       | 現在ページ       | total, current, onChange |
 
 ## コンポーネント詳細
 
@@ -203,13 +203,13 @@ Page
 
 \`\`\`typescript
 interface ButtonProps {
-  variant: 'primary' | 'secondary' | 'danger';
-  size: 'small' | 'medium' | 'large';
-  disabled?: boolean;
-  loading?: boolean;
-  icon?: ReactNode;
-  onClick?: () => void;
-  children: ReactNode;
+variant: 'primary' | 'secondary' | 'danger';
+size: 'small' | 'medium' | 'large';
+disabled?: boolean;
+loading?: boolean;
+icon?: ReactNode;
+onClick?: () => void;
+children: ReactNode;
 }
 \`\`\`
 
@@ -217,7 +217,7 @@ interface ButtonProps {
 
 \`\`\`tsx
 <Button variant="primary" size="medium" onClick={handleClick}>
-  Save
+Save
 </Button>
 
 <Button variant="danger" loading={isDeleting}>
@@ -239,19 +239,19 @@ interface ButtonProps {
 
 \`\`\`typescript
 interface Column<T> {
-  key: keyof T;
-  header: string;
-  sortable?: boolean;
-  render?: (value: T[keyof T], row: T) => ReactNode;
+key: keyof T;
+header: string;
+sortable?: boolean;
+render?: (value: T[keyof T], row: T) => ReactNode;
 }
 
 interface DataTableProps<T> {
-  data: T[];
-  columns: Column<T>[];
-  onSort?: (key: keyof T, direction: 'asc' | 'desc') => void;
-  onRowClick?: (row: T) => void;
-  loading?: boolean;
-  emptyMessage?: string;
+data: T[];
+columns: Column<T>[];
+onSort?: (key: keyof T, direction: 'asc' | 'desc') => void;
+onRowClick?: (row: T) => void;
+loading?: boolean;
+emptyMessage?: string;
 }
 \`\`\`
 
@@ -259,19 +259,19 @@ interface DataTableProps<T> {
 
 \`\`\`tsx
 <DataTable
-  data={users}
-  columns={[
-    { key: 'name', header: 'Name', sortable: true },
-    { key: 'email', header: 'Email', sortable: true },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (value) => <Badge>{value}</Badge>
-    },
-  ]}
-  onSort={handleSort}
-  onRowClick={handleRowClick}
-  loading={isLoading}
+data={users}
+columns={[
+{ key: 'name', header: 'Name', sortable: true },
+{ key: 'email', header: 'Email', sortable: true },
+{
+key: 'status',
+header: 'Status',
+render: (value) => <Badge>{value}</Badge>
+},
+]}
+onSort={handleSort}
+onRowClick={handleRowClick}
+loading={isLoading}
 />
 \`\`\`
 
@@ -293,13 +293,13 @@ interface DataTableProps<T> {
 
 \`\`\`
 User Action (クリック)
-  ↓
+↓
 Event Handler
-  ↓
+↓
 State Update (setState/dispatch)
-  ↓
+↓
 Re-render
-  ↓
+↓
 UI Update
 \`\`\`
 
@@ -333,55 +333,55 @@ UI Update
 
 ### イベント一覧
 
-| イベント | トリガー | アクション |
-|---------|---------|----------|
-| onClick | ボタンクリック | フォーム送信、モーダル表示 |
-| onChange | 入力値変更 | 状態更新、バリデーション |
-| onSubmit | フォーム送信 | APIリクエスト |
-| onScroll | スクロール | 無限スクロール、ヘッダー固定 |
+| イベント | トリガー       | アクション                   |
+| -------- | -------------- | ---------------------------- |
+| onClick  | ボタンクリック | フォーム送信、モーダル表示   |
+| onChange | 入力値変更     | 状態更新、バリデーション     |
+| onSubmit | フォーム送信   | APIリクエスト                |
+| onScroll | スクロール     | 無限スクロール、ヘッダー固定 |
 
 ## レスポンシブデザイン
 
 ### ブレークポイント
 
 \`\`\`css
-/* Mobile */
+/_ Mobile _/
 @media (max-width: 767px) {
-  /* モバイル専用スタイル */
+/_ モバイル専用スタイル _/
 }
 
-/* Tablet */
+/_ Tablet _/
 @media (min-width: 768px) and (max-width: 1023px) {
-  /* タブレット専用スタイル */
+/_ タブレット専用スタイル _/
 }
 
-/* Desktop */
+/_ Desktop _/
 @media (min-width: 1024px) {
-  /* デスクトップ専用スタイル */
+/_ デスクトップ専用スタイル _/
 }
 \`\`\`
 
 ### レイアウト変更
 
-| デバイス | レイアウト | 特徴 |
-|---------|-----------|------|
-| モバイル (< 768px) | シングルカラム | サイドバー非表示、ハンバーガーメニュー |
-| タブレット (768px - 1024px) | 2カラム | サイドバー折りたたみ可能 |
-| デスクトップ (> 1024px) | 3カラム | サイドバー常時表示 |
+| デバイス                    | レイアウト     | 特徴                                   |
+| --------------------------- | -------------- | -------------------------------------- |
+| モバイル (< 768px)          | シングルカラム | サイドバー非表示、ハンバーガーメニュー |
+| タブレット (768px - 1024px) | 2カラム        | サイドバー折りたたみ可能               |
+| デスクトップ (> 1024px)     | 3カラム        | サイドバー常時表示                     |
 
 ### レスポンシブコンポーネント例
 
 \`\`\`tsx
 const ResponsiveLayout = () => {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+const isMobile = useMediaQuery('(max-width: 767px)');
 
-  return (
-    <div className="layout">
-      {!isMobile && <Sidebar />}
-      <MainContent />
-      {isMobile && <MobileNavigation />}
-    </div>
-  );
+return (
+<div className="layout">
+{!isMobile && <Sidebar />}
+<MainContent />
+{isMobile && <MobileNavigation />}
+</div>
+);
 };
 \`\`\`
 
@@ -391,12 +391,12 @@ const ResponsiveLayout = () => {
 
 \`\`\`tsx
 <button
-  aria-label="ユーザーを削除"
-  aria-describedby="delete-description"
-  aria-pressed={isActive}
->
-  削除
-</button>
+aria-label="ユーザーを削除"
+aria-describedby="delete-description"
+aria-pressed={isActive}
+
+> 削除
+> </button>
 
 <div id="delete-description" role="tooltip">
   このアクションは取り消せません
@@ -405,43 +405,44 @@ const ResponsiveLayout = () => {
 
 ### キーボード操作
 
-| キー | 操作 |
-|------|------|
-| Tab | フォーカス移動 |
-| Enter | ボタンクリック、リンク遷移 |
-| Space | チェックボックス/ラジオボタン切り替え |
-| Escape | モーダル/ドロップダウンを閉じる |
-| Arrow Keys | リスト内の移動 |
+| キー       | 操作                                  |
+| ---------- | ------------------------------------- |
+| Tab        | フォーカス移動                        |
+| Enter      | ボタンクリック、リンク遷移            |
+| Space      | チェックボックス/ラジオボタン切り替え |
+| Escape     | モーダル/ドロップダウンを閉じる       |
+| Arrow Keys | リスト内の移動                        |
 
 ### フォーカス管理
 
 \`\`\`tsx
 // モーダル表示時にフォーカスをトラップ
 const Modal = ({ isOpen, onClose }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
+const modalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (isOpen && modalRef.current) {
-      modalRef.current.focus();
-    }
-  }, [isOpen]);
+useEffect(() => {
+if (isOpen && modalRef.current) {
+modalRef.current.focus();
+}
+}, [isOpen]);
 
-  return (
-    <div
+return (
+<div
       ref={modalRef}
       role="dialog"
       aria-modal="true"
       tabIndex={-1}
     >
-      {/* モーダルコンテンツ */}
-    </div>
-  );
+{/_ モーダルコンテンツ _/}
+</div>
+);
 };
 \`\`\`
 
 ### カラーコントラスト
 
 WCAG AA基準を満たすコントラスト比:
+
 - 通常テキスト: 4.5:1 以上
 - 大きなテキスト: 3:1 以上
 
@@ -453,37 +454,39 @@ WCAG AA基準を満たすコントラスト比:
 import styled from 'styled-components';
 
 const Button = styled.button<{ variant: 'primary' | 'secondary' }>\`
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.25rem;
-  font-weight: 600;
-  transition: all 0.2s;
+padding: 0.75rem 1.5rem;
+border-radius: 0.25rem;
+font-weight: 600;
+transition: all 0.2s;
 
-  \${({ variant }) =>
-    variant === 'primary' &&
-    \`
-    background-color: #3b82f6;
-    color: white;
+\${({ variant }) =>
+variant === 'primary' &&
+\`
+background-color: #3b82f6;
+color: white;
 
     &:hover {
       background-color: #2563eb;
     }
-  \`}
 
-  \${({ variant }) =>
-    variant === 'secondary' &&
-    \`
-    background-color: #6b7280;
-    color: white;
+\`}
+
+\${({ variant }) =>
+variant === 'secondary' &&
+\`
+background-color: #6b7280;
+color: white;
 
     &:hover {
       background-color: #4b5563;
     }
-  \`}
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+\`}
+
+&:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+}
 \`;
 \`\`\`
 
@@ -491,7 +494,7 @@ const Button = styled.button<{ variant: 'primary' | 'secondary' }>\`
 
 \`\`\`tsx
 <button className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded transition-colors disabled:opacity-50">
-  Submit
+Submit
 </button>
 \`\`\`
 
@@ -505,7 +508,7 @@ import { lazy, Suspense } from 'react';
 const HeavyComponent = lazy(() => import('./HeavyComponent'));
 
 <Suspense fallback={<Loading />}>
-  <HeavyComponent />
+<HeavyComponent />
 </Suspense>
 \`\`\`
 
@@ -515,15 +518,15 @@ const HeavyComponent = lazy(() => import('./HeavyComponent'));
 import { memo, useMemo, useCallback } from 'react';
 
 const ExpensiveComponent = memo(({ data }) => {
-  const processedData = useMemo(() => {
-    return data.map(item => heavyCalculation(item));
-  }, [data]);
+const processedData = useMemo(() => {
+return data.map(item => heavyCalculation(item));
+}, [data]);
 
-  const handleClick = useCallback(() => {
-    // 処理
-  }, []);
+const handleClick = useCallback(() => {
+// 処理
+}, []);
 
-  return <div>{/* ... */}</div>;
+return <div>{/_ ... _/}</div>;
 });
 \`\`\`
 
@@ -542,15 +545,18 @@ const ExpensiveComponent = memo(({ data }) => {
 ## テスト設計の考慮事項
 
 1. **ユニットテスト**
+
    - コンポーネントが正しくレンダリングされる
    - Props が正しく渡される
    - イベントハンドラーが呼ばれる
 
 2. **統合テスト**
+
    - ユーザーフローが正常に動作する
    - 状態管理が正しく機能する
 
 3. **ビジュアルレグレッションテスト**
+
    - UI の見た目が意図通りである
    - レスポンシブデザインが正しく機能する
 
@@ -570,3 +576,4 @@ const ExpensiveComponent = memo(({ data }) => {
 - [ ] ローディング状態が表示されるか
 - [ ] 空状態（データなし）が表示されるか
 - [ ] デザインシステムに準拠しているか
+```

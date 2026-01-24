@@ -76,7 +76,7 @@ paths:
             default: 0
             minimum: 0
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
@@ -86,13 +86,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/User'
+                      $ref: "#/components/schemas/User"
                   pagination:
-                    $ref: '#/components/schemas/Pagination'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       summary: ユーザーを作成
@@ -104,7 +104,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserInput'
+              $ref: "#/components/schemas/UserInput"
             examples:
               example1:
                 summary: 基本的なユーザー作成
@@ -112,22 +112,22 @@ paths:
                   name: "John Doe"
                   email: "john@example.com"
       responses:
-        '201':
+        "201":
           description: 作成成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '409':
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "409":
           description: コンフリクト（すでに存在する）
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               example:
                 error:
                   code: "CONFLICT"
@@ -147,14 +147,14 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: 成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
     put:
       summary: ユーザー情報を更新
@@ -172,16 +172,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserInput'
+              $ref: "#/components/schemas/UserInput"
       responses:
-        '200':
+        "200":
           description: 更新成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
     delete:
       summary: ユーザーを削除
@@ -195,10 +195,10 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: 削除成功
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
 components:
   securitySchemes:
@@ -309,7 +309,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error:
               code: "VALIDATION_ERROR"
@@ -323,7 +323,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error:
               code: "UNAUTHORIZED"
@@ -334,7 +334,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error:
               code: "NOT_FOUND"
@@ -345,7 +345,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             error:
               code: "INTERNAL_SERVER_ERROR"
@@ -364,24 +364,29 @@ components:
 ### 方法1: Prismを使用（モックサーバー付き）
 
 \`\`\`bash
+
 # Prismをインストール
+
 npm install -g @stoplight/prism-cli
 
 # モックサーバーを起動
+
 prism mock openapi.yaml
 
 # ブラウザで http://127.0.0.1:4010 を開く
+
 \`\`\`
 
 ### 方法2: Swagger UIをDockerで起動
 
 \`\`\`bash
 docker run -p 8080:8080 \
-  -e SWAGGER_JSON=/api/openapi.yaml \
-  -v $(pwd):/api \
-  swaggerapi/swagger-ui
+ -e SWAGGER_JSON=/api/openapi.yaml \
+ -v $(pwd):/api \
+ swaggerapi/swagger-ui
 
 # ブラウザで http://localhost:8080 を開く
+
 \`\`\`
 
 ### 方法3: オンラインエディタ
@@ -422,20 +427,20 @@ POST /auth/login
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
-  "password": "password"
+"email": "user@example.com",
+"password": "password"
 }
 \`\`\`
 
 ## エンドポイント一覧
 
-| メソッド | パス | 説明 | 認証 |
-|---------|------|------|------|
-| GET | /users | ユーザー一覧を取得 | 必須 |
-| POST | /users | ユーザーを作成 | 必須 |
-| GET | /users/{userId} | ユーザー詳細を取得 | 必須 |
-| PUT | /users/{userId} | ユーザー情報を更新 | 必須 |
-| DELETE | /users/{userId} | ユーザーを削除 | 必須 |
+| メソッド | パス            | 説明               | 認証 |
+| -------- | --------------- | ------------------ | ---- |
+| GET      | /users          | ユーザー一覧を取得 | 必須 |
+| POST     | /users          | ユーザーを作成     | 必須 |
+| GET      | /users/{userId} | ユーザー詳細を取得 | 必須 |
+| PUT      | /users/{userId} | ユーザー情報を更新 | 必須 |
+| DELETE   | /users/{userId} | ユーザーを削除     | 必須 |
 
 ## エンドポイント詳細
 
@@ -445,10 +450,10 @@ Content-Type: application/json
 
 #### リクエストパラメータ
 
-| 名前 | 場所 | 型 | 必須 | 説明 |
-|-----|------|-----|------|------|
-| limit | query | integer | No | 取得する最大件数（デフォルト: 10） |
-| offset | query | integer | No | スキップする件数（デフォルト: 0） |
+| 名前   | 場所  | 型      | 必須 | 説明                               |
+| ------ | ----- | ------- | ---- | ---------------------------------- |
+| limit  | query | integer | No   | 取得する最大件数（デフォルト: 10） |
+| offset | query | integer | No   | スキップする件数（デフォルト: 0）  |
 
 #### レスポンス例
 
@@ -456,20 +461,20 @@ Content-Type: application/json
 
 \`\`\`json
 {
-  "data": [
-    {
-      "id": 1,
-      "name": "John Doe",
-      "email": "john@example.com",
-      "createdAt": "2024-01-01T00:00:00Z",
-      "updatedAt": "2024-01-01T00:00:00Z"
-    }
-  ],
-  "pagination": {
-    "total": 100,
-    "limit": 10,
-    "offset": 0
-  }
+"data": [
+{
+"id": 1,
+"name": "John Doe",
+"email": "john@example.com",
+"createdAt": "2024-01-01T00:00:00Z",
+"updatedAt": "2024-01-01T00:00:00Z"
+}
+],
+"pagination": {
+"total": 100,
+"limit": 10,
+"offset": 0
+}
 }
 \`\`\`
 
@@ -477,10 +482,10 @@ Content-Type: application/json
 
 \`\`\`json
 {
-  "error": {
-    "code": "UNAUTHORIZED",
-    "message": "Authentication required"
-  }
+"error": {
+"code": "UNAUTHORIZED",
+"message": "Authentication required"
+}
 }
 \`\`\`
 
@@ -492,8 +497,8 @@ Content-Type: application/json
 
 \`\`\`json
 {
-  "name": "John Doe",
-  "email": "john@example.com"
+"name": "John Doe",
+"email": "john@example.com"
 }
 \`\`\`
 
@@ -503,11 +508,11 @@ Content-Type: application/json
 
 \`\`\`json
 {
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "createdAt": "2024-01-01T00:00:00Z",
-  "updatedAt": "2024-01-01T00:00:00Z"
+"id": 1,
+"name": "John Doe",
+"email": "john@example.com",
+"createdAt": "2024-01-01T00:00:00Z",
+"updatedAt": "2024-01-01T00:00:00Z"
 }
 \`\`\`
 
@@ -515,29 +520,29 @@ Content-Type: application/json
 
 \`\`\`json
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Validation failed",
-    "details": [
-      {
-        "field": "email",
-        "message": "Invalid email format"
-      }
-    ]
-  }
+"error": {
+"code": "VALIDATION_ERROR",
+"message": "Validation failed",
+"details": [
+{
+"field": "email",
+"message": "Invalid email format"
+}
+]
+}
 }
 \`\`\`
 
 ## エラーコード
 
-| コード | HTTPステータス | 説明 |
-|--------|---------------|------|
-| VALIDATION_ERROR | 400 | リクエストのバリデーションエラー |
-| UNAUTHORIZED | 401 | 認証が必要 |
-| FORBIDDEN | 403 | 権限不足 |
-| NOT_FOUND | 404 | リソースが見つからない |
-| CONFLICT | 409 | リソースの競合 |
-| INTERNAL_SERVER_ERROR | 500 | サーバー内部エラー |
+| コード                | HTTPステータス | 説明                             |
+| --------------------- | -------------- | -------------------------------- |
+| VALIDATION_ERROR      | 400            | リクエストのバリデーションエラー |
+| UNAUTHORIZED          | 401            | 認証が必要                       |
+| FORBIDDEN             | 403            | 権限不足                         |
+| NOT_FOUND             | 404            | リソースが見つからない           |
+| CONFLICT              | 409            | リソースの競合                   |
+| INTERNAL_SERVER_ERROR | 500            | サーバー内部エラー               |
 
 ## レート制限
 
@@ -624,15 +629,18 @@ scalar DateTime
 API のテストで確認すべき項目:
 
 1. **正常系テスト**
+
    - 各エンドポイントが正しくレスポンスを返す
    - レスポンススキーマが仕様通りである
 
 2. **異常系テスト**
+
    - バリデーションエラーが適切に返る
    - 認証エラーが適切に処理される
    - 存在しないリソースへのアクセスで404が返る
 
 3. **境界値テスト**
+
    - ページネーションの境界値
    - リクエストボディの最大サイズ
    - レート制限の動作

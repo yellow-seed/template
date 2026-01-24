@@ -29,11 +29,13 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 ### A. GitHub設定ファイル群（`.github/` 配下）
 
 **対象パターン**:
+
 ```bash
 .github/**/*
 ```
 
 **同期戦略**:
+
 - `.github/workflows/`: 新規ファイルは追加、既存ファイルは構造比較後に更新提案
 - `.github/ISSUE_TEMPLATE/`: 新規テンプレートを追加
 - `.github/PULL_REQUEST_TEMPLATE.md`: 新規追加または内容比較
@@ -43,6 +45,7 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 ### B. AIエージェント設定ファイル群
 
 **対象パターン**:
+
 ```bash
 # 既知のAIエージェント設定ディレクトリ
 .claude/**/*
@@ -55,10 +58,12 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 
 **自動検出ロジック**:
 テンプレート側でドット始まりの新しいディレクトリを検出した場合、以下の条件でAIエージェント設定と判定：
+
 - ディレクトリ名が `.{claude,codex,cursor,aider,codeium,copilot}` のパターンに一致
 - `skills/`, `prompts/`, `config/`, `hooks/` などのサブディレクトリを含む
 
 **同期戦略**:
+
 - **skills/**: 新規スキル追加、既存スキルは更新確認
 - **hooks/**: 新規フック追加、既存フックは内容比較後に更新提案
 - **config/**, **prompts/**: 新規ファイル追加、既存ファイルは内容比較
@@ -66,6 +71,7 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 ### C. 開発環境設定ファイル群
 
 **対象パターン**:
+
 ```bash
 # エディタ・フォーマッタ設定
 .editorconfig
@@ -81,6 +87,7 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 ```
 
 **同期戦略**:
+
 - 新規ファイル: そのまま追加
 - 既存ファイル: 内容差分を表示し、マージ方法を提案
 - 設定値: テンプレート値を基準に（詳細は「設定ファイル値の基準化」セクション参照）
@@ -88,6 +95,7 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 ### D. Git設定ファイル群
 
 **対象パターン**:
+
 ```bash
 .gitignore
 .gitattributes
@@ -95,12 +103,14 @@ yellow-seed/template の更新内容を、このテンプレートを基に作�
 ```
 
 **同期戦略**:
+
 - 行単位でマージ（重複を避けて新規エントリを追加）
 - コメントブロック単位で整理
 
 ### E. ドキュメントファイル（構造同期を含む）
 
 **対象パターン**:
+
 ```markdown
 README.md
 AGENTS.md
@@ -109,20 +119,21 @@ CONTRIBUTING.md
 ```
 
 **同期戦略**:
+
 - `README.md`: バッジセクション（先頭の `<!-- ... -->` コメントで囲まれた範囲）を同期
 - `AGENTS.md`, `CLAUDE.md`: セクション構造をテンプレートに合わせてリファクタリング提案
 - **構造同期の重要性**: skillsへの適切な委譲は、ドキュメント構造の質に依存するため、テンプレートのお手本構造を維持
 
 ## 同期ルールの明確化
 
-| 同期タイプ | 対象ファイル | 動作 |
-|------------|-------------|------|
-| **完全同期** | `.github/workflows/` (新規), `.github/ISSUE_TEMPLATE/`, `.github/actions/` | テンプレートから完全コピー |
-| **構造同期** | README.md, AGENTS.md, CLAUDE.md, `.github/workflows/` (既存) | 構造をテンプレートに合わせる |
-| **マージ同期** | `.gitignore`, `.gitattributes` | 既存内容を保持しつつ新規内容を追加 |
-| **値同期** | `.codecov.yml`, `.renovate.json`, `.editorconfig` | テンプレート値を基準に |
-| **選択的同期** | README.md (バッジセクションのみ) | 特定セクションのみを置換 |
-| **スキップ** | プロジェクト固有ファイル (`package.json`, `Cargo.toml`, `pyproject.toml` など) | 同期対象外 |
+| 同期タイプ     | 対象ファイル                                                                   | 動作                               |
+| -------------- | ------------------------------------------------------------------------------ | ---------------------------------- |
+| **完全同期**   | `.github/workflows/` (新規), `.github/ISSUE_TEMPLATE/`, `.github/actions/`     | テンプレートから完全コピー         |
+| **構造同期**   | README.md, AGENTS.md, CLAUDE.md, `.github/workflows/` (既存)                   | 構造をテンプレートに合わせる       |
+| **マージ同期** | `.gitignore`, `.gitattributes`                                                 | 既存内容を保持しつつ新規内容を追加 |
+| **値同期**     | `.codecov.yml`, `.renovate.json`, `.editorconfig`                              | テンプレート値を基準に             |
+| **選択的同期** | README.md (バッジセクションのみ)                                               | 特定セクションのみを置換           |
+| **スキップ**   | プロジェクト固有ファイル (`package.json`, `Cargo.toml`, `pyproject.toml` など) | 同期対象外                         |
 
 ## ドキュメント構造同期
 
@@ -142,6 +153,7 @@ diff -u /tmp/target_structure.txt /tmp/template_structure.txt
 ### テンプレート推奨構造
 
 **README.md**:
+
 1. タイトルとバッジ
 2. 概要・説明
 3. 特徴（Features）
@@ -154,6 +166,7 @@ diff -u /tmp/target_structure.txt /tmp/template_structure.txt
 10. ライセンス（License）
 
 **AGENTS.md**:
+
 1. プロジェクト概要
 2. 技術スタック
 3. ディレクトリ構造
@@ -192,21 +205,21 @@ diff -u /tmp/target_structure.txt /tmp/template_structure.txt
 
 **同期する要素**:
 
-| 要素 | 同期方法 | 理由 |
-|-----|---------|------|
-| **トリガー条件** | テンプレート値を採用 | CI/CD戦略の統一 |
-| **ブランチ条件** | テンプレート値を採用 | `branches: [main]` |
-| **パス条件** | テンプレート値を採用 | `paths-ignore: ['**.md']` でCI最適化 |
-| **ジョブ分離** | 構造パターンを採用 | lint → test → coverage の分離 |
-| **依存関係** | 構造パターンを採用 | `needs: lint` |
-| **ステップ順序** | 構造パターンを採用 | checkout → setup → action |
+| 要素             | 同期方法             | 理由                                 |
+| ---------------- | -------------------- | ------------------------------------ |
+| **トリガー条件** | テンプレート値を採用 | CI/CD戦略の統一                      |
+| **ブランチ条件** | テンプレート値を採用 | `branches: [main]`                   |
+| **パス条件**     | テンプレート値を採用 | `paths-ignore: ['**.md']` でCI最適化 |
+| **ジョブ分離**   | 構造パターンを採用   | lint → test → coverage の分離        |
+| **依存関係**     | 構造パターンを採用   | `needs: lint`                        |
+| **ステップ順序** | 構造パターンを採用   | checkout → setup → action            |
 
 **同期しない要素**:
 
-| 要素 | 理由 |
-|-----|------|
+| 要素                 | 理由                                                       |
+| -------------------- | ---------------------------------------------------------- |
 | **具体的なコマンド** | 技術スタック依存（`npm test` vs `pytest` vs `cargo test`） |
-| **環境変数値** | プロジェクト固有（`NODE_VERSION`, `PYTHON_VERSION` など） |
+| **環境変数値**       | プロジェクト固有（`NODE_VERSION`, `PYTHON_VERSION` など）  |
 
 ### テンプレート推奨トリガー条件
 
@@ -214,11 +227,11 @@ diff -u /tmp/target_structure.txt /tmp/template_structure.txt
 on:
   push:
     branches: [main]
-    paths-ignore: ['**.md', 'docs/**']
+    paths-ignore: ["**.md", "docs/**"]
   pull_request:
     branches: [main]
-    paths-ignore: ['**.md', 'docs/**']
-  workflow_dispatch:  # 手動実行を許可
+    paths-ignore: ["**.md", "docs/**"]
+  workflow_dispatch: # 手動実行を許可
 ```
 
 ### ワークフロー構造パターン
@@ -287,11 +300,12 @@ coverage:
   status:
     project:
       default:
-        target: 80%      # ← この値を基準に
-        threshold: 5%    # ← この値を基準に
+        target: 80% # ← この値を基準に
+        threshold: 5% # ← この値を基準に
 ```
 
 **適用方法**:
+
 - カバレッジ目標値: テンプレート値を採用（プロジェクト全体で統一）
 - 除外パス: マージ（テンプレート + プロジェクト固有）
 
@@ -306,6 +320,7 @@ coverage:
 ```
 
 **適用方法**:
+
 - スケジュール設定: テンプレート値を採用
 - automerge設定: テンプレート値を採用
 - パッケージ固有ルール: マージ
@@ -322,8 +337,10 @@ coverage:
 
 ```markdown
 <!-- CI/CD & Code Quality -->
+
 [![CI - macOS](https://github.com/yellow-seed/template/workflows/CI%20-%20macOS/badge.svg)](...)
 [![CI - Ubuntu](https://github.com/yellow-seed/template/workflows/CI%20-%20Ubuntu/badge.svg)](...)
+
 <!-- /CI/CD & Code Quality -->
 ```
 
@@ -381,6 +398,7 @@ git ls-remote --heads $TEMPLATE_REPO
 ### 2. 現在のリポジトリ設定を分析
 
 **分析項目**:
+
 - プログラミング言語とフレームワーク
 - 既存のCI/CD設定
 - プロジェクト構造
@@ -388,6 +406,7 @@ git ls-remote --heads $TEMPLATE_REPO
 - 既存のskillsとhooks
 
 **分析方法**:
+
 ```bash
 # 言語検出
 ls package.json pyproject.toml Cargo.toml go.mod Gemfile pom.xml build.gradle 2>/dev/null
@@ -423,6 +442,7 @@ git diff HEAD template/main -- README.md
 ### 4. 適用すべき変更を選択
 
 **自動適用可能な変更**:
+
 - `.claude/skills/`内の新規skillファイル
 - `.github/`配下の全ての新規ファイル・ディレクトリ
   - `.github/workflows/`内の新規ワークフローファイル
@@ -430,6 +450,7 @@ git diff HEAD template/main -- README.md
   - `.github/skills/`, `.github/configs/`等、将来追加される新規ディレクトリ
 
 **確認が必要な変更**:
+
 - 既存ファイルの更新
 - 設定ファイルの変更（`.gitignore`, `.editorconfig`等）
 - ドキュメントファイルの更新（`AGENTS.md`, `CLAUDE.md`）
@@ -454,25 +475,33 @@ fi
 #### 5.2 既存設定との統合
 
 **戦略**:
+
 - 新規ファイル: そのまま追加
 - 既存ファイルの新規セクション: セクション単位で追加
 - 既存ファイルの更新: ユーザーに確認を求める
 
 **例: AGENTS.mdの統合**:
+
 ```markdown
 # 現在のAGENTS.md
+
 ## プロジェクト概要
+
 [既存の内容]
 
 # yellow-seed/template からの新規セクション
+
 ## 開発環境のセットアップ
+
 ### Claude Code での GitHub CLI (gh) のセットアップ
+
 [新規内容を追加]
 ```
 
 #### 5.3 競合解決
 
 **競合が発生する場合**:
+
 1. 両方の内容を並べて表示
 2. 推奨される統合方法を提案
 3. ユーザーの確認を待つ
@@ -527,20 +556,24 @@ git remote remove template
 
 ```markdown
 **検出された変更**:
+
 - `.claude/skills/template-sync/SKILL.md` (新規スキル)
 - `.github/workflows/shell-linting.yml` (新規ワークフロー)
 - `.codex/` (新規AIエージェント設定ディレクトリ、自動検出)
 
 **自動検出の流れ**:
+
 1. ドット始まりのディレクトリ `.codex/` を検出
 2. サブディレクトリ `skills/`, `config/` を確認
 3. AIエージェント設定と判定
 
 **適用戦略**:
+
 - パターンベースで自動的に追加対象と判定
 - 新規ファイル・ディレクトリをそのままコピー
 
 **実行**:
+
 1. 新規ディレクトリを作成
 2. yellow-seed/template からファイルをコピー
 3. 動作確認
@@ -551,32 +584,41 @@ git remote remove template
 
 ```markdown
 **検出された変更**:
+
 - yellow-seed/template の `.gitignore`: 複数の新規エントリ
 
 **現在の.gitignore**:
 ```
+
 node_modules/
 .env
 dist/
+
 ```
 
 **yellow-seed/template の .gitignore**:
 ```
+
 # Node
+
 node_modules/
 .env
 dist/
 
 # IDE
+
 .vscode/
 .idea/
 
 # OS
+
 .DS_Store
 Thumbs.db
 
 # Claude Code
+
 .claude/settings.local.json
+
 ```
 
 **適用戦略**:
@@ -591,12 +633,14 @@ Thumbs.db
 
 ### シナリオ3: ドキュメント構造のリファクタリング（構造同期）
 
-```markdown
+````markdown
 **検出された変更**:
+
 - `AGENTS.md`: 構造の整理と新規セクション追加
 - `README.md`: バッジセクションの更新
 
 **AGENTS.md 構造比較結果**:
+
 ```diff
 # 現在のターゲットリポジトリ
 ## プロジェクト概要
@@ -616,21 +660,26 @@ Thumbs.db
 ## デプロイメント
 ## その他の重要な情報
 ```
+````
 
 **README.md バッジセクション**:
+
 - コメントブロック `<!-- CI/CD & Code Quality -->` で囲まれた範囲を同期
 - リポジトリ名を自動置換（`yellow-seed/template` → `yellow-seed/target-repo`）
 
 **適用戦略**:
+
 - AGENTS.md: 既存内容を保持しつつ、セクション構造をテンプレートに合わせる
 - README.md: バッジセクションのみ選択的に同期
 
 **実行**:
+
 1. 見出し構造を抽出して比較
 2. リファクタリング提案を生成
 3. ユーザー確認後、構造を再編成
 4. コミット: `git commit -m "docs: restructure documents to match template"`
-```
+
+````
 
 ### シナリオ4: ワークフロー構造の同期（構造同期）
 
@@ -661,19 +710,22 @@ jobs:
   test:
     needs: lint
     steps: [checkout, setup-env, run-tests]
-```
+````
 
 **適用戦略**:
+
 - トリガー条件をテンプレート値に更新（branches指定、paths-ignore、workflow_dispatch追加）
 - ジョブを lint と test に分離、依存関係を明示
 - 具体的なコマンド（npm test など）は変更しない
 
 **実行**:
+
 1. ワークフロー構造を比較
 2. トリガー条件を更新
 3. ジョブ構造をリファクタリング（コマンドは保持）
 4. コミット: `git commit -m "ci: refactor workflow structure to match template"`
-```
+
+````
 
 ### シナリオ5: 設定ファイル値の基準化（値同期）
 
@@ -699,19 +751,22 @@ coverage:
       default:
         target: 80%
         threshold: 5%
-```
+````
 
 **適用戦略**:
+
 - カバレッジ目標値をテンプレート基準値（80%、5%）に更新
 - 除外パスはマージ（テンプレート + プロジェクト固有）
 - プロジェクト全体で統一された基準を維持
 
 **実行**:
+
 1. 設定値を比較
 2. テンプレート基準値を適用
 3. 除外パスをマージ
 4. コミット: `git commit -m "chore: align config values with template standards"`
-```
+
+````
 
 ## 同期時のチェックリスト
 
@@ -730,7 +785,7 @@ coverage:
 1. **バックアップの推奨**: 同期前にブランチを作成することを推奨
    ```bash
    git checkout -b sync-from-template
-   ```
+````
 
 2. **段階的な適用**: 一度に全ての変更を適用せず、段階的に適用することを推奨
 
@@ -745,6 +800,7 @@ coverage:
 ### 問題: yellow-seed/template にアクセスできない
 
 **解決策**:
+
 ```bash
 # SSHキーの確認
 ssh -T git@github.com
@@ -756,12 +812,14 @@ TEMPLATE_REPO="https://github.com/yellow-seed/template.git"
 ### 問題: 差分が大きすぎて適用が困難
 
 **解決策**:
+
 - 優先度の高い変更のみを適用
 - 複数のPRに分割して段階的に適用
 
 ### 問題: 競合が複雑で自動マージが困難
 
 **解決策**:
+
 - ユーザーに手動マージを依頼
 - 競合部分の両方の内容を表示し、選択を促す
 
@@ -799,12 +857,14 @@ TEMPLATE_REPO="https://github.com/yellow-seed/template.git"
 3. **設定**: 環境変数 `TEMPLATE_REPO`（オプション、デフォルト: yellow-seed/template）
 
 **使用方法**:
+
 ```bash
 # AI Agentに依頼するだけ
 "yellow-seed/template の最新の変更を同期してください"
 ```
 
 AI Agentが自動的に：
+
 1. yellow-seed/template の変更を検出
 2. 現在のリポジトリ設定を分析
 3. 適用可能な変更を提案
@@ -818,6 +878,7 @@ AI Agentが自動的に：
 - **URL**: `https://github.com/yellow-seed/template.git`
 
 別のテンプレートを使用する場合は、以下のように指定：
+
 ```bash
 TEMPLATE_REPO="https://github.com/your-org/your-template.git"
 ```

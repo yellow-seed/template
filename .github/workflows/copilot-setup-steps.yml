@@ -26,4 +26,3 @@ jobs:
         run: |
           echo "Running shell linting checks..."
           docker compose run --rm shell-dev lint-shell
-

@@ -4,7 +4,20 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/*, claude/* ]
+    branches:
+      [
+        main,
+        feat/*,
+        fix/*,
+        docs/*,
+        style/*,
+        refactor/*,
+        perf/*,
+        test/*,
+        chore/*,
+        copilot/*,
+        claude/*,
+      ]
 
 jobs:
   Lint:
@@ -39,4 +52,3 @@ jobs:
         uses: actions/checkout@v6
       - name: Run tests
         run: echo "Add your test commands here"
-
