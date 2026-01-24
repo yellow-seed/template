@@ -1,15 +1,18 @@
 # Template Repository
 
 <!-- CI/CD & Code Quality -->
+
 [![CI](https://github.com/yellow-seed/template/workflows/CI/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/ci.yml)
 [![Actionlint](https://github.com/yellow-seed/template/workflows/Actionlint/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/actionlint.yml)
 [![codecov](https://codecov.io/gh/yellow-seed/template/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/template)
 
 <!-- Project Info -->
+
 [![License](https://img.shields.io/github/license/yellow-seed/template)](https://github.com/yellow-seed/template/blob/main/LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/yellow-seed/template)](https://github.com/yellow-seed/template/commits/main)
 
 <!-- Repository Activity -->
+
 [![GitHub stars](https://img.shields.io/github/stars/yellow-seed/template)](https://github.com/yellow-seed/template/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/yellow-seed/template)](https://github.com/yellow-seed/template/network/members)
 [![GitHub issues](https://img.shields.io/github/issues/yellow-seed/template)](https://github.com/yellow-seed/template/issues)
@@ -24,35 +27,51 @@
 ## 含まれる内容
 
 ### `.github/workflows/`
+
 CI/CD、コードレビュー、コード品質チェックなどの自動化ワークフローを格納しています。
 
 ### `.github/ISSUE_TEMPLATE/`
+
 バグレポート、機能リクエスト、タスク管理など、様々な用途のIssueテンプレートを格納しています。
 
 ### `.github/PULL_REQUEST_TEMPLATE.md`
+
 統一されたPull Request形式を提供するテンプレートです。
 
 ### `.github/rulesets/`
-ブランチ保護ルールやフィーチャーブランチルールなど、GitHub Ruleset用のJSONテンプレートを格納しています。
+
+ブランチ保護ルールやフィーチャーブランチルールなど、GitHub
+Ruleset用のJSONテンプレートを格納しています。
 
 ### `.github/scripts/`
-Rulesetの適用、ブランチ自動削除、GitHub Project作成など、リポジトリセットアップを自動化するスクリプトを格納しています。詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
+
+Rulesetの適用、ブランチ自動削除、GitHub
+Project作成など、リポジトリセットアップを自動化するスクリプトを格納しています。詳細は
+[GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
 
 ### `.github/dependabot.yml`
+
 依存関係の自動更新設定です。
 
 ### `.github/skills/`
-TDD開発、Issue作成、コードレビュー、セキュリティレビューなど、Claude Code用の開発支援スキルを格納しています。
 
-**注意**: `.claude/skills/`は`.github/skills/`へのシンボリックリンクです。シンボリックリンクが機能しない環境（Windows管理者権限なしなど）では、`.claude/hooks/skills-setup.sh`を実行してください。
+TDD開発、Issue作成、コードレビュー、セキュリティレビューなど、Claude
+Code用の開発支援スキルを格納しています。
+
+**注意**:
+`.claude/skills/`は`.github/skills/`へのシンボリックリンクです。シンボリックリンクが機能しない環境（Windows管理者権限なしなど）では、`.claude/hooks/skills-setup.sh`を実行してください。
 
 ### `.claude/hooks/`
-Claude Code on the Webでのセットアップスクリプトやスキルディレクトリのセットアップスクリプトを格納しています。
+
+Claude Code on the
+Webでのセットアップスクリプトやスキルディレクトリのセットアップスクリプトを格納しています。
 
 ### `docs/`
+
 プロジェクトのドキュメントを格納しています。
 
 ### ルートレベルの設定ファイル
+
 - `AGENTS.md` - AIエージェント向けのプロジェクト情報
 - `CLAUDE.md` - Claude向けの設定とドキュメント参照
 - `.gitignore` - 複数言語対応（Ruby, Python, JavaScript/TypeScript, Go）
@@ -73,7 +92,8 @@ Claude Code on the Webでのセットアップスクリプトやスキルディ�
 
 #### 方法1: GitHub Actions で実行（推奨）
 
-リポジトリのオーナーまたは管理者権限を持つユーザーは、GitHub Actions から簡単にセットアップできます：
+リポジトリのオーナーまたは管理者権限を持つユーザーは、GitHub
+Actions から簡単にセットアップできます：
 
 1. リポジトリの **Actions** タブを開く
 2. **Setup Repository** ワークフローを選択
@@ -82,6 +102,7 @@ Claude Code on the Webでのセットアップスクリプトやスキルディ�
 5. **Run workflow** で実行
 
 **特徴:**
+
 - リポジトリオーナー/管理者のみ実行可能（セキュリティ保護）
 - Dry-run モードで事前確認可能
 - ローカル環境不要

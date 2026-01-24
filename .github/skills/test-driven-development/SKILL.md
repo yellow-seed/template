@@ -1,6 +1,8 @@
 ---
 name: test-driven-development
-description: "TDD（テスト駆動開発）スキル。Red-Green-Refactorサイクルに基づく開発支援。Use when: 開発を依頼された時。"
+description:
+  'TDD（テスト駆動開発）スキル。Red-Green-Refactorサイクルに基づく開発支援。Use when:
+  開発を依頼された時。'
 ---
 
 # テスト駆動開発（TDD）
@@ -9,11 +11,11 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 ## TDDサイクル
 
-| フェーズ | 説明 | 実施内容 |
-| ----- | ------------- | ------------- |
-| Red | 失敗するテストを書く | 要件を満たすテストケースを作成し、実行して失敗を確認 |
-| Green | テストを通す最小限のコード | テストが通る最小限の実装を追加 |
-| Refactor | コードを改善 | 重複排除、可読性向上、設計改善を実施 |
+| フェーズ | 説明                       | 実施内容                                             |
+| -------- | -------------------------- | ---------------------------------------------------- |
+| Red      | 失敗するテストを書く       | 要件を満たすテストケースを作成し、実行して失敗を確認 |
+| Green    | テストを通す最小限のコード | テストが通る最小限の実装を追加                       |
+| Refactor | コードを改善               | 重複排除、可読性向上、設計改善を実施                 |
 
 ## TDD原則
 
@@ -45,7 +47,7 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 **テストファイルの扱い**:
 
-- **コード開発**: 作成したテストファイルは最終成果物として残す（例: tests/*.bats）
+- **コード開発**: 作成したテストファイルは最終成果物として残す（例: tests/\*.bats）
 - **ドキュメント開発**: 検証用のテストチェックリスト（TEST.md など）は、Greenフェーズ完了後に以下のいずれかを実施
   - 不要な場合は削除する
   - 継続的な品質確認が必要な場合は残す
@@ -120,7 +122,8 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 #### 3.5. Pull Request 作成
 
-- Pull Requestを作成（詳細は [.claude/skills/pull-request/SKILL.md](../pull-request/SKILL.md) を参照）
+- Pull Requestを作成（詳細は [.claude/skills/pull-request/SKILL.md](../pull-request/SKILL.md)
+  を参照）
 
   ```bash
   gh pr create --title "type: description" --body "..."
@@ -140,13 +143,13 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 ## テスト品質チェックポイント
 
-| 項目 | チェック内容 |
-| ----- | ------------- |
+| 項目       | チェック内容                                 |
+| ---------- | -------------------------------------------- |
 | カバレッジ | 重要なパス、エッジケース、エラーケースを網羅 |
-| 独立性 | テスト間の依存関係がない |
-| 明確性 | テストの意図が明確で可読性が高い |
-| 速度 | テストが高速に実行できる |
-| 信頼性 | テストが安定して同じ結果を返す |
+| 独立性     | テスト間の依存関係がない                     |
+| 明確性     | テストの意図が明確で可読性が高い             |
+| 速度       | テストが高速に実行できる                     |
+| 信頼性     | テストが安定して同じ結果を返す               |
 
 ## 出力形式
 
@@ -177,8 +180,10 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 プロジェクトでは以下のCI/CDチェックが自動実行されます:
 
-- **Actionlint**: GitHub Actions ワークフローファイルの構文チェック ([actionlint.yml](.github/workflows/actionlint.yml))
-- **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック ([ci.yml](.github/workflows/ci.yml))
+- **Actionlint**: GitHub
+  Actions ワークフローファイルの構文チェック ([actionlint.yml](.github/workflows/actionlint.yml))
+- **ShellCheck +
+  shfmt**: シェルスクリプトの静的解析とフォーマットチェック ([ci.yml](.github/workflows/ci.yml))
 - **Test**: プロジェクト固有のテスト実行 ([ci.yml](.github/workflows/ci.yml))
 
 CI/CDパイプラインのURL: `https://github.com/{owner}/{repo}/actions`

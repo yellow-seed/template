@@ -27,7 +27,8 @@ project/
 
 ### Claude Code での GitHub CLI (gh) のセットアップ
 
-Claude Code on the Web などのリモート環境で GitHub CLI (`gh`) コマンドを使用する場合は、以下のhookスクリプトを実行してください：
+Claude Code on the Web などのリモート環境で GitHub CLI
+(`gh`) コマンドを使用する場合は、以下のhookスクリプトを実行してください：
 
 ```bash
 bash .claude/hooks/gh-setup.sh
@@ -35,7 +36,8 @@ bash .claude/hooks/gh-setup.sh
 
 ### リモート環境での gh コマンド使用方法
 
-gitのremoteがローカルプロキシを経由している環境では、`gh` コマンドがリポジトリを自動認識できない場合があります。その場合は以下の方法を使用してください：
+gitのremoteがローカルプロキシを経由している環境では、`gh`
+コマンドがリポジトリを自動認識できない場合があります。その場合は以下の方法を使用してください：
 
 方法: `-R` フラグでリポジトリを明示的に指定
 
@@ -48,7 +50,8 @@ gh pr view 123 -R yellow-seed/template
 
 ### スキルディレクトリのセットアップ（Windows環境など）
 
-このリポジトリでは、`.claude/skills` と `.codex/skills` は `.github/skills` へのシンボリックリンクとして構成されています。
+このリポジトリでは、`.claude/skills` と `.codex/skills` は `.github/skills`
+へのシンボリックリンクとして構成されています。
 
 **シンボリックリンクが機能しない環境**（Windows管理者権限なし、`core.symlinks=false`など）では、以下のスクリプトを実行してください：
 
@@ -59,6 +62,7 @@ bash .claude/hooks/skills-setup.sh
 このスクリプトは`.github/skills`を`.claude/skills`と`.codex/skills`にコピーします。
 
 **注意事項**:
+
 - シンボリックリンク環境では、すべてのディレクトリは自動的に同期されます
 - コピー環境では、`.github/skills`を変更した場合、再度`skills-setup.sh`を実行して同期する必要があります
 - 新しいスキルを追加する際は、必ず`.github/skills/`に配置してください
@@ -134,21 +138,28 @@ This fix ensures all resources are cleaned up correctly.
 ### 基本原則
 
 - **機能の意味のある単位でコミット**: 実装とそれが通るテストコードなど、機能的に独立した単位でコミットする
-- **Pull Requestのすべての変更を一つのコミットにまとめない**: 複数の異なる目的の変更は別々のコミットに分割する
+- **Pull
+  Requestのすべての変更を一つのコミットにまとめない**: 複数の異なる目的の変更は別々のコミットに分割する
 
 ### 詳細なガイドライン
 
-コミット分割の判断基準や実践例については、[.claude/skills/git-commit/SKILL.md](.claude/skills/git-commit/SKILL.md) を参照してください。
+コミット分割の判断基準や実践例については、[.claude/skills/git-commit/SKILL.md](.claude/skills/git-commit/SKILL.md)
+を参照してください。
 
 ## テスト戦略
 
-<!-- テストの実行方法や戦略を記述してください -->
+- ドキュメント/設定ファイルは Prettier で整形します。
+  - 対象: Markdown, YAML, JSON
+  - チェック: `npm run lint`
+  - 自動整形: `npm run format`
 
 ## Pull Request 作成
 
-このプロジェクトでは、`.github/PULL_REQUEST_TEMPLATE.md`のテンプレート形式に準拠した高品質なPull Requestを作成します。
+このプロジェクトでは、`.github/PULL_REQUEST_TEMPLATE.md`のテンプレート形式に準拠した高品質なPull
+Requestを作成します。
 
-詳細なガイドラインは [.claude/skills/pull-request/SKILL.md](.claude/skills/pull-request/SKILL.md) を参照してください。
+詳細なガイドラインは [.claude/skills/pull-request/SKILL.md](.claude/skills/pull-request/SKILL.md)
+を参照してください。
 
 ## デプロイメント
 

@@ -109,8 +109,8 @@ paths:
               example1:
                 summary: 基本的なユーザー作成
                 value:
-                  name: "John Doe"
-                  email: "john@example.com"
+                  name: 'John Doe'
+                  email: 'john@example.com'
       responses:
         '201':
           description: 作成成功
@@ -130,8 +130,8 @@ paths:
                 $ref: '#/components/schemas/Error'
               example:
                 error:
-                  code: "CONFLICT"
-                  message: "User with this email already exists"
+                  code: 'CONFLICT'
+                  message: 'User with this email already exists'
 
   /users/{userId}:
     get:
@@ -222,22 +222,22 @@ components:
         name:
           type: string
           description: ユーザー名
-          example: "John Doe"
+          example: 'John Doe'
         email:
           type: string
           format: email
           description: メールアドレス
-          example: "john@example.com"
+          example: 'john@example.com'
         createdAt:
           type: string
           format: date-time
           description: 作成日時
-          example: "2024-01-01T00:00:00Z"
+          example: '2024-01-01T00:00:00Z'
         updatedAt:
           type: string
           format: date-time
           description: 更新日時
-          example: "2024-01-01T00:00:00Z"
+          example: '2024-01-01T00:00:00Z'
 
     UserInput:
       type: object
@@ -250,12 +250,12 @@ components:
           minLength: 1
           maxLength: 100
           description: ユーザー名
-          example: "John Doe"
+          example: 'John Doe'
         email:
           type: string
           format: email
           description: メールアドレス
-          example: "john@example.com"
+          example: 'john@example.com'
 
     Pagination:
       type: object
@@ -287,11 +287,11 @@ components:
             code:
               type: string
               description: エラーコード
-              example: "VALIDATION_ERROR"
+              example: 'VALIDATION_ERROR'
             message:
               type: string
               description: エラーメッセージ
-              example: "Invalid input"
+              example: 'Invalid input'
             details:
               type: array
               description: 詳細なエラー情報
@@ -312,11 +312,11 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             error:
-              code: "VALIDATION_ERROR"
-              message: "Validation failed"
+              code: 'VALIDATION_ERROR'
+              message: 'Validation failed'
               details:
-                - field: "email"
-                  message: "Invalid email format"
+                - field: 'email'
+                  message: 'Invalid email format'
 
     UnauthorizedError:
       description: 認証エラー
@@ -326,8 +326,8 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             error:
-              code: "UNAUTHORIZED"
-              message: "Authentication required"
+              code: 'UNAUTHORIZED'
+              message: 'Authentication required'
 
     NotFoundError:
       description: リソースが見つからない
@@ -337,8 +337,8 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             error:
-              code: "NOT_FOUND"
-              message: "Resource not found"
+              code: 'NOT_FOUND'
+              message: 'Resource not found'
 
     InternalServerError:
       description: サーバーエラー
@@ -348,8 +348,8 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             error:
-              code: "INTERNAL_SERVER_ERROR"
-              message: "An unexpected error occurred"
+              code: 'INTERNAL_SERVER_ERROR'
+              message: 'An unexpected error occurred'
 ```
 
 ## Swagger UIのセットアップ
@@ -364,24 +364,28 @@ components:
 ### 方法1: Prismを使用（モックサーバー付き）
 
 \`\`\`bash
+
 # Prismをインストール
+
 npm install -g @stoplight/prism-cli
 
 # モックサーバーを起動
+
 prism mock openapi.yaml
 
 # ブラウザで http://127.0.0.1:4010 を開く
+
 \`\`\`
 
 ### 方法2: Swagger UIをDockerで起動
 
-\`\`\`bash
-docker run -p 8080:8080 \
-  -e SWAGGER_JSON=/api/openapi.yaml \
-  -v $(pwd):/api \
-  swaggerapi/swagger-ui
+\`\`\`bash docker run -p 8080:8080 \
+ -e SWAGGER_JSON=/api/openapi.yaml \
+ -v $(pwd):/api \
+ swaggerapi/swagger-ui
 
 # ブラウザで http://localhost:8080 を開く
+
 \`\`\`
 
 ### 方法3: オンラインエディタ
@@ -411,31 +415,23 @@ https://editor.swagger.io/ にアクセスして openapi.yaml の内容を貼り
 
 ### 認証ヘッダー
 
-\`\`\`
-Authorization: Bearer <token>
-\`\`\`
+\`\`\` Authorization: Bearer <token> \`\`\`
 
 ### トークン取得
 
-\`\`\`bash
-POST /auth/login
-Content-Type: application/json
+\`\`\`bash POST /auth/login Content-Type: application/json
 
-{
-  "email": "user@example.com",
-  "password": "password"
-}
-\`\`\`
+{ "email": "user@example.com", "password": "password" } \`\`\`
 
 ## エンドポイント一覧
 
-| メソッド | パス | 説明 | 認証 |
-|---------|------|------|------|
-| GET | /users | ユーザー一覧を取得 | 必須 |
-| POST | /users | ユーザーを作成 | 必須 |
-| GET | /users/{userId} | ユーザー詳細を取得 | 必須 |
-| PUT | /users/{userId} | ユーザー情報を更新 | 必須 |
-| DELETE | /users/{userId} | ユーザーを削除 | 必須 |
+| メソッド | パス            | 説明               | 認証 |
+| -------- | --------------- | ------------------ | ---- |
+| GET      | /users          | ユーザー一覧を取得 | 必須 |
+| POST     | /users          | ユーザーを作成     | 必須 |
+| GET      | /users/{userId} | ユーザー詳細を取得 | 必須 |
+| PUT      | /users/{userId} | ユーザー情報を更新 | 必須 |
+| DELETE   | /users/{userId} | ユーザーを削除     | 必須 |
 
 ## エンドポイント詳細
 
@@ -445,44 +441,22 @@ Content-Type: application/json
 
 #### リクエストパラメータ
 
-| 名前 | 場所 | 型 | 必須 | 説明 |
-|-----|------|-----|------|------|
-| limit | query | integer | No | 取得する最大件数（デフォルト: 10） |
-| offset | query | integer | No | スキップする件数（デフォルト: 0） |
+| 名前   | 場所  | 型      | 必須 | 説明                               |
+| ------ | ----- | ------- | ---- | ---------------------------------- |
+| limit  | query | integer | No   | 取得する最大件数（デフォルト: 10） |
+| offset | query | integer | No   | スキップする件数（デフォルト: 0）  |
 
 #### レスポンス例
 
 **200 OK**
 
-\`\`\`json
-{
-  "data": [
-    {
-      "id": 1,
-      "name": "John Doe",
-      "email": "john@example.com",
-      "createdAt": "2024-01-01T00:00:00Z",
-      "updatedAt": "2024-01-01T00:00:00Z"
-    }
-  ],
-  "pagination": {
-    "total": 100,
-    "limit": 10,
-    "offset": 0
-  }
-}
-\`\`\`
+\`\`\`json { "data": [ { "id": 1, "name": "John Doe", "email": "john@example.com", "createdAt":
+"2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" } ], "pagination": { "total": 100,
+"limit": 10, "offset": 0 } } \`\`\`
 
 **401 Unauthorized**
 
-\`\`\`json
-{
-  "error": {
-    "code": "UNAUTHORIZED",
-    "message": "Authentication required"
-  }
-}
-\`\`\`
+\`\`\`json { "error": { "code": "UNAUTHORIZED", "message": "Authentication required" } } \`\`\`
 
 ### POST /users
 
@@ -490,54 +464,30 @@ Content-Type: application/json
 
 #### リクエストボディ
 
-\`\`\`json
-{
-  "name": "John Doe",
-  "email": "john@example.com"
-}
-\`\`\`
+\`\`\`json { "name": "John Doe", "email": "john@example.com" } \`\`\`
 
 #### レスポンス例
 
 **201 Created**
 
-\`\`\`json
-{
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "createdAt": "2024-01-01T00:00:00Z",
-  "updatedAt": "2024-01-01T00:00:00Z"
-}
-\`\`\`
+\`\`\`json { "id": 1, "name": "John Doe", "email": "john@example.com", "createdAt":
+"2024-01-01T00:00:00Z", "updatedAt": "2024-01-01T00:00:00Z" } \`\`\`
 
 **400 Bad Request**
 
-\`\`\`json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Validation failed",
-    "details": [
-      {
-        "field": "email",
-        "message": "Invalid email format"
-      }
-    ]
-  }
-}
-\`\`\`
+\`\`\`json { "error": { "code": "VALIDATION_ERROR", "message": "Validation failed", "details": [ {
+"field": "email", "message": "Invalid email format" } ] } } \`\`\`
 
 ## エラーコード
 
-| コード | HTTPステータス | 説明 |
-|--------|---------------|------|
-| VALIDATION_ERROR | 400 | リクエストのバリデーションエラー |
-| UNAUTHORIZED | 401 | 認証が必要 |
-| FORBIDDEN | 403 | 権限不足 |
-| NOT_FOUND | 404 | リソースが見つからない |
-| CONFLICT | 409 | リソースの競合 |
-| INTERNAL_SERVER_ERROR | 500 | サーバー内部エラー |
+| コード                | HTTPステータス | 説明                             |
+| --------------------- | -------------- | -------------------------------- |
+| VALIDATION_ERROR      | 400            | リクエストのバリデーションエラー |
+| UNAUTHORIZED          | 401            | 認証が必要                       |
+| FORBIDDEN             | 403            | 権限不足                         |
+| NOT_FOUND             | 404            | リソースが見つからない           |
+| CONFLICT              | 409            | リソースの競合                   |
+| INTERNAL_SERVER_ERROR | 500            | サーバー内部エラー               |
 
 ## レート制限
 

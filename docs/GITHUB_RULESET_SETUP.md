@@ -1,7 +1,7 @@
 # GitHub Ruleset とブランチ保護設定ガイド
 
-このドキュメントでは、GitHub Ruleset とブランチ保護設定をテンプレート化して適用する方法を説明します。
-このテンプレートを取り込んだ他リポジトリでは不要だと思われます。必要に応じて削除してください。
+このドキュメントでは、GitHub
+Ruleset とブランチ保護設定をテンプレート化して適用する方法を説明します。このテンプレートを取り込んだ他リポジトリでは不要だと思われます。必要に応じて削除してください。
 
 ## 概要
 
@@ -93,11 +93,7 @@ chmod +x .github/scripts/setup-branch-auto-delete.sh
 {
   "conditions": {
     "ref_name": {
-      "include": [
-        "main",
-        "develop",
-        "release/*"
-      ]
+      "include": ["main", "develop", "release/*"]
     }
   }
 }
@@ -111,7 +107,7 @@ chmod +x .github/scripts/setup-branch-auto-delete.sh
     {
       "type": "pull_request",
       "parameters": {
-        "required_approving_review_count": 2  // 2名以上の承認を必須にする
+        "required_approving_review_count": 2 // 2名以上の承認を必須にする
       }
     }
   ]
@@ -124,9 +120,9 @@ chmod +x .github/scripts/setup-branch-auto-delete.sh
 {
   "bypass_actors": [
     {
-      "actor_id": 123456,  // チームIDまたはユーザーID
-      "actor_type": "Team",  // Team, Integration, OrganizationAdmin
-      "bypass_mode": "always"  // always, pull_request
+      "actor_id": 123456, // チームIDまたはユーザーID
+      "actor_type": "Team", // Team, Integration, OrganizationAdmin
+      "bypass_mode": "always" // always, pull_request
     }
   ]
 }
@@ -144,7 +140,8 @@ gh api users/USERNAME --jq '{id: .id, login: .login}'
 
 ### Feature Branch Ruleset のカスタマイズ
 
-`.github/rulesets/feature-branch-ruleset.json` を編集して、フィーチャーブランチ用のルールをカスタマイズできます。
+`.github/rulesets/feature-branch-ruleset.json`
+を編集して、フィーチャーブランチ用のルールをカスタマイズできます。
 
 ## 手動設定（UI を使用する場合）
 

@@ -1,7 +1,7 @@
 name: TODO
 description: タスクや今後の作業項目を記録する
-title: "[TODO] "
-labels: ["todo"]
+title: '[TODO] '
+labels: ['todo']
 body:
   - type: markdown
     attributes:

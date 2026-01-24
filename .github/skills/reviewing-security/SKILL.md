@@ -1,20 +1,24 @@
 ---
 name: reviewing-security
-description: "OWASP API Security Top 10 (2023) と {開発言語をここに書く} セキュリティベストプラクティス。脆弱性検出。Use when: セキュリティレビュー、脆弱性チェック、バージョン管理確認を依頼された時。"
+description:
+  'OWASP API Security Top 10 (2023) と {開発言語をここに書く}
+  セキュリティベストプラクティス。脆弱性検出。Use when:
+  セキュリティレビュー、脆弱性チェック、バージョン管理確認を依頼された時。'
 ---
 
 # セキュリティレビュー
 
-OWASP API Security Top 10 (2023) と {開発言語をここに書く} セキュリティベストプラクティスに基づくレビュースキル。
+OWASP API Security Top 10
+(2023) と {開発言語をここに書く} セキュリティベストプラクティスに基づくレビュースキル。
 
 ## OWASP チェック項目
 
-| ID   | リスク        | チェック内容                               |
-| ---- | ------------- | ------------------------------------------ |
-| API1 | BOLA          | tenant_id 検証、file_id との組み合わせ検証 |
-| API2 | Broken Auth   | gRPC メタデータ認証                        |
-| API3 | Property      | レスポンスの不要情報                       |
-| API4 | Resource      | ファイルサイズ制限、ページネーション       |
+| ID   | リスク      | チェック内容                               |
+| ---- | ----------- | ------------------------------------------ |
+| API1 | BOLA        | tenant_id 検証、file_id との組み合わせ検証 |
+| API2 | Broken Auth | gRPC メタデータ認証                        |
+| API3 | Property    | レスポンスの不要情報                       |
+| API4 | Resource    | ファイルサイズ制限、ページネーション       |
 
 ## {開発言語をここに書く} セキュリティ
 
@@ -26,18 +30,20 @@ OWASP API Security Top 10 (2023) と {開発言語をここに書く} セキュ�
 
 ## バージョン管理チェック
 
-dependabotやrenovateで自動検証できないバージョン指定をチェックします。Dockerfile内の直接指定、GitHub Actionsのバージョン、設定ファイルで指定されたツールバージョンなどが対象です。古いバージョンの使用はセキュリティリスクやパフォーマンス問題につながる可能性があります。
+dependabotやrenovateで自動検証できないバージョン指定をチェックします。Dockerfile内の直接指定、GitHub
+Actionsのバージョン、設定ファイルで指定されたツールバージョンなどが対象です。古いバージョンの使用はセキュリティリスクやパフォーマンス問題につながる可能性があります。
 
-**注意**: `package.json`、`requirements.txt`、`go.mod`などの依存関係管理ファイルはdependabot/renovateで検証されるため、このチェックの対象外です。
+**注意**:
+`package.json`、`requirements.txt`、`go.mod`などの依存関係管理ファイルはdependabot/renovateで検証されるため、このチェックの対象外です。
 
 ### チェック対象ファイルとパターン
 
-| ファイルタイプ | ファイル名/パターン | チェック内容 |
-| -------------- | ------------------- | ------------ |
-| Dockerfile | `Dockerfile`, `*.dockerfile`, `Dockerfile.*` | `FROM` イメージとタグ、`RUN apt-get install`、`RUN apk add` でのパッケージバージョン |
-| GitHub Actions | `.github/workflows/*.yml`, `.github/workflows/*.yaml` | `uses:` でのアクションバージョン、`setup-*` アクションの `*-version` 指定 |
-| ツールバージョン設定 | `.nvmrc`, `.python-version`, `.go-version`, `.tool-versions` | 開発環境のツールバージョン指定 |
-| その他の設定 | `Makefile`, `runtime.txt` | ビルドスクリプトや実行環境のバージョン指定 |
+| ファイルタイプ       | ファイル名/パターン                                          | チェック内容                                                                         |
+| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Dockerfile           | `Dockerfile`, `*.dockerfile`, `Dockerfile.*`                 | `FROM` イメージとタグ、`RUN apt-get install`、`RUN apk add` でのパッケージバージョン |
+| GitHub Actions       | `.github/workflows/*.yml`, `.github/workflows/*.yaml`        | `uses:` でのアクションバージョン、`setup-*` アクションの `*-version` 指定            |
+| ツールバージョン設定 | `.nvmrc`, `.python-version`, `.go-version`, `.tool-versions` | 開発環境のツールバージョン指定                                                       |
+| その他の設定         | `Makefile`, `runtime.txt`                                    | ビルドスクリプトや実行環境のバージョン指定                                           |
 
 ### チェック手順
 
@@ -65,12 +71,12 @@ dependabotやrenovateで自動検証できないバージョン指定をチェ�
 ```markdown
 ## バージョン管理ツールの更新可否
 
-| 優先度 | ファイル | ツール/パッケージ | 現在のバージョン | 最新版 | 状態 | 備考 |
-|--------|----------|-------------------|------------------|--------|------|------|
-| 🔴 | Dockerfile | python (FROM) | 3.8.0 | 3.12.1 | EOL | Python 3.8は2024年10月でEOL |
-| 🔴 | Dockerfile | node (FROM) | 16.0.0 | 20.11.0 | 脆弱性あり | CVE-2023-XXXXX: 既知の脆弱性 |
-| 🟡 | .github/workflows/ci.yml | actions/checkout | v3 | v4 | 更新可 | メジャーバージョンアップ |
-| 🟡 | Dockerfile | apt-get: postgresql-client | 12 | 16 | 更新可 | メジャーバージョンアップ |
+| 優先度 | ファイル                 | ツール/パッケージ          | 現在のバージョン | 最新版  | 状態       | 備考                         |
+| ------ | ------------------------ | -------------------------- | ---------------- | ------- | ---------- | ---------------------------- |
+| 🔴     | Dockerfile               | python (FROM)              | 3.8.0            | 3.12.1  | EOL        | Python 3.8は2024年10月でEOL  |
+| 🔴     | Dockerfile               | node (FROM)                | 16.0.0           | 20.11.0 | 脆弱性あり | CVE-2023-XXXXX: 既知の脆弱性 |
+| 🟡     | .github/workflows/ci.yml | actions/checkout           | v3               | v4      | 更新可     | メジャーバージョンアップ     |
+| 🟡     | Dockerfile               | apt-get: postgresql-client | 12               | 16      | 更新可     | メジャーバージョンアップ     |
 ```
 
 **注意**: この表に表示されるのは、メジャーバージョン以上の差がある、またはEOL・脆弱性があるバージョン指定のみです。マイナーバージョンやパッチバージョン程度の差は表示されません。

@@ -1,6 +1,8 @@
 ---
 name: design-plan
-description: "設計計画スキル。TDD開発前の設計フェーズを支援し、仕様ドキュメントを作成。Use when: 新機能・API・画面・インフラの設計、実装前の仕様策定を依頼された時。"
+description:
+  '設計計画スキル。TDD開発前の設計フェーズを支援し、仕様ドキュメントを作成。Use when:
+  新機能・API・画面・インフラの設計、実装前の仕様策定を依頼された時。'
 ---
 
 # 設計計画（Design Plan）
@@ -23,13 +25,13 @@ TDD開発を開始する前の設計フェーズを支援します。実装前�
 
 開発タイプに応じた詳細ガイドを参照してください。
 
-| 開発タイプ | 基本補助ツール | 詳細ガイド |
-|-----------|--------------|-----------|
-| **CLI開発** | CLIフレームワーク (oclif, cobra, clap, click等) | [resources/cli_design_desc.md](./resources/cli_design_desc.md) |
-| **API開発** | **Swagger UI / OpenAPI Specification** | [resources/api_design_desc.md](./resources/api_design_desc.md) |
-| **画面開発** | **Storybook** | [resources/ui_design_desc.md](./resources/ui_design_desc.md) |
-| **モバイルアプリ開発** | Figma, React Native Storybook, Flutter DevTools | [resources/mobile_design_desc.md](./resources/mobile_design_desc.md) |
-| **クラウドインフラ構築** | **Terraform / OpenTofu** | [resources/infrastructure_design_desc.md](./resources/infrastructure_design_desc.md) |
+| 開発タイプ               | 基本補助ツール                                  | 詳細ガイド                                                                           |
+| ------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **CLI開発**              | CLIフレームワーク (oclif, cobra, clap, click等) | [resources/cli_design_desc.md](./resources/cli_design_desc.md)                       |
+| **API開発**              | **Swagger UI / OpenAPI Specification**          | [resources/api_design_desc.md](./resources/api_design_desc.md)                       |
+| **画面開発**             | **Storybook**                                   | [resources/ui_design_desc.md](./resources/ui_design_desc.md)                         |
+| **モバイルアプリ開発**   | Figma, React Native Storybook, Flutter DevTools | [resources/mobile_design_desc.md](./resources/mobile_design_desc.md)                 |
+| **クラウドインフラ構築** | **Terraform / OpenTofu**                        | [resources/infrastructure_design_desc.md](./resources/infrastructure_design_desc.md) |
 
 ## 詳細情報
 
@@ -46,4 +48,5 @@ TDD開発を開始する前の設計フェーズを支援します。実装前�
 
 ---
 
-**次のステップ**: 設計完了後は [test-driven-development](../test-driven-development/SKILL.md) スキルで実装を開始してください。
+**次のステップ**: 設計完了後は [test-driven-development](../test-driven-development/SKILL.md)
+スキルで実装を開始してください。

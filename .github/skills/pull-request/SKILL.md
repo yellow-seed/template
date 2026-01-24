@@ -1,6 +1,8 @@
 ---
 name: pull-request
-description: "Pull Request作成スキル。.github/PULL_REQUEST_TEMPLATE.mdに準拠した高品質なPRを作成。Use when: PR作成、Pull Request作成、変更内容のPR化を依頼された時。"
+description:
+  'Pull Request作成スキル。.github/PULL_REQUEST_TEMPLATE.mdに準拠した高品質なPRを作成。Use when:
+  PR作成、Pull Request作成、変更内容のPR化を依頼された時。'
 ---
 
 # Pull Request作成
@@ -17,23 +19,23 @@ description: "Pull Request作成スキル。.github/PULL_REQUEST_TEMPLATE.mdに�
 
 ## PR概要の構成要素
 
-| 要素 | 必須/任意 | 説明 |
-| ----- | ------------- | ------------- |
-| Summary | 必須 | PRの目的と背景を2-3文で説明 |
-| Type of Change | 必須 | 変更種別を選択 |
-| Related Issues | 必須 | 関連Issue番号を記載 |
-| Changes | 必須 | 変更内容を詳細に列挙 |
-| Test Plan | 必須 | テスト方法と確認事項 |
-| Screenshots | 任意 | UI変更時のスクリーンショット |
-| Additional Notes | 任意 | その他の注意事項 |
+| 要素             | 必須/任意 | 説明                         |
+| ---------------- | --------- | ---------------------------- |
+| Summary          | 必須      | PRの目的と背景を2-3文で説明  |
+| Type of Change   | 必須      | 変更種別を選択               |
+| Related Issues   | 必須      | 関連Issue番号を記載          |
+| Changes          | 必須      | 変更内容を詳細に列挙         |
+| Test Plan        | 必須      | テスト方法と確認事項         |
+| Screenshots      | 任意      | UI変更時のスクリーンショット |
+| Additional Notes | 任意      | その他の注意事項             |
 
 ## What/Why/How の明確化
 
-| 要素 | 記述場所 | 説明 |
-|------|----------|------|
-| **What（何を）** | Summary, Changes | 何を変更したか |
-| **Why（なぜ）** | Summary | なぜ変更したか（目的、背景、効果） |
-| **How（どのように）** | Changes | どのように変更したか（実装方法、詳細） |
+| 要素                  | 記述場所         | 説明                                   |
+| --------------------- | ---------------- | -------------------------------------- |
+| **What（何を）**      | Summary, Changes | 何を変更したか                         |
+| **Why（なぜ）**       | Summary          | なぜ変更したか（目的、背景、効果）     |
+| **How（どのように）** | Changes          | どのように変更したか（実装方法、詳細） |
 
 ## PR作成手順
 
@@ -69,12 +71,14 @@ git diff main...HEAD
 **目的**: PRの「何を」「なぜ」「効果」を2-3文で説明
 
 **生成方法**:
+
 1. コミットメッセージのtype（feat, fix, docsなど）を確認
 2. 複数のコミットから共通の目的を抽出
 3. Issueの説明文を参考に背景を記述
 4. 2-3文で簡潔にまとめる
 
 **例**:
+
 ```markdown
 ## Summary
 
@@ -102,11 +106,11 @@ Issue番号を正確に記載:
 - `Related to #YYY`: 関連するが自動クローズしないIssue
 
 **例**:
+
 ```markdown
 ## Related Issues
 
-Closes #20
-Related to #15
+Closes #20 Related to #15
 ```
 
 ### 6. Changes を構成
@@ -114,11 +118,13 @@ Related to #15
 **目的**: 「何を」「どのように」変更したかを詳細に説明
 
 **生成方法**:
+
 1. `git diff --name-only` でファイル一覧を取得
 2. 関連ファイルをグループ化（例: GitHub Actions, Docker, Docs）
 3. 各グループで変更内容を階層的に記述
 
 **例**:
+
 ```markdown
 ## Changes
 
@@ -141,11 +147,13 @@ Related to #15
 **目的**: テスト方法と確認事項を明確にする
 
 **生成方法**:
+
 1. Issueの受け入れ基準をTest Planに変換
 2. テストコミットからテスト項目を抽出
 3. チェックリスト形式で記述（実施済みは`[x]`、未実施は`[ ]`）
 
 **例**:
+
 ```markdown
 ## Test Plan
 
@@ -216,16 +224,16 @@ EOF
 
 ## PR品質チェックポイント
 
-| 項目 | チェック内容 |
-|------|--------------|
-| **タイトル** | Conventional Commits形式（type: description） |
-| **Summary** | 目的と背景が2-3文で明確 |
-| **Type of Change** | 適切な変更種別を選択 |
-| **Related Issues** | Issue番号が正確（Closes/Fixes/Related to） |
-| **Changes** | 変更内容が階層的で詳細 |
-| **Test Plan** | テスト方法が具体的でチェックリスト形式 |
-| **Checklist** | 全項目を確認済み |
-| **Breaking Change** | 破壊的変更がある場合は明記 |
+| 項目                | チェック内容                                  |
+| ------------------- | --------------------------------------------- |
+| **タイトル**        | Conventional Commits形式（type: description） |
+| **Summary**         | 目的と背景が2-3文で明確                       |
+| **Type of Change**  | 適切な変更種別を選択                          |
+| **Related Issues**  | Issue番号が正確（Closes/Fixes/Related to）    |
+| **Changes**         | 変更内容が階層的で詳細                        |
+| **Test Plan**       | テスト方法が具体的でチェックリスト形式        |
+| **Checklist**       | 全項目を確認済み                              |
+| **Breaking Change** | 破壊的変更がある場合は明記                    |
 
 ## 良い例・悪い例
 
@@ -270,6 +278,7 @@ Closes #20
 ```
 
 **なぜ良いか**:
+
 - Summary で目的と効果が明確
 - Type of Change が適切に選択されている
 - Related Issues で正確にIssueを参照
@@ -285,6 +294,7 @@ Added some files for shell linting.
 ```
 
 **なぜ悪いか**:
+
 - Summary が不明確（なぜ必要か、効果は何か）
 - Type of Change が選択されていない
 - Related Issues が記載されていない
@@ -421,7 +431,8 @@ Fixes #45
 ```markdown
 ## Summary
 
-Pull Request作成時の適切な概要作成ガイドラインを整備します。AIエージェントが高品質なPR概要を自動生成できるようになります。
+Pull
+Request作成時の適切な概要作成ガイドラインを整備します。AIエージェントが高品質なPR概要を自動生成できるようになります。
 
 ## Type of Change
 
