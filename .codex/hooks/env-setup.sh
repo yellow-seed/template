@@ -76,7 +76,7 @@ else
       SHELLCHECK_ARCH="$ARCH"
       TEMP_DIR=$(mktemp -d)
       trap 'rm -rf "$TEMP_DIR"' EXIT
-      
+
       if curl -sL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${SHELLCHECK_ARCH}.tar.xz" -o "$TEMP_DIR/shellcheck.tar.xz" 2>/dev/null; then
         tar -xJf "$TEMP_DIR/shellcheck.tar.xz" -C "$TEMP_DIR" 2>/dev/null || true
         if [ -f "$TEMP_DIR/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" ]; then
@@ -102,22 +102,22 @@ else
   log "Installing Go ${GO_VERSION}..."
   TEMP_DIR=$(mktemp -d)
   trap 'rm -rf "$TEMP_DIR"' EXIT
-  
+
   GO_TARBALL="go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
   GO_URL="https://go.dev/dl/${GO_TARBALL}"
-  
+
   if curl -sL "$GO_URL" -o "$TEMP_DIR/go.tar.gz"; then
     log "Extracting Go..."
     GO_INSTALL_DIR="$HOME/.local/go"
     mkdir -p "$GO_INSTALL_DIR"
-    
+
     if tar -C "$GO_INSTALL_DIR" -xzf "$TEMP_DIR/go.tar.gz" --strip-components=1; then
       # Add Go to PATH
       if [[ ":$PATH:" != *":$GO_INSTALL_DIR/bin:"* ]]; then
         export PATH="$GO_INSTALL_DIR/bin:$PATH"
         export GOPATH="$HOME/go"
         export PATH="$GOPATH/bin:$PATH"
-        
+
         # Persist to environment file
         if [ -n "$CODEX_ENV_FILE" ]; then
           {
@@ -199,7 +199,7 @@ else
           export NVM_DIR="$HOME/.nvm"
           # shellcheck source=/dev/null
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          
+
           if command_exists nvm; then
             nvm install --lts 2>/dev/null || log "Failed to install Node.js via nvm"
           fi
