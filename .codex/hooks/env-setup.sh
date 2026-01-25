@@ -5,7 +5,7 @@
 #
 # This script:
 # - Installs shellcheck
-# - Installs Go 1.23
+# - Installs Go 1.23.5
 # - Installs shfmt v3.12.0
 # - Installs actionlint v1.7.5
 # - Installs Node.js/npm
@@ -69,14 +69,15 @@ if command_exists shellcheck; then
 else
   log "Installing shellcheck..."
   if command_exists apt-get; then
-    if ! sudo apt-get update -qq && sudo apt-get install -y shellcheck 2>/dev/null; then
+    if ! (sudo apt-get update -qq && sudo apt-get install -y shellcheck 2>/dev/null); then
       log "Failed to install shellcheck via apt-get, trying alternative method..."
       # Try downloading binary directly
       SHELLCHECK_VERSION="0.10.0"
+      SHELLCHECK_ARCH="$ARCH"
       TEMP_DIR=$(mktemp -d)
       trap 'rm -rf "$TEMP_DIR"' EXIT
       
-      if curl -sL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${ARCH}.tar.xz" -o "$TEMP_DIR/shellcheck.tar.xz" 2>/dev/null; then
+      if curl -sL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${SHELLCHECK_ARCH}.tar.xz" -o "$TEMP_DIR/shellcheck.tar.xz" 2>/dev/null; then
         tar -xJf "$TEMP_DIR/shellcheck.tar.xz" -C "$TEMP_DIR" 2>/dev/null || true
         if [ -f "$TEMP_DIR/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" ]; then
           mv "$TEMP_DIR/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" "$LOCAL_BIN/shellcheck"
@@ -189,7 +190,7 @@ if command_exists node && command_exists npm; then
 else
   log "Installing Node.js and npm..."
   if command_exists apt-get; then
-    if ! sudo apt-get update -qq && sudo apt-get install -y nodejs npm 2>/dev/null; then
+    if ! (sudo apt-get update -qq && sudo apt-get install -y nodejs npm 2>/dev/null); then
       log "Failed to install Node.js via apt-get, trying nvm..."
       # Try installing via nvm
       if ! command_exists nvm; then
