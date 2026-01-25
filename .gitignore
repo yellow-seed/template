@@ -163,5 +163,6 @@ out/
 # Claude Code
 .claude/settings.local.json
 
-# Podman build artifacts
-certs/
+# Podman build artifacts (proxy certificates, keep .gitkeep)
+certs/*
+!certs/.gitkeep

@@ -4,6 +4,10 @@
 
 FROM ubuntu:22.04
 
+# Build argument for remote environment (Codex/Podman)
+# Set to "true" when building in remote environment with proxy certificate
+ARG REMOTE_ENV=false
+
 # Avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -17,7 +21,19 @@ RUN apt-get update && \
     curl \
     nodejs \
     npm \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# Conditionally copy and install proxy certificate for remote environment
+# The certificate file is copied with wildcard to handle cases where it doesn't exist
+COPY certs/egress-proxy.cr[t] /tmp/
+RUN if [ "$REMOTE_ENV" = "true" ] && [ -f /tmp/egress-proxy.crt ]; then \
+      cp /tmp/egress-proxy.crt /usr/local/share/ca-certificates/ && \
+      update-ca-certificates && \
+      echo "Proxy certificate installed"; \
+    else \
+      echo "Skipping proxy certificate (REMOTE_ENV=$REMOTE_ENV)"; \
+    fi
 
 # Install Go 1.23 (required for shfmt v3.12.0)
 RUN wget -O /tmp/go.tar.gz https://go.dev/dl/go1.23.5.linux-amd64.tar.gz && \
