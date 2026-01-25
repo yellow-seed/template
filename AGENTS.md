@@ -34,12 +34,37 @@ project/
 `CODEX_REMOTE=true`の場合:
 
 - DockerおよびDocker Composeは使用不可
-- 代わりにPodmanが利用可能
+- Podmanが利用可能（ただし制限あり）
 - ネットワークはプロキシ経由（証明書の設定が必要な場合あり）
 
-### Podman環境のセットアップ
+### コンテナランタイムの制限
 
-リモート環境でコンテナビルドを行う場合は、以下のhookスクリプトを実行してください：
+Codex環境では、セキュリティ上の理由によりコンテナランタイムに制限があります：
+
+- `sudo podman build --isolation=chroot` ✅ 利用可能
+- `podman run` ❌ 制限あり（名前空間の作成が禁止）
+
+このため、コンテナ内でツールを実行する方法は使用できません。代わりに、ツールを直接ホストにインストールしてください。
+
+### 開発ツールのセットアップ（推奨）
+
+コンテナ実行が制限されているため、以下のスクリプトでツールを直接インストールします：
+
+```bash
+bash .codex/hooks/tools-setup.sh
+```
+
+このスクリプトは以下のツールをインストールします：
+
+- shellcheck
+- shfmt
+- bats
+- actionlint
+- prettier
+
+### Podman環境のセットアップ（オプション）
+
+コンテナイメージのビルドのみが必要な場合は、以下のスクリプトを実行してください：
 
 ```bash
 bash .codex/hooks/podman-setup.sh
@@ -57,7 +82,7 @@ bash .codex/hooks/podman-setup.sh
 docker build -t dev-env .
 
 # リモート環境（Podman使用、CODEX_REMOTE=trueの場合）
-podman build --build-arg CODEX_REMOTE=true --isolation=chroot -t dev-env .
+sudo podman build --build-arg CODEX_REMOTE=true --isolation=chroot -t dev-env .
 ```
 
 ## 開発環境のセットアップ
