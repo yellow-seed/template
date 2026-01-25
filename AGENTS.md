@@ -49,7 +49,6 @@ bash .codex/hooks/podman-setup.sh
 
 1. Podmanのインストール（未インストールの場合）
 2. プロキシ証明書のコピー
-3. 統合Dockerfileを使用したコンテナビルド（`CODEX_REMOTE=true`引数付き）
 
 ### コンテナビルドコマンド
 

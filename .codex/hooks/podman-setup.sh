@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Codex hook: Podman environment setup for remote environments
-# This script sets up Podman and builds the development container
-# following best practices: idempotent, fail-safe, proper logging
+# This script installs Podman and sets up proxy certificates.
+# Actual builds (podman build, podman compose) should be run separately as needed.
 
 set -euo pipefail
 
@@ -40,14 +40,5 @@ if [ -f /usr/local/share/ca-certificates/envoy-mitmproxy-ca-cert.crt ]; then
 else
   log "Warning: Proxy certificate not found at expected location"
 fi
-
-# Build container using unified Dockerfile with REMOTE_ENV=true
-log "Building development container with Podman..."
-cd "${repo_root}"
-sudo podman build \
-  --build-arg CODEX_REMOTE=true \
-  --isolation=chroot \
-  -t dev-env \
-  .
 
 log "Podman setup completed successfully"
