@@ -163,3 +163,5 @@ out/
 # Claude Code
 .claude/settings.local.json
 
+# Podman build artifacts
+certs/
