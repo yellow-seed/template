@@ -20,21 +20,21 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Go 1.23 (required for shfmt v3.12.0)
-RUN wget -O /tmp/go.tar.gz https://go.dev/dl/go1.23.5.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf /tmp/go.tar.gz && \
-    rm /tmp/go.tar.gz
-ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
+# RUN wget -O /tmp/go.tar.gz https://go.dev/dl/go1.23.5.linux-amd64.tar.gz && \
+#     tar -C /usr/local -xzf /tmp/go.tar.gz && \
+#     rm /tmp/go.tar.gz
+# ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
 
 # Install shfmt via go install (secure and maintainable)
-RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.12.0 && \
-    mv /root/go/bin/shfmt /usr/local/bin/shfmt
+# RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.12.0 && \
+#     mv /root/go/bin/shfmt /usr/local/bin/shfmt
 
 # Install actionlint via go install (secure and maintainable)
-RUN go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.5 && \
-    mv /root/go/bin/actionlint /usr/local/bin/actionlint
+# RUN go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.5 && \
+#     mv /root/go/bin/actionlint /usr/local/bin/actionlint
 
 # Install Prettier
-RUN npm install -g prettier@3.4.2
+# RUN npm install -g prettier@3.4.2
 
 # Set working directory
 WORKDIR /workspace
