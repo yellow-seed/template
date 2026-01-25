@@ -23,6 +23,44 @@ project/
 └── ...
 ```
 
+## リモート環境（Codex）について
+
+### 環境変数
+
+- `CODEX_REMOTE`: リモート環境（Codex）の場合に`true`がセットされる
+
+### リモート環境の特徴
+
+`CODEX_REMOTE=true`の場合:
+
+- DockerおよびDocker Composeは使用不可
+- 代わりにPodmanが利用可能
+- ネットワークはプロキシ経由（証明書の設定が必要な場合あり）
+
+### Podman環境のセットアップ
+
+リモート環境でコンテナビルドを行う場合は、以下のhookスクリプトを実行してください：
+
+```bash
+bash .codex/hooks/podman-setup.sh
+```
+
+このスクリプトは以下を行います：
+
+1. Podmanのインストール（未インストールの場合）
+2. プロキシ証明書のコピー
+3. 統合Dockerfileを使用したコンテナビルド（`REMOTE_ENV=true`引数付き）
+
+### コンテナビルドコマンド
+
+```bash
+# ローカル環境（Docker使用）
+docker build -t dev-env .
+
+# リモート環境（Podman使用、CODEX_REMOTE=trueの場合）
+podman build --build-arg REMOTE_ENV=true --isolation=chroot -t dev-env .
+```
+
 ## 開発環境のセットアップ
 
 ### Claude Code での GitHub CLI (gh) のセットアップ
