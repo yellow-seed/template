@@ -45,7 +45,7 @@ fi
 log "Building development container with Podman..."
 cd "${repo_root}"
 sudo podman build \
-  --build-arg REMOTE_ENV=true \
+  --build-arg CODEX_REMOTE=true \
   --isolation=chroot \
   -t dev-env \
   .

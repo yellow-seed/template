@@ -49,7 +49,7 @@ bash .codex/hooks/podman-setup.sh
 
 1. Podmanのインストール（未インストールの場合）
 2. プロキシ証明書のコピー
-3. 統合Dockerfileを使用したコンテナビルド（`REMOTE_ENV=true`引数付き）
+3. 統合Dockerfileを使用したコンテナビルド（`CODEX_REMOTE=true`引数付き）
 
 ### コンテナビルドコマンド
 
@@ -58,7 +58,7 @@ bash .codex/hooks/podman-setup.sh
 docker build -t dev-env .
 
 # リモート環境（Podman使用、CODEX_REMOTE=trueの場合）
-podman build --build-arg REMOTE_ENV=true --isolation=chroot -t dev-env .
+podman build --build-arg CODEX_REMOTE=true --isolation=chroot -t dev-env .
 ```
 
 ## 開発環境のセットアップ
