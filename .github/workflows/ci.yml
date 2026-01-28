@@ -22,7 +22,7 @@ on:
 jobs:
   Lint:
     name: ShellCheck Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
 
@@ -46,7 +46,7 @@ jobs:
           find . -name "*.sh" -type f -print0 | xargs -0 shfmt -d -i 2
 
   Test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
