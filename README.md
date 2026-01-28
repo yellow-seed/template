@@ -2,8 +2,8 @@
 
 <!-- CI/CD & Code Quality -->
 
-[![CI](https://github.com/yellow-seed/template/workflows/CI/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/ci.yml)
-[![Actionlint](https://github.com/yellow-seed/template/workflows/Actionlint/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/actionlint.yml)
+[![CI](https://github.com/yellow-seed/template/workflows/CI/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/ci/shellcheck.yml)
+[![Actionlint](https://github.com/yellow-seed/template/workflows/Actionlint/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/lint/workflows.yml)
 [![codecov](https://codecov.io/gh/yellow-seed/template/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/template)
 
 <!-- Project Info -->
@@ -29,6 +29,13 @@
 ### `.github/workflows/`
 
 CI/CD、コードレビュー、コード品質チェックなどの自動化ワークフローを格納しています。
+
+#### サブディレクトリ構成
+
+- `ai/`: AIエージェント連携（Claude/Copilot）
+- `ci/`: プログラム検証（ShellCheck など）
+- `lint/`: ドキュメント・ワークフローの検証
+- `management/`: リポジトリ管理・自動化
 
 ### `.github/ISSUE_TEMPLATE/`
 
