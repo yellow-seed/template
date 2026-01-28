@@ -25,6 +25,7 @@ Codex環境向けのセットアップスクリプトを整備し、Dockerfile�
    - 例: `bash .codex/hooks/env-setup.sh`
 
 3. **スキルディレクトリの同期を案内する**
+
    - `.claude/hooks/skills-setup.sh` を実行する
    - 例: `bash .claude/hooks/skills-setup.sh`
 
