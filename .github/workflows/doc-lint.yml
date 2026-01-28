@@ -22,7 +22,7 @@ on:
 jobs:
   markdown:
     name: Markdown format check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -43,7 +43,7 @@ jobs:
 
   yaml:
     name: YAML format check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -64,7 +64,7 @@ jobs:
 
   json:
     name: JSON format check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
