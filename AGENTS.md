@@ -64,6 +64,68 @@ bash .claude/hooks/skills-setup.sh
 - コピー環境では、`.github/skills`を変更した場合、再度`skills-setup.sh`を実行して同期する必要があります
 - 新しいスキルを追加する際は、必ず`.github/skills/`に配置してください
 
+## 仕様書駆動開発（Spec-Driven Development）
+
+このプロジェクトでは、[GitHub Spec Kit](https://github.com/github/spec-kit) を使用した仕様書駆動開発をサポートしています。
+
+### 概要
+
+仕様書駆動開発は、コード作成前に仕様書（spec）を作成し、AIエージェントがその仕様書に基づいて実装を行うアプローチです。
+
+### ワークフロー
+
+1. **`/speckit.specify`** - 機能の仕様書を作成
+2. **`/speckit.clarify`** - 不明点を明確化（オプション）
+3. **`/speckit.plan`** - 技術的な実装計画を策定
+4. **`/speckit.tasks`** - 実行可能なタスクリストを生成
+5. **`/speckit.implement`** - すべてのタスクを実行して実装
+
+### オプションコマンド
+
+- **`/speckit.constitution`** - プロジェクトの基本原則を作成・更新
+- **`/speckit.analyze`** - アーティファクト間の一貫性を分析
+- **`/speckit.checklist`** - 品質チェックリストを生成
+
+### ディレクトリ構造
+
+```
+.specify/
+├── memory/
+│   └── constitution.md    # プロジェクトの基本原則
+├── scripts/               # 自動化スクリプト
+└── templates/             # 仕様書テンプレート
+
+.claude/commands/          # スラッシュコマンド定義
+└── speckit.*.md
+
+specs/                     # 機能ごとの仕様書（自動生成）
+└── NNN-feature-name/
+    ├── spec.md           # 仕様書
+    ├── plan.md           # 実装計画
+    └── tasks.md          # タスクリスト
+```
+
+### 使用例
+
+```
+# 新機能の仕様書を作成
+/speckit.specify ユーザー認証機能を追加したい
+
+# 実装計画を作成
+/speckit.plan
+
+# タスクリストを生成
+/speckit.tasks
+
+# 実装を開始
+/speckit.implement
+```
+
+### 参考リンク
+
+- [GitHub Spec Kit](https://github.com/github/spec-kit)
+- [Constitution](.specify/memory/constitution.md) - このプロジェクトの基本原則
+
 ## コーディング規約
 
 <!-- プロジェクトで使用しているコーディング規約を記述してください -->
