@@ -128,13 +128,11 @@ Related to #15
 ## Changes
 
 - GitHub Actions ワークフロー (.github/workflows/shell-linting.yml) を追加
-
   - PR と main ブランチへのプッシュで自動実行
   - shellcheck による静的解析
   - shfmt によるフォーマットチェック
 
 - Docker 環境を追加
-
   - Dockerfile.shell-linting: shellcheck と shfmt をインストール
   - docker-compose.shell-linting.yml: 簡単に実行可能な設定
 
@@ -256,13 +254,11 @@ Closes #20
 ## Changes
 
 - GitHub Actions ワークフロー (.github/workflows/shell-linting.yml) を追加
-
   - PR と main ブランチへのプッシュで自動実行
   - shellcheck による静的解析
   - shfmt によるフォーマットチェック
 
 - Docker 環境を追加
-
   - Dockerfile.shell-linting: shellcheck と shfmt をインストール
   - docker-compose.shell-linting.yml: 簡単に実行可能な設定
 
@@ -354,16 +350,13 @@ Closes #30
 ## Changes
 
 - 認証ミドルウェアを追加 (middleware/auth.js)
-
   - JWTトークンの検証
   - 認証エラーハンドリング
 
 - ログインエンドポイントを追加 (routes/auth.js)
-
   - POST /api/login: ユーザー認証とトークン発行
 
 - テストを追加 (tests/auth.test.js)
-
   - 認証成功・失敗のテストケース
   - トークン検証のテストケース
 
@@ -407,7 +400,6 @@ Fixes #45
 ## Changes
 
 - データ処理のメモリリークを修正 (services/data-processor.js)
-
   - リソース解放処理を追加
   - try-finallyブロックで確実にクリーンアップ
 
@@ -451,13 +443,11 @@ Closes #24
 ## Changes
 
 - PR作成スキルを追加 (.claude/skills/pull-request/SKILL.md)
-
   - フォーマット定義
   - 良い例・悪い例
   - AIエージェント向けガイド
 
 - AGENTS.mdを更新
-
   - PR作成ガイドラインへの参照を追加
 
 - PRテンプレートを更新 (.github/PULL_REQUEST_TEMPLATE.md)

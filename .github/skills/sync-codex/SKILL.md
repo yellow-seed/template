@@ -15,17 +15,14 @@ Codex環境向けのセットアップスクリプトを整備し、Dockerfile�
 ## セットアップ手順
 
 1. **GitHub CLIのセットアップを案内する**
-
    - `.codex/hooks/gh-setup.sh` を実行する
    - 例: `bash .codex/hooks/gh-setup.sh`
 
 2. **Codex向け開発環境のセットアップを案内する**
-
    - `.codex/hooks/env-setup.sh` を実行する
    - 例: `bash .codex/hooks/env-setup.sh`
 
 3. **スキルディレクトリの同期を案内する**
-
    - `.claude/hooks/skills-setup.sh` を実行する
    - 例: `bash .claude/hooks/skills-setup.sh`
 

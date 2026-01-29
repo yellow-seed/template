@@ -810,17 +810,14 @@ terraform-docs markdown table . > README.md
 ## テスト設計の考慮事項
 
 1. **構文チェック**
-
    - `terraform validate`: Terraform構文チェック
    - `terraform fmt`: フォーマットチェック
 
 2. **セキュリティテスト**
-
    - Checkov, tfsec, terrascan でスキャン
    - IAMポリシーの最小権限確認
 
 3. **コストテスト**
-
    - Infracost でコスト見積もり
    - 予算を超えていないか確認
 

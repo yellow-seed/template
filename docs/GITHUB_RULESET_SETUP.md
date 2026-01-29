@@ -61,7 +61,6 @@ chmod +x .github/scripts/setup-rulesets.sh
 このスクリプトは以下の Ruleset を適用します：
 
 - **Branch Protection Ruleset**: `main`, `develop`, `release/*` ブランチ用
-
   - プルリクエスト必須
   - 1名以上の承認必須
   - CI ステータスチェック必須
