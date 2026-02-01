@@ -12,6 +12,25 @@ log() {
   echo "$LOG_PREFIX $1" >&2
 }
 
+# Install gh-sub-issue extension for sub-issue management
+install_gh_sub_issue() {
+  local gh_cmd="$1"
+  log "Checking gh-sub-issue extension..."
+
+  # Check if extension is already installed
+  if "$gh_cmd" extension list 2>/dev/null | grep -q "yahsan2/gh-sub-issue"; then
+    log "gh-sub-issue extension already installed"
+    return 0
+  fi
+
+  log "Installing gh-sub-issue extension..."
+  if "$gh_cmd" extension install yahsan2/gh-sub-issue 2>/dev/null; then
+    log "gh-sub-issue extension installed successfully"
+  else
+    log "Failed to install gh-sub-issue extension (non-critical, continuing)"
+  fi
+}
+
 # Only run in remote Claude Code environment
 if [ "$CLAUDE_CODE_REMOTE" != "true" ]; then
   log "Not a remote session, skipping gh setup"
@@ -20,15 +39,16 @@ fi
 
 log "Remote session detected, checking gh CLI..."
 
-# Check if gh is already available
-if command -v gh &>/dev/null; then
-  log "gh CLI already available: $(gh --version | head -1)"
-  exit 0
-fi
-
 # Setup local bin directory
 LOCAL_BIN="$HOME/.local/bin"
 mkdir -p "$LOCAL_BIN"
+
+# Check if gh is already available in PATH
+if command -v gh &>/dev/null; then
+  log "gh CLI already available: $(gh --version | head -1)"
+  install_gh_sub_issue "gh"
+  exit 0
+fi
 
 # Check if gh exists in local bin
 if [ -x "$LOCAL_BIN/gh" ]; then
@@ -42,6 +62,7 @@ if [ -x "$LOCAL_BIN/gh" ]; then
       log "PATH updated in CLAUDE_ENV_FILE"
     fi
   fi
+  install_gh_sub_issue "$LOCAL_BIN/gh"
   exit 0
 fi
 
@@ -102,4 +123,7 @@ if [ -n "$CLAUDE_ENV_FILE" ]; then
 fi
 
 log "gh CLI installed successfully: $($LOCAL_BIN/gh --version | head -1)"
+
+install_gh_sub_issue "$LOCAL_BIN/gh"
+
 exit 0

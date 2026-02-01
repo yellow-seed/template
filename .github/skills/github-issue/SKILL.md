@@ -166,6 +166,64 @@ PRの本文に記載:
 Closes #456
 ```
 
+### gh-sub-issue拡張機能によるsub issue管理
+
+GitHub CLIの標準コマンドにはsub issue（親子関係）を設定する機能がないため、`gh-sub-issue`拡張機能を使用します。
+
+> **Note**: この拡張機能はセットアップスクリプト（`gh-setup.sh`）により自動的にインストールされます。
+
+#### 基本コマンド
+
+##### 既存issueをsub issueとして追加
+
+```bash
+gh sub-issue add <parent-issue-number> <child-issue-number>
+```
+
+例:
+
+```bash
+# issue #456を親issue #123のsub issueとして追加
+gh sub-issue add 123 456
+```
+
+##### 新規sub issueの作成
+
+```bash
+gh sub-issue create --parent <parent-issue-number> --title "タイトル" [--body "本文"]
+```
+
+例:
+
+```bash
+# 親issue #123に新しいsub issueを作成
+gh sub-issue create --parent 123 --title "データベーススキーマの設計"
+gh sub-issue create --parent 123 --title "APIエンドポイントの実装" --body "認証APIを実装する"
+```
+
+##### sub issueの一覧表示
+
+```bash
+gh sub-issue list <parent-issue-number>
+```
+
+例:
+
+```bash
+# 親issue #123のsub issue一覧を表示
+gh sub-issue list 123
+```
+
+#### リモート環境での使用
+
+gitのremoteがローカルプロキシを経由している環境では、`-R`フラグでリポジトリを明示的に指定してください:
+
+```bash
+gh sub-issue add 123 456 -R owner/repo
+gh sub-issue create --parent 123 --title "タイトル" -R owner/repo
+gh sub-issue list 123 -R owner/repo
+```
+
 ### 活用例
 
 #### 例: ユーザー認証機能の実装
@@ -268,6 +326,37 @@ Closes #124
 5. **内容作成**: テンプレートの全項目を埋める
 6. **関連性設定**: 関連IssueやPRをリンク
 7. **Issue作成**: `gh issue create`コマンドで作成
+
+### メインissueとsub issueの作成ワークフロー
+
+大きな機能を分割して実装する場合は、以下のワークフローに従います:
+
+1. **メインissue作成**: `gh issue create`でメインissueを作成
+
+   ```bash
+   gh issue create --title "ユーザー認証機能の実装" --body "..."
+   # 作成されたissue番号を確認（例: #123）
+   ```
+
+2. **sub issue作成**: `gh sub-issue create`でsub issueを作成
+
+   ```bash
+   gh sub-issue create --parent 123 --title "データベーススキーマの設計"
+   gh sub-issue create --parent 123 --title "APIエンドポイントの実装"
+   gh sub-issue create --parent 123 --title "フロントエンドUIの実装"
+   ```
+
+3. **既存issueをsub issueに追加**: 既にissueが存在する場合
+
+   ```bash
+   gh sub-issue add 123 456  # issue #456を親issue #123のsub issueに追加
+   ```
+
+4. **進捗確認**: sub issue一覧を確認
+
+   ```bash
+   gh sub-issue list 123
+   ```
 
 ## 出力形式
 
