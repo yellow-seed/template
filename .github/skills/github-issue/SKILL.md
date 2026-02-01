@@ -170,11 +170,7 @@ Closes #456
 
 GitHub CLIの標準コマンドにはsub issue（親子関係）を設定する機能がないため、`gh-sub-issue`拡張機能を使用します。
 
-#### セットアップ
-
-```bash
-gh extension install yahsan2/gh-sub-issue
-```
+> **Note**: この拡張機能はセットアップスクリプト（`gh-setup.sh`）により自動的にインストールされます。
 
 #### 基本コマンド
 
@@ -345,10 +341,6 @@ Closes #124
 2. **sub issue作成**: `gh sub-issue create`でsub issueを作成
 
    ```bash
-   # gh-sub-issue拡張機能がインストールされていない場合は先にインストール
-   gh extension install yahsan2/gh-sub-issue
-
-   # sub issueを作成
    gh sub-issue create --parent 123 --title "データベーススキーマの設計"
    gh sub-issue create --parent 123 --title "APIエンドポイントの実装"
    gh sub-issue create --parent 123 --title "フロントエンドUIの実装"
