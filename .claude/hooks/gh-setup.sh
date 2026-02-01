@@ -102,4 +102,25 @@ if [ -n "$CLAUDE_ENV_FILE" ]; then
 fi
 
 log "gh CLI installed successfully: $($LOCAL_BIN/gh --version | head -1)"
+
+# Install gh-sub-issue extension for sub-issue management
+install_gh_sub_issue() {
+  log "Checking gh-sub-issue extension..."
+
+  # Check if extension is already installed
+  if "$LOCAL_BIN/gh" extension list 2>/dev/null | grep -q "yahsan2/gh-sub-issue"; then
+    log "gh-sub-issue extension already installed"
+    return 0
+  fi
+
+  log "Installing gh-sub-issue extension..."
+  if "$LOCAL_BIN/gh" extension install yahsan2/gh-sub-issue 2>/dev/null; then
+    log "gh-sub-issue extension installed successfully"
+  else
+    log "Failed to install gh-sub-issue extension (non-critical, continuing)"
+  fi
+}
+
+install_gh_sub_issue
+
 exit 0
