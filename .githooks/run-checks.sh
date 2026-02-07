@@ -24,71 +24,50 @@ if [ "$#" -eq 0 ]; then
   exit 0
 fi
 
-declare -A seen_files=()
-declare -a files=()
+# Detect which categories of files changed
+has_shell=false
+has_docs=false
+has_workflows=false
+
 for file in "$@"; do
-  if [ -n "$file" ] && [ -z "${seen_files[$file]+x}" ]; then
-    seen_files["$file"]=1
-    files+=("$file")
-  fi
+  case "$file" in
+  *.sh) has_shell=true ;;
+  esac
+  case "$file" in
+  *.md | *.yml | *.yaml | *.json) has_docs=true ;;
+  esac
+  case "$file" in
+  .github/workflows/*) has_workflows=true ;;
+  esac
 done
 
-declare -a shell_files=()
-declare -a doc_files=()
-declare -a workflow_files=()
+checked=false
 
-for file in "${files[@]}"; do
-  if [[ "$file" == *.sh ]]; then
-    shell_files+=("$file")
-  fi
-
-  if [[ "$file" == "README.md" ]] ||
-    [[ "$file" == "AGENTS.md" ]] ||
-    [[ "$file" == "CLAUDE.md" ]] ||
-    [[ "$file" == docs/*.md ]] ||
-    [[ "$file" == docs/**/*.md ]] ||
-    [[ "$file" == .github/*.md ]] ||
-    [[ "$file" == .github/**/*.md ]] ||
-    [[ "$file" == "compose.yml" ]] ||
-    [[ "$file" == "codecov.yml" ]] ||
-    [[ "$file" == .github/*.yml ]] ||
-    [[ "$file" == .github/**/*.yml ]] ||
-    [[ "$file" == .github/*.yaml ]] ||
-    [[ "$file" == .github/**/*.yaml ]] ||
-    [[ "$file" == .github/*.json ]] ||
-    [[ "$file" == .github/**/*.json ]]; then
-    doc_files+=("$file")
-  fi
-
-  if [[ "$file" == .github/workflows/*.yml ]] ||
-    [[ "$file" == .github/workflows/*.yaml ]] ||
-    [[ "$file" == .github/workflows/**/*.yml ]] ||
-    [[ "$file" == .github/workflows/**/*.yaml ]]; then
-    workflow_files+=("$file")
-  fi
-done
-
-if [ "${#shell_files[@]}" -gt 0 ]; then
+# Use the same commands as CI (ci.yml)
+if "$has_shell"; then
   log "Running shell checks..."
-  "$REPO_ROOT/scripts/lint-shell.sh" "${shell_files[@]}"
+  "$REPO_ROOT/scripts/lint-shell.sh"
+  checked=true
 fi
 
-if [ "${#doc_files[@]}" -gt 0 ]; then
+# Use the same commands as CI (doc-lint.yml)
+if "$has_docs"; then
   log "Running document checks..."
-  "$REPO_ROOT/scripts/lint-docs.sh" "${doc_files[@]}"
+  npm run format:check
+  checked=true
 fi
 
-if [ "${#workflow_files[@]}" -gt 0 ]; then
+# Use the same commands as CI (actionlint.yml)
+if "$has_workflows"; then
   if ! command -v actionlint >/dev/null 2>&1; then
     log "actionlint is not installed. Please run scripts/install-tools.sh."
     exit 1
   fi
   log "Running actionlint..."
-  actionlint "${workflow_files[@]}"
+  actionlint
+  checked=true
 fi
 
-if [ "${#shell_files[@]}" -eq 0 ] &&
-  [ "${#doc_files[@]}" -eq 0 ] &&
-  [ "${#workflow_files[@]}" -eq 0 ]; then
+if ! "$checked"; then
   log "No relevant files to lint."
 fi
