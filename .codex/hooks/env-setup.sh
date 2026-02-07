@@ -2,8 +2,6 @@
 # Development Environment Setup Script for Codex
 # This script delegates to scripts/install-tools.sh with Codex-friendly defaults.
 
-set -e
-
 LOG_PREFIX="[env-setup]"
 
 log() {
@@ -22,6 +20,8 @@ export INSTALL_PREFIX
 export ENV_FILE
 export STRICT_MODE
 
-bash "$REPO_ROOT/scripts/install-tools.sh"
-
-log "Development environment setup completed successfully!"
+if bash "$REPO_ROOT/scripts/install-tools.sh"; then
+  log "Development environment setup completed successfully!"
+else
+  log "Installer exited with errors (non-strict mode — continuing)"
+fi

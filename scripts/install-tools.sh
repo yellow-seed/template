@@ -14,6 +14,8 @@ ENV_FILE="${ENV_FILE:-}"
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
+APT_UPDATED="false"
+
 SHELLCHECK_VERSION="0.10.0"
 GO_VERSION="1.23.5"
 SHFMT_VERSION="3.12.0"
@@ -32,7 +34,20 @@ command_exists() {
 }
 
 ensure_path() {
-  mkdir -p "$INSTALL_PREFIX"
+  if [ ! -d "$INSTALL_PREFIX" ]; then
+    local sudo_cmd
+    sudo_cmd=$(use_sudo)
+    if ! $sudo_cmd mkdir -p "$INSTALL_PREFIX"; then
+      fail "Unable to create install prefix '$INSTALL_PREFIX'. Try rerunning with sudo or choose a different INSTALL_PREFIX."
+      return 1
+    fi
+  fi
+
+  if [ ! -w "$INSTALL_PREFIX" ]; then
+    fail "Install prefix '$INSTALL_PREFIX' is not writable. Try rerunning with sudo or choose a different INSTALL_PREFIX."
+    return 1
+  fi
+
   if [[ ":$PATH:" != *":$INSTALL_PREFIX:"* ]]; then
     export PATH="$INSTALL_PREFIX:$PATH"
     if [ -n "$ENV_FILE" ]; then
@@ -75,9 +90,12 @@ install_packages() {
   fi
 
   sudo_cmd=$(use_sudo)
-  if ! $sudo_cmd apt-get update -qq; then
-    fail "apt-get update failed"
-    return 1
+  if [ "$APT_UPDATED" != "true" ]; then
+    if ! $sudo_cmd apt-get update -qq; then
+      fail "apt-get update failed"
+      return 1
+    fi
+    APT_UPDATED="true"
   fi
 
   if ! $sudo_cmd apt-get install -y "${packages[@]}"; then
@@ -124,7 +142,6 @@ install_shellcheck() {
 
   local temp_dir
   temp_dir=$(mktemp -d)
-  trap 'rm -rf "$temp_dir"' EXIT
 
   local archive="shellcheck-v${SHELLCHECK_VERSION}.linux.${SHELLCHECK_ARCH}.tar.xz"
   local url="https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/${archive}"
@@ -144,6 +161,8 @@ install_shellcheck() {
   else
     fail "failed to download shellcheck archive"
   fi
+
+  rm -rf "$temp_dir"
 }
 
 install_go() {
@@ -160,7 +179,6 @@ install_go() {
   log "Installing Go ${GO_VERSION}..."
   local temp_dir
   temp_dir=$(mktemp -d)
-  trap 'rm -rf "$temp_dir"' EXIT
 
   local tarball="go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
   local url="https://go.dev/dl/${tarball}"
@@ -193,6 +211,8 @@ install_go() {
   else
     fail "failed to extract Go"
   fi
+
+  rm -rf "$temp_dir"
 }
 
 ensure_gopath() {
@@ -281,7 +301,14 @@ install_prettier() {
   fi
 
   log "Installing Prettier v${PRETTIER_VERSION}..."
-  if npm install -g "prettier@${PRETTIER_VERSION}"; then
+  local sudo_cmd=""
+  local npm_prefix
+  npm_prefix=$(npm config get prefix 2>/dev/null || echo "")
+  if [ -n "$npm_prefix" ] && [ ! -w "$npm_prefix" ]; then
+    sudo_cmd=$(use_sudo)
+  fi
+
+  if $sudo_cmd npm install -g "prettier@${PRETTIER_VERSION}"; then
     log "Prettier v${PRETTIER_VERSION} installed successfully"
   else
     fail "Failed to install Prettier"
@@ -299,13 +326,25 @@ install_helper_script() {
     return 0
   fi
 
-  if [ -f "$source_path" ]; then
-    cp "$source_path" "$dest_path"
-    chmod +x "$dest_path"
-    log "$dest_name installed"
-  else
+  if [ ! -f "$source_path" ]; then
     fail "$source_path not found"
+    return 1
   fi
+
+  local sudo_cmd=""
+  if [ ! -w "$INSTALL_PREFIX" ]; then
+    sudo_cmd=$(use_sudo)
+  fi
+
+  if ! $sudo_cmd cp "$source_path" "$dest_path"; then
+    fail "Failed to copy helper script to $dest_path"
+    return 1
+  fi
+  if ! $sudo_cmd chmod +x "$dest_path"; then
+    fail "Failed to make helper script executable: $dest_path"
+    return 1
+  fi
+  log "$dest_name installed"
 }
 
 main() {
