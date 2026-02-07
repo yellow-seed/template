@@ -15,7 +15,7 @@ fi
 cd "$REPO_ROOT"
 
 declare -a changed_files=()
-while read -r local_ref local_sha remote_ref remote_sha; do
+while read -r local_ref local_sha _ remote_sha; do
   if [ -z "${local_ref:-}" ]; then
     continue
   fi
