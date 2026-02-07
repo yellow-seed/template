@@ -9,7 +9,13 @@ log() {
 }
 
 STRICT_MODE="${STRICT_MODE:-false}"
-INSTALL_PREFIX="${INSTALL_PREFIX:-/usr/local/bin}"
+if [ -z "${INSTALL_PREFIX:-}" ]; then
+  if [ -w "/usr/local/bin" ] || [ "$(id -u)" -eq 0 ]; then
+    INSTALL_PREFIX="/usr/local/bin"
+  else
+    INSTALL_PREFIX="$HOME/.local/bin"
+  fi
+fi
 ENV_FILE="${ENV_FILE:-}"
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
