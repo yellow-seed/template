@@ -53,6 +53,10 @@ fi
 # Use the same commands as CI (doc-lint.yml)
 if "$has_docs"; then
   log "Running document checks..."
+  if [ ! -x "$REPO_ROOT/node_modules/.bin/prettier" ]; then
+    log "Prettier is not installed. Run 'npm ci' to install dependencies."
+    exit 1
+  fi
   npm run format:check
   checked=true
 fi
