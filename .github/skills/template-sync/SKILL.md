@@ -126,7 +126,21 @@ scripts/**/*
 - 行単位でマージ（重複を避けて新規エントリを追加）
 - コメントブロック単位で整理
 
-### F. ドキュメントファイル（構造同期を含む）
+### F. Gitフック構造（`.githooks/` 配下）
+
+**対象パターン**:
+
+```bash
+.githooks/**/*
+```
+
+**同期戦略**:
+
+- `.githooks/` のディレクトリ構造はテンプレートに合わせて同期
+- 新規フックは追加、既存フックは内容比較後に更新提案
+- プロジェクト固有のフックがある場合は保持しつつ、共通フックを追加
+
+### G. ドキュメントファイル（構造同期を含む）
 
 **対象パターン**:
 
@@ -152,7 +166,7 @@ CONTRIBUTING.md
 | **マージ同期** | `.gitignore`, `.gitattributes`                                                 | 既存内容を保持しつつ新規内容を追加 |
 | **値同期**     | `.codecov.yml`, `.renovate.json`, `.editorconfig`                              | テンプレート値を基準に             |
 | **選択的同期** | README.md (バッジセクションのみ)                                               | 特定セクションのみを置換           |
-| **差分同期**   | `scripts/`                                                                     | 差分を確認して更新提案             |
+| **差分同期**   | `scripts/`, `.githooks/`                                                       | 差分を確認して更新提案             |
 | **スキップ**   | プロジェクト固有ファイル (`package.json`, `Cargo.toml`, `pyproject.toml` など) | 同期対象外                         |
 
 ## ドキュメント構造同期
@@ -424,6 +438,7 @@ git ls-remote --heads $TEMPLATE_REPO
 - プロジェクト構造
 - カスタマイズされた設定ファイル
 - 既存のskillsとhooks
+- `.githooks/` の構造と運用有無
 - `.claude/` `.codex/` のトップレベル構造（設定ファイルとsymlink）
 - `scripts/` の有無と利用箇所（Dockerfileなど）
 
@@ -465,6 +480,7 @@ git diff HEAD template/main -- .claude/
 git diff HEAD template/main -- .codex/
 git diff HEAD template/main -- .claude/skills/
 git diff HEAD template/main -- .github/
+git diff HEAD template/main -- .githooks/
 git diff HEAD template/main -- scripts/
 git diff HEAD template/main -- AGENTS.md
 git diff HEAD template/main -- README.md
