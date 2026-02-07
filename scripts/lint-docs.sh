@@ -4,6 +4,7 @@ set -euo pipefail
 declare -a markdown_files=()
 declare -a yaml_files=()
 declare -a json_files=()
+prettier_cmd=(npx --no-install prettier)
 
 matches_markdown() {
   local file="$1"
@@ -51,19 +52,19 @@ fi
 
 if [ "${#markdown_files[@]}" -gt 0 ]; then
   echo "Running Prettier (Markdown)..."
-  prettier --check "${markdown_files[@]}"
+  "${prettier_cmd[@]}" --check "${markdown_files[@]}"
   echo ""
 fi
 
 if [ "${#yaml_files[@]}" -gt 0 ]; then
   echo "Running Prettier (YAML)..."
-  prettier --check "${yaml_files[@]}"
+  "${prettier_cmd[@]}" --check "${yaml_files[@]}"
   echo ""
 fi
 
 if [ "${#json_files[@]}" -gt 0 ]; then
   echo "Running Prettier (JSON)..."
-  prettier --check "${json_files[@]}"
+  "${prettier_cmd[@]}" --check "${json_files[@]}"
   echo ""
 fi
 
