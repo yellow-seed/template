@@ -28,6 +28,8 @@ log() {
 
 log "Starting development environment setup..."
 
+REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+
 # Detect architecture
 ARCH=$(uname -m)
 case "$ARCH" in
@@ -235,20 +237,14 @@ LINT_SHELL_SCRIPT="$LOCAL_BIN/lint-shell"
 if [ -f "$LINT_SHELL_SCRIPT" ]; then
   log "lint-shell script already exists"
 else
-  log "Creating lint-shell helper script..."
-  cat >"$LINT_SHELL_SCRIPT" <<'EOF'
-#!/bin/bash
-set -e
-echo "Running shellcheck..."
-find . -name "*.sh" -type f -print0 | xargs -0 shellcheck --severity=warning
-echo ""
-echo "Running shfmt..."
-find . -name "*.sh" -not -name "*.bats" -type f -print0 | xargs -0 shfmt -i 2 -d
-echo ""
-echo "All linting checks passed!"
-EOF
-  chmod +x "$LINT_SHELL_SCRIPT"
-  log "lint-shell script created successfully"
+  if [ -f "$REPO_ROOT/scripts/lint-shell.sh" ]; then
+    log "Copying lint-shell helper script..."
+    cp "$REPO_ROOT/scripts/lint-shell.sh" "$LINT_SHELL_SCRIPT"
+    chmod +x "$LINT_SHELL_SCRIPT"
+    log "lint-shell script created successfully"
+  else
+    log "lint-shell helper script not found in repository"
+  fi
 fi
 
 # 8. Create lint-docs helper script
@@ -256,23 +252,14 @@ LINT_DOCS_SCRIPT="$LOCAL_BIN/lint-docs"
 if [ -f "$LINT_DOCS_SCRIPT" ]; then
   log "lint-docs script already exists"
 else
-  log "Creating lint-docs helper script..."
-  cat >"$LINT_DOCS_SCRIPT" <<'EOF'
-#!/bin/bash
-set -e
-echo "Running Prettier (Markdown)..."
-prettier --check "README.md" "AGENTS.md" "CLAUDE.md" "docs/**/*.md" ".github/**/*.md"
-echo ""
-echo "Running Prettier (YAML)..."
-prettier --check "compose.yml" "codecov.yml" ".github/**/*.{yml,yaml}"
-echo ""
-echo "Running Prettier (JSON)..."
-prettier --check ".github/**/*.json"
-echo ""
-echo "All document linting checks passed!"
-EOF
-  chmod +x "$LINT_DOCS_SCRIPT"
-  log "lint-docs script created successfully"
+  if [ -f "$REPO_ROOT/scripts/lint-docs.sh" ]; then
+    log "Copying lint-docs helper script..."
+    cp "$REPO_ROOT/scripts/lint-docs.sh" "$LINT_DOCS_SCRIPT"
+    chmod +x "$LINT_DOCS_SCRIPT"
+    log "lint-docs script created successfully"
+  else
+    log "lint-docs helper script not found in repository"
+  fi
 fi
 
 log "Development environment setup completed successfully!"

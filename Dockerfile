@@ -39,34 +39,10 @@ RUN npm install -g prettier@3.4.2
 # Set working directory
 WORKDIR /workspace
 
-# Create a script to run both linters
-RUN echo '#!/bin/bash\n\
-set -e\n\
-echo "Running shellcheck..."\n\
-find . -name "*.sh" -type f -print0 | xargs -0 shellcheck --severity=warning\n\
-echo ""\n\
-echo "Running shfmt..."\n\
-find . -name "*.sh" -not -name "*.bats" -type f -print0 | xargs -0 shfmt -i 2 -d\n\
-echo ""\n\
-echo "All linting checks passed!"\n\
-' > /usr/local/bin/lint-shell && \
-    chmod +x /usr/local/bin/lint-shell
-
-# Create a script to run document formatting checks
-RUN echo '#!/bin/bash\n\
-set -e\n\
-echo \"Running Prettier (Markdown)...\"\n\
-prettier --check \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\"\n\
-echo \"\"\n\
-echo \"Running Prettier (YAML)...\"\n\
-prettier --check \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\"\n\
-echo \"\"\n\
-echo \"Running Prettier (JSON)...\"\n\
-prettier --check \".github/**/*.json\"\n\
-echo \"\"\n\
-echo \"All document linting checks passed!\"\n\
-' > /usr/local/bin/lint-docs && \
-    chmod +x /usr/local/bin/lint-docs
+# Install lint helper scripts
+COPY scripts/lint-shell.sh /usr/local/bin/lint-shell
+COPY scripts/lint-docs.sh /usr/local/bin/lint-docs
+RUN chmod +x /usr/local/bin/lint-shell /usr/local/bin/lint-docs
 
 # Default command
 CMD ["lint-shell"]
