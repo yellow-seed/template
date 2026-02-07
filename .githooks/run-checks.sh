@@ -42,28 +42,28 @@ for file in "${files[@]}"; do
     shell_files+=("$file")
   fi
 
-  if [[ "$file" == "README.md" ]] \
-    || [[ "$file" == "AGENTS.md" ]] \
-    || [[ "$file" == "CLAUDE.md" ]] \
-    || [[ "$file" == docs/*.md ]] \
-    || [[ "$file" == docs/**/*.md ]] \
-    || [[ "$file" == .github/*.md ]] \
-    || [[ "$file" == .github/**/*.md ]] \
-    || [[ "$file" == "compose.yml" ]] \
-    || [[ "$file" == "codecov.yml" ]] \
-    || [[ "$file" == .github/*.yml ]] \
-    || [[ "$file" == .github/**/*.yml ]] \
-    || [[ "$file" == .github/*.yaml ]] \
-    || [[ "$file" == .github/**/*.yaml ]] \
-    || [[ "$file" == .github/*.json ]] \
-    || [[ "$file" == .github/**/*.json ]]; then
+  if [[ "$file" == "README.md" ]] ||
+    [[ "$file" == "AGENTS.md" ]] ||
+    [[ "$file" == "CLAUDE.md" ]] ||
+    [[ "$file" == docs/*.md ]] ||
+    [[ "$file" == docs/**/*.md ]] ||
+    [[ "$file" == .github/*.md ]] ||
+    [[ "$file" == .github/**/*.md ]] ||
+    [[ "$file" == "compose.yml" ]] ||
+    [[ "$file" == "codecov.yml" ]] ||
+    [[ "$file" == .github/*.yml ]] ||
+    [[ "$file" == .github/**/*.yml ]] ||
+    [[ "$file" == .github/*.yaml ]] ||
+    [[ "$file" == .github/**/*.yaml ]] ||
+    [[ "$file" == .github/*.json ]] ||
+    [[ "$file" == .github/**/*.json ]]; then
     doc_files+=("$file")
   fi
 
-  if [[ "$file" == .github/workflows/*.yml ]] \
-    || [[ "$file" == .github/workflows/*.yaml ]] \
-    || [[ "$file" == .github/workflows/**/*.yml ]] \
-    || [[ "$file" == .github/workflows/**/*.yaml ]]; then
+  if [[ "$file" == .github/workflows/*.yml ]] ||
+    [[ "$file" == .github/workflows/*.yaml ]] ||
+    [[ "$file" == .github/workflows/**/*.yml ]] ||
+    [[ "$file" == .github/workflows/**/*.yaml ]]; then
     workflow_files+=("$file")
   fi
 done
@@ -87,8 +87,8 @@ if [ "${#workflow_files[@]}" -gt 0 ]; then
   actionlint "${workflow_files[@]}"
 fi
 
-if [ "${#shell_files[@]}" -eq 0 ] \
-  && [ "${#doc_files[@]}" -eq 0 ] \
-  && [ "${#workflow_files[@]}" -eq 0 ]; then
+if [ "${#shell_files[@]}" -eq 0 ] &&
+  [ "${#doc_files[@]}" -eq 0 ] &&
+  [ "${#workflow_files[@]}" -eq 0 ]; then
   log "No relevant files to lint."
 fi

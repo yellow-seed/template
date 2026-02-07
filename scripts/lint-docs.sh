@@ -7,23 +7,23 @@ declare -a json_files=()
 
 matches_markdown() {
   local file="$1"
-  [[ "$file" == "README.md" ]] \
-    || [[ "$file" == "AGENTS.md" ]] \
-    || [[ "$file" == "CLAUDE.md" ]] \
-    || [[ "$file" == docs/*.md ]] \
-    || [[ "$file" == docs/**/*.md ]] \
-    || [[ "$file" == .github/*.md ]] \
-    || [[ "$file" == .github/**/*.md ]]
+  [[ "$file" == "README.md" ]] ||
+    [[ "$file" == "AGENTS.md" ]] ||
+    [[ "$file" == "CLAUDE.md" ]] ||
+    [[ "$file" == docs/*.md ]] ||
+    [[ "$file" == docs/**/*.md ]] ||
+    [[ "$file" == .github/*.md ]] ||
+    [[ "$file" == .github/**/*.md ]]
 }
 
 matches_yaml() {
   local file="$1"
-  [[ "$file" == "compose.yml" ]] \
-    || [[ "$file" == "codecov.yml" ]] \
-    || [[ "$file" == .github/*.yml ]] \
-    || [[ "$file" == .github/**/*.yml ]] \
-    || [[ "$file" == .github/*.yaml ]] \
-    || [[ "$file" == .github/**/*.yaml ]]
+  [[ "$file" == "compose.yml" ]] ||
+    [[ "$file" == "codecov.yml" ]] ||
+    [[ "$file" == .github/*.yml ]] ||
+    [[ "$file" == .github/**/*.yml ]] ||
+    [[ "$file" == .github/*.yaml ]] ||
+    [[ "$file" == .github/**/*.yaml ]]
 }
 
 matches_json() {
@@ -67,9 +67,9 @@ if [ "${#json_files[@]}" -gt 0 ]; then
   echo ""
 fi
 
-if [ "${#markdown_files[@]}" -eq 0 ] \
-  && [ "${#yaml_files[@]}" -eq 0 ] \
-  && [ "${#json_files[@]}" -eq 0 ]; then
+if [ "${#markdown_files[@]}" -eq 0 ] &&
+  [ "${#yaml_files[@]}" -eq 0 ] &&
+  [ "${#json_files[@]}" -eq 0 ]; then
   echo "No document files to lint."
   exit 0
 fi
