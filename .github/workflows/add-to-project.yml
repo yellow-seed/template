@@ -14,8 +14,81 @@ jobs:
       issues: write
 
     steps:
+      - name: Validate configuration
+        id: validate
+        run: |
+          errors=0
+
+          # PROJECT_URL の検証
+          if [ -z "${{ secrets.PROJECT_URL }}" ]; then
+            echo "::error::SECRET 'PROJECT_URL' が設定されていません。Settings > Secrets and variables > Actions で設定してください。"
+            echo "::notice::PROJECT_URL の形式: https://github.com/orgs/{org}/projects/{number} または https://github.com/users/{user}/projects/{number}"
+            errors=$((errors + 1))
+          else
+            url="${{ secrets.PROJECT_URL }}"
+            if echo "$url" | grep -qE '^https://github\.com/(orgs|users)/[^/]+/projects/[0-9]+$'; then
+              echo "::notice::PROJECT_URL の形式は正しいです。"
+            else
+              echo "::error::PROJECT_URL の形式が不正です。期待される形式: https://github.com/orgs/{org}/projects/{number} または https://github.com/users/{user}/projects/{number}"
+              echo "::notice::現在の PROJECT_URL の先頭: $(echo "$url" | cut -c1-30)..."
+              errors=$((errors + 1))
+            fi
+          fi
+
+          # ADD_TO_PROJECT_PAT の検証
+          if [ -z "${{ secrets.ADD_TO_PROJECT_PAT }}" ]; then
+            echo "::error::SECRET 'ADD_TO_PROJECT_PAT' が設定されていません。Settings > Secrets and variables > Actions で設定してください。"
+            echo "::notice::Personal Access Token (classic) に必要なスコープ: project (Full control of projects)"
+            echo "::notice::Fine-grained token の場合: Organization permissions > Projects > Read and write"
+            errors=$((errors + 1))
+          else
+            echo "::notice::ADD_TO_PROJECT_PAT は設定されています。"
+          fi
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::設定に $errors 件の問題があります。上記のエラーを確認してください。"
+            echo ""
+            echo "=== トラブルシューティング ==="
+            echo "1. GitHub リポジトリの Settings > Secrets and variables > Actions を開く"
+            echo "2. 以下の Repository secrets が設定されていることを確認:"
+            echo "   - PROJECT_URL: GitHub Project の URL"
+            echo "   - ADD_TO_PROJECT_PAT: project スコープを持つ Personal Access Token"
+            echo ""
+            echo "セットアップスクリプトを使う場合:"
+            echo "  bash .github/scripts/setup-github-project.sh"
+            exit 1
+          fi
+
+          echo "設定の検証が完了しました。"
+
       - name: Add to project
+        id: add-to-project
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: ${{ secrets.PROJECT_URL }}
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+
+      - name: Debug on failure
+        if: failure() && steps.add-to-project.outcome == 'failure'
+        run: |
+          echo "::error::Issue の Project への追加に失敗しました。"
+          echo ""
+          echo "=== 考えられる原因 ==="
+          echo "1. ADD_TO_PROJECT_PAT の権限不足"
+          echo "   - Personal Access Token (classic) の場合: 'project' スコープが必要"
+          echo "   - Fine-grained token の場合: Organization permissions > Projects > Read and write が必要"
+          echo ""
+          echo "2. ADD_TO_PROJECT_PAT の有効期限切れ"
+          echo "   - https://github.com/settings/tokens で有効期限を確認してください"
+          echo ""
+          echo "3. PROJECT_URL で指定された Project が存在しない"
+          echo "   - Project が削除されていないか確認してください"
+          echo "   - URL をブラウザで開いてアクセスできるか確認してください"
+          echo ""
+          echo "4. トークンのオーナーが Project にアクセスできない"
+          echo "   - Organization の Project の場合、トークンのオーナーが Organization のメンバーであることを確認してください"
+          echo ""
+          echo "=== 対象 Issue 情報 ==="
+          echo "Issue: #${{ github.event.issue.number }}"
+          echo "Title: ${{ github.event.issue.title }}"
+          echo "Author: ${{ github.event.issue.user.login }}"
