@@ -70,6 +70,10 @@ jobs:
 
       - name: Debug on failure
         if: failure() && steps.add-to-project.outcome == 'failure'
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
         run: |
           echo "::error::Issue の Project への追加に失敗しました。"
           echo ""
@@ -89,6 +93,6 @@ jobs:
           echo "   - Organization の Project の場合、トークンのオーナーが Organization のメンバーであることを確認してください"
           echo ""
           echo "=== 対象 Issue 情報 ==="
-          echo "Issue: #${{ github.event.issue.number }}"
-          echo "Title: ${{ github.event.issue.title }}"
-          echo "Author: ${{ github.event.issue.user.login }}"
+          echo "Issue: #${ISSUE_NUMBER}"
+          echo "Title: ${ISSUE_TITLE}"
+          echo "Author: ${ISSUE_AUTHOR}"
