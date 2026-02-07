@@ -11,9 +11,9 @@ matches_markdown() {
     [[ "$file" == "AGENTS.md" ]] ||
     [[ "$file" == "CLAUDE.md" ]] ||
     [[ "$file" == docs/*.md ]] ||
-    [[ "$file" == docs/**/*.md ]] ||
+    [[ "$file" == docs/*/*.md ]] ||
     [[ "$file" == .github/*.md ]] ||
-    [[ "$file" == .github/**/*.md ]]
+    [[ "$file" == .github/*/*.md ]]
 }
 
 matches_yaml() {
@@ -21,14 +21,14 @@ matches_yaml() {
   [[ "$file" == "compose.yml" ]] ||
     [[ "$file" == "codecov.yml" ]] ||
     [[ "$file" == .github/*.yml ]] ||
-    [[ "$file" == .github/**/*.yml ]] ||
+    [[ "$file" == .github/*/*.yml ]] ||
     [[ "$file" == .github/*.yaml ]] ||
-    [[ "$file" == .github/**/*.yaml ]]
+    [[ "$file" == .github/*/*.yaml ]]
 }
 
 matches_json() {
   local file="$1"
-  [[ "$file" == .github/*.json ]] || [[ "$file" == .github/**/*.json ]]
+  [[ "$file" == .github/*.json ]] || [[ "$file" == .github/*/*.json ]]
 }
 
 if [ "$#" -gt 0 ]; then

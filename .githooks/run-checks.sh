@@ -24,11 +24,19 @@ if [ "$#" -eq 0 ]; then
   exit 0
 fi
 
-declare -A seen_files=()
 declare -a files=()
 for file in "$@"; do
-  if [ -n "$file" ] && [ -z "${seen_files[$file]+x}" ]; then
-    seen_files["$file"]=1
+  if [ -z "$file" ]; then
+    continue
+  fi
+  duplicate=false
+  for existing in "${files[@]}"; do
+    if [ "$existing" = "$file" ]; then
+      duplicate=true
+      break
+    fi
+  done
+  if [ "$duplicate" = false ]; then
     files+=("$file")
   fi
 done
@@ -46,24 +54,24 @@ for file in "${files[@]}"; do
     [[ "$file" == "AGENTS.md" ]] ||
     [[ "$file" == "CLAUDE.md" ]] ||
     [[ "$file" == docs/*.md ]] ||
-    [[ "$file" == docs/**/*.md ]] ||
+    [[ "$file" == docs/*/*.md ]] ||
     [[ "$file" == .github/*.md ]] ||
-    [[ "$file" == .github/**/*.md ]] ||
+    [[ "$file" == .github/*/*.md ]] ||
     [[ "$file" == "compose.yml" ]] ||
     [[ "$file" == "codecov.yml" ]] ||
     [[ "$file" == .github/*.yml ]] ||
-    [[ "$file" == .github/**/*.yml ]] ||
+    [[ "$file" == .github/*/*.yml ]] ||
     [[ "$file" == .github/*.yaml ]] ||
-    [[ "$file" == .github/**/*.yaml ]] ||
+    [[ "$file" == .github/*/*.yaml ]] ||
     [[ "$file" == .github/*.json ]] ||
-    [[ "$file" == .github/**/*.json ]]; then
+    [[ "$file" == .github/*/*.json ]]; then
     doc_files+=("$file")
   fi
 
   if [[ "$file" == .github/workflows/*.yml ]] ||
     [[ "$file" == .github/workflows/*.yaml ]] ||
-    [[ "$file" == .github/workflows/**/*.yml ]] ||
-    [[ "$file" == .github/workflows/**/*.yaml ]]; then
+    [[ "$file" == .github/workflows/*/*.yml ]] ||
+    [[ "$file" == .github/workflows/*/*.yaml ]]; then
     workflow_files+=("$file")
   fi
 done

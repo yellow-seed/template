@@ -20,5 +20,5 @@ if [ ! -d "$REPO_ROOT/.githooks" ]; then
 fi
 
 log "Configuring git to use .githooks..."
-git -C "$REPO_ROOT" config core.hooksPath .githooks
+git -C "$REPO_ROOT" config --local core.hooksPath .githooks
 log "Git hooks configured."
