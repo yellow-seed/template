@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "format": "npx --no-install prettier --write \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\" \".github/**/*.json\"",
-    "format:check": "npx --no-install prettier --check \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\" \".github/**/*.json\"",
-    "format:md": "npx --no-install prettier --check \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\"",
+    "format": "npx --no-install prettier --write \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"!.github/skills/**\" \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\" \".github/**/*.json\"",
+    "format:check": "npx --no-install prettier --check \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"!.github/skills/**\" \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\" \".github/**/*.json\"",
+    "format:md": "npx --no-install prettier --check \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"!.github/skills/**\"",
     "format:yaml": "npx --no-install prettier --check \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\"",
     "format:json": "npx --no-install prettier --check \".github/**/*.json\""
   },
