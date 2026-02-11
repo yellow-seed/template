@@ -15,8 +15,12 @@ REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
 log "Starting Codex setup..."
 
-log "1/5 Removing git remote origin..."
-git -C "$REPO_ROOT" remote remove origin 2>/dev/null || true
+if [ "${CODEX_REMOTE:-}" = "true" ]; then
+  log "1/5 Removing git remote origin..."
+  git -C "$REPO_ROOT" remote remove origin 2>/dev/null || true
+else
+  log "1/5 Skipping git remote removal (not a remote session)"
+fi
 
 log "2/5 Running gh CLI setup..."
 bash "$REPO_ROOT/.codex/hooks/gh-setup.sh"
