@@ -13,8 +13,6 @@
 
 <!-- Repository Activity -->
 
-[![GitHub stars](https://img.shields.io/github/stars/yellow-seed/template)](https://github.com/yellow-seed/template/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yellow-seed/template)](https://github.com/yellow-seed/template/network/members)
 [![GitHub issues](https://img.shields.io/github/issues/yellow-seed/template)](https://github.com/yellow-seed/template/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/yellow-seed/template)](https://github.com/yellow-seed/template/pulls)
 
