@@ -15,16 +15,23 @@ REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
 log "Starting Codex setup..."
 
-log "1/4 Running gh CLI setup..."
+if [ "${CODEX_REMOTE:-}" = "true" ]; then
+  log "1/5 Removing git remote origin..."
+  git -C "$REPO_ROOT" remote remove origin 2>/dev/null || true
+else
+  log "1/5 Skipping git remote removal (not a remote session)"
+fi
+
+log "2/5 Running gh CLI setup..."
 bash "$REPO_ROOT/.codex/hooks/gh-setup.sh"
 
-log "2/4 Running environment setup..."
+log "3/5 Running environment setup..."
 bash "$REPO_ROOT/.codex/hooks/env-setup.sh"
 
-log "3/4 Syncing skills directory..."
+log "4/5 Syncing skills directory..."
 bash "$REPO_ROOT/.claude/hooks/skills-setup.sh"
 
-log "4/4 Configuring git hooks..."
+log "5/5 Configuring git hooks..."
 bash "$REPO_ROOT/scripts/setup-git-hooks.sh"
 
 log "Codex setup completed successfully."
