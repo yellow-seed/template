@@ -1,0 +1,115 @@
+#!/bin/bash
+set -u
+set -o pipefail
+
+LOG_PREFIX="[install-tools]"
+
+STRICT_MODE="${STRICT_MODE:-false}"
+INSTALL_PREFIX="${INSTALL_PREFIX:-/usr/local/bin}"
+ENV_FILE="${ENV_FILE:-}"
+REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+export REPO_ROOT
+
+log() {
+  echo "$LOG_PREFIX $*" >&2
+}
+
+fail() {
+  log "ERROR: $1"
+  if [ "$STRICT_MODE" = "true" ]; then
+    exit 1
+  fi
+  return 1
+}
+
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+ensure_path() {
+  mkdir -p "$INSTALL_PREFIX"
+  if [[ ":$PATH:" != *":$INSTALL_PREFIX:"* ]]; then
+    export PATH="$INSTALL_PREFIX:$PATH"
+    if [ -n "$ENV_FILE" ]; then
+      echo "export PATH=\"$INSTALL_PREFIX:\$PATH\"" >>"$ENV_FILE"
+    fi
+  fi
+}
+
+use_sudo() {
+  if [ "$(id -u)" -eq 0 ]; then
+    echo ""
+  elif command_exists sudo; then
+    echo "sudo"
+  else
+    echo ""
+  fi
+}
+
+download_file() {
+  local url="$1"
+  local destination="$2"
+
+  if command_exists curl; then
+    curl -fsSL "$url" -o "$destination"
+  elif command_exists wget; then
+    wget -qO "$destination" "$url"
+  else
+    fail "curl or wget is required to download $url"
+    return 1
+  fi
+}
+
+install_packages() {
+  local packages=("$@")
+  local sudo_cmd
+
+  if ! command_exists apt-get; then
+    fail "apt-get is not available to install ${packages[*]}"
+    return 1
+  fi
+
+  sudo_cmd=$(use_sudo)
+  if ! $sudo_cmd apt-get update -qq; then
+    fail "apt-get update failed"
+    return 1
+  fi
+
+  if ! $sudo_cmd apt-get install -y "${packages[@]}"; then
+    fail "apt-get install failed for ${packages[*]}"
+    return 1
+  fi
+}
+
+detect_arch() {
+  local arch
+  arch=$(uname -m)
+  case "$arch" in
+  x86_64)
+    GO_ARCH="amd64"
+    SHELLCHECK_ARCH="x86_64"
+    ;;
+  aarch64 | arm64)
+    GO_ARCH="arm64"
+    SHELLCHECK_ARCH="aarch64"
+    ;;
+  *)
+    fail "Unsupported architecture: $arch"
+    return 1
+    ;;
+  esac
+  export GO_ARCH SHELLCHECK_ARCH
+}
+
+ensure_gopath() {
+  if [ -z "${GOPATH:-}" ]; then
+    export GOPATH="$HOME/go"
+  fi
+  mkdir -p "$GOPATH/bin"
+  if [[ ":$PATH:" != *":$GOPATH/bin:"* ]]; then
+    export PATH="$GOPATH/bin:$PATH"
+    if [ -n "$ENV_FILE" ]; then
+      echo "export PATH=\"$GOPATH/bin:\$PATH\"" >>"$ENV_FILE"
+    fi
+  fi
+}
