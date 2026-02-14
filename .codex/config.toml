@@ -1,0 +1,8 @@
+# Codex local configuration for this repository.
+# Keep GitHub tokens out of the default shell environment and only inject
+# them when running gh commands.
+
+[shell_environment_policy]
+inherit = "core"
+ignore_default_excludes = false
+exclude = ["GH_TOKEN", "GITHUB_TOKEN"]
