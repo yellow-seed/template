@@ -25,6 +25,7 @@ fail() {
   if [ "$STRICT_MODE" = "true" ]; then
     exit 1
   fi
+  return 1
 }
 
 command_exists() {
@@ -137,12 +138,15 @@ install_shellcheck() {
         log "shellcheck installed successfully from release archive"
       else
         fail "shellcheck binary not found after extraction"
+        return 1
       fi
     else
       fail "failed to extract shellcheck archive"
+      return 1
     fi
   else
     fail "failed to download shellcheck archive"
+    return 1
   fi
 }
 
@@ -192,6 +196,7 @@ install_go() {
     log "Go ${GO_VERSION} installed successfully"
   else
     fail "failed to extract Go"
+    return 1
   fi
 }
 
@@ -224,6 +229,7 @@ install_shfmt() {
     log "shfmt v${SHFMT_VERSION} installed successfully"
   else
     fail "failed to install shfmt"
+    return 1
   fi
 }
 
@@ -243,6 +249,7 @@ install_actionlint() {
     log "actionlint v${ACTIONLINT_VERSION} installed successfully"
   else
     fail "failed to install actionlint"
+    return 1
   fi
 }
 
@@ -259,6 +266,12 @@ install_node() {
     return 0
   fi
 
+  local nvm_dir="${NVM_DIR:-$HOME/.nvm}"
+  if [ -s "$nvm_dir/nvm.sh" ]; then
+    # shellcheck disable=SC1090
+    . "$nvm_dir/nvm.sh"
+  fi
+
   if command_exists nvm; then
     if nvm install --lts; then
       log "Node.js installed successfully via nvm"
@@ -267,6 +280,7 @@ install_node() {
   fi
 
   fail "Failed to install Node.js and npm"
+  return 1
 }
 
 install_prettier() {
@@ -285,6 +299,7 @@ install_prettier() {
     log "Prettier v${PRETTIER_VERSION} installed successfully"
   else
     fail "Failed to install Prettier"
+    return 1
   fi
 }
 
@@ -305,27 +320,35 @@ install_helper_script() {
     log "$dest_name installed"
   else
     fail "$source_path not found"
+    return 1
   fi
 }
 
 main() {
+  local has_failure=0
+
   log "Starting tool installation"
   ensure_path
 
   if ! detect_arch; then
-    return 0
+    return 1
   fi
 
-  install_shellcheck
-  install_go
+  install_shellcheck || has_failure=1
+  install_go || has_failure=1
   ensure_gopath
-  install_shfmt
-  install_actionlint
-  install_node
-  install_prettier
+  install_shfmt || has_failure=1
+  install_actionlint || has_failure=1
+  install_node || has_failure=1
+  install_prettier || has_failure=1
 
-  install_helper_script "lint-shell" "lint-shell"
-  install_helper_script "lint-docs" "lint-docs"
+  install_helper_script "lint-shell" "lint-shell" || has_failure=1
+  install_helper_script "lint-docs" "lint-docs" || has_failure=1
+
+  if [ "$has_failure" -ne 0 ]; then
+    fail "Tool installation completed with errors"
+    return 1
+  fi
 
   log "Tool installation completed"
 }
