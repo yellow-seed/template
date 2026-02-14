@@ -10,17 +10,50 @@ log() {
   echo "$LOG_PREFIX $1" >&2
 }
 
+resolve_gh_token() {
+  local token=""
+
+  if [ -n "${GH_SETUP_TOKEN:-}" ]; then
+    token="${GH_SETUP_TOKEN}"
+  elif [ -n "${CODEX_GH_AUTH:-}" ]; then
+    token="${CODEX_GH_AUTH}"
+  elif [ -n "${CLAUDE_GH_AUTH:-}" ]; then
+    token="${CLAUDE_GH_AUTH}"
+  elif [ -n "${GH_TOKEN:-}" ]; then
+    token="${GH_TOKEN}"
+  elif [ -n "${GITHUB_TOKEN:-}" ]; then
+    token="${GITHUB_TOKEN}"
+  fi
+
+  # Limit token scope to per-command injection only.
+  unset GH_TOKEN
+  unset GITHUB_TOKEN
+
+  printf '%s' "$token"
+}
+
+run_gh() {
+  local gh_cmd="$1"
+  shift
+
+  if [ -n "${GH_CLI_TOKEN:-}" ]; then
+    env GH_TOKEN="${GH_CLI_TOKEN}" GITHUB_TOKEN="${GH_CLI_TOKEN}" "$gh_cmd" "$@"
+  else
+    "$gh_cmd" "$@"
+  fi
+}
+
 install_gh_sub_issue() {
   local gh_cmd="$1"
   log "Checking gh-sub-issue extension..."
 
-  if "$gh_cmd" extension list 2>/dev/null | grep -q "yahsan2/gh-sub-issue"; then
+  if run_gh "$gh_cmd" extension list 2>/dev/null | grep -q "yahsan2/gh-sub-issue"; then
     log "gh-sub-issue extension already installed"
     return 0
   fi
 
   log "Installing gh-sub-issue extension..."
-  if "$gh_cmd" extension install yahsan2/gh-sub-issue 2>/dev/null; then
+  if run_gh "$gh_cmd" extension install yahsan2/gh-sub-issue 2>/dev/null; then
     log "gh-sub-issue extension installed successfully"
   else
     log "Failed to install gh-sub-issue extension (non-critical, continuing)"
@@ -38,13 +71,15 @@ if [ "$REMOTE_ENV_VALUE" != "true" ]; then
   exit 0
 fi
 
+GH_CLI_TOKEN="$(resolve_gh_token)"
+
 log "Remote session detected, checking gh CLI..."
 
 LOCAL_BIN="$HOME/.local/bin"
 mkdir -p "$LOCAL_BIN"
 
 if command -v gh &>/dev/null; then
-  log "gh CLI already available: $(gh --version | head -1)"
+  log "gh CLI already available: $(run_gh gh --version | head -1)"
   install_gh_sub_issue "gh"
   exit 0
 fi
@@ -112,7 +147,7 @@ if [ -n "${ENV_FILE:-}" ]; then
   log "PATH persisted to ENV_FILE"
 fi
 
-log "gh CLI installed successfully: $($LOCAL_BIN/gh --version | head -1)"
+log "gh CLI installed successfully: $(run_gh "$LOCAL_BIN/gh" --version | head -1)"
 
 install_gh_sub_issue "$LOCAL_BIN/gh"
 

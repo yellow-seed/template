@@ -33,6 +33,21 @@ Claude Code on the Web などのリモート環境で GitHub CLI (`gh`) コマ�
 bash .claude/hooks/gh-setup.sh
 ```
 
+### リモート環境でのトークン管理ポリシー（Codex）
+
+セキュリティのため、Codex では `GH_TOKEN` / `GITHUB_TOKEN` をデフォルトのシェル環境へ継承しない方針です。
+
+- `.codex/config.toml` の `shell_environment_policy` で `GH_TOKEN` / `GITHUB_TOKEN` を除外
+- `gh` を実行するコマンドにだけトークンを注入
+
+例:
+
+```bash
+env GH_TOKEN="$GH_TOKEN" gh issue list -R yellow-seed/template
+# または
+env GH_SETUP_TOKEN="$GH_TOKEN" bash .codex/hooks/gh-setup.sh
+```
+
 ### リモート環境での gh コマンド使用方法
 
 gitのremoteがローカルプロキシを経由している環境では、`gh` コマンドがリポジトリを自動認識できない場合があります。その場合は以下の方法を使用してください：
