@@ -46,29 +46,21 @@ checked=false
 # Use the same commands as CI (ci.yml)
 if "$has_shell"; then
   log "Running shell checks..."
-  "$REPO_ROOT/scripts/lint-shell.sh"
+  "$REPO_ROOT/scripts/lint-shell.sh" "$@"
   checked=true
 fi
 
 # Use the same commands as CI (doc-lint.yml)
 if "$has_docs"; then
   log "Running document checks..."
-  if [ ! -x "$REPO_ROOT/node_modules/.bin/prettier" ]; then
-    log "Prettier is not installed. Run 'npm ci' to install dependencies."
-    exit 1
-  fi
-  npm run format:check
+  "$REPO_ROOT/scripts/lint-docs.sh" "$@"
   checked=true
 fi
 
 # Use the same commands as CI (actionlint.yml)
 if "$has_workflows"; then
-  if ! command -v actionlint >/dev/null 2>&1; then
-    log "actionlint is not installed. Please run scripts/install-tools.sh."
-    exit 1
-  fi
   log "Running actionlint..."
-  actionlint
+  "$REPO_ROOT/scripts/lint-actions.sh" "$@"
   checked=true
 fi
 

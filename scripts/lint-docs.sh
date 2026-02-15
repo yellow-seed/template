@@ -6,6 +6,11 @@ declare -a yaml_files=()
 declare -a json_files=()
 prettier_cmd=(npx --no-install prettier)
 
+if [ ! -x "node_modules/.bin/prettier" ]; then
+  echo "Prettier is not installed. Run 'npm ci' to install dependencies." >&2
+  exit 1
+fi
+
 matches_markdown() {
   local file="$1"
   [[ "$file" == "README.md" ]] ||
@@ -55,29 +60,20 @@ else
   json_files=(".github/**/*.json")
 fi
 
-if [ "${#markdown_files[@]}" -gt 0 ]; then
-  echo "Running Prettier (Markdown)..."
-  "${prettier_cmd[@]}" --check "${markdown_files[@]}"
-  echo ""
-fi
-
-if [ "${#yaml_files[@]}" -gt 0 ]; then
-  echo "Running Prettier (YAML)..."
-  "${prettier_cmd[@]}" --check "${yaml_files[@]}"
-  echo ""
-fi
-
-if [ "${#json_files[@]}" -gt 0 ]; then
-  echo "Running Prettier (JSON)..."
-  "${prettier_cmd[@]}" --check "${json_files[@]}"
-  echo ""
-fi
-
 if [ "${#markdown_files[@]}" -eq 0 ] &&
   [ "${#yaml_files[@]}" -eq 0 ] &&
   [ "${#json_files[@]}" -eq 0 ]; then
   echo "No document files to lint."
   exit 0
+fi
+
+if [ "$#" -gt 0 ]; then
+  declare -a doc_files=("${markdown_files[@]}" "${yaml_files[@]}" "${json_files[@]}")
+  echo "Running Prettier for changed document files..."
+  "${prettier_cmd[@]}" --check "${doc_files[@]}"
+else
+  echo "Running npm run format:check..."
+  npm run format:check
 fi
 
 echo "All document linting checks passed!"
