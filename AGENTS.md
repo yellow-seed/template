@@ -143,6 +143,13 @@ This fix ensures all resources are cleaned up correctly.
 
 ## テスト戦略
 
+### スクリプト設計方針
+
+`scripts/` 配下のスクリプトは、環境間での一貫性を確保するために設計されています。
+
+- **インストールスクリプト (`scripts/install-tools.sh`)**: 開発ツールの共通インストーラー。Dockerfile・CI・リモート開発環境（Claude Code / Codex）から再利用し、環境構築手順の重複を排除する。
+- **チェックスクリプト (`scripts/lint-*.sh`)**: 静的解析・フォーマットチェックの共通スクリプト。pre-commit フック（`.githooks/run-checks.sh`）と CI で同一のスクリプトを使用し、チェック基準を統一する。
+
 ### ドキュメント/設定ファイルのフォーマット
 
 - PrettierでMarkdown/YAML/JSONをフォーマットします
