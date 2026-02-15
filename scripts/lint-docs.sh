@@ -39,6 +39,10 @@ matches_json() {
 
 if [ "$#" -gt 0 ]; then
   for file in "$@"; do
+    # Skip symbolic links (Prettier rejects them)
+    if [ -L "$file" ]; then
+      continue
+    fi
     if matches_markdown "$file"; then
       markdown_files+=("$file")
     fi
