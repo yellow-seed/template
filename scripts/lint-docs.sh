@@ -17,6 +17,11 @@ matches_markdown() {
     [[ "$file" == .github/**/*.md ]]
 }
 
+is_excluded_markdown() {
+  local file="$1"
+  [[ "$file" == .github/skills/* ]] || [[ "$file" == .github/skills/**/* ]]
+}
+
 matches_yaml() {
   local file="$1"
   [[ "$file" == "compose.yml" ]] ||
@@ -34,7 +39,7 @@ matches_json() {
 
 if [ "$#" -gt 0 ]; then
   for file in "$@"; do
-    if matches_markdown "$file"; then
+    if matches_markdown "$file" && ! is_excluded_markdown "$file"; then
       markdown_files+=("$file")
     fi
     if matches_yaml "$file"; then
