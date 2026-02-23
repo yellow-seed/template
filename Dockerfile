@@ -25,7 +25,8 @@ WORKDIR /workspace
 COPY scripts/ /workspace/scripts/
 
 # Install tools via shared installer
-RUN STRICT_MODE=true bash /workspace/scripts/install-tools.sh
+RUN STRICT_MODE=true bash /workspace/scripts/install-tools.sh && \
+    qlty --version
 
 # Default command
 CMD ["lint-shell"]

@@ -28,6 +28,7 @@ main() {
     go
     shfmt
     actionlint
+    install-qlty
     node
     prettier
     helper-scripts

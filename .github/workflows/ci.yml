@@ -20,8 +20,8 @@ on:
       ]
 
 jobs:
-  Lint:
-    name: ShellCheck Lint
+  qlty:
+    name: qlty checks
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,20 +30,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@2.0.0
-        with:
-          severity: warning
-          ignore_paths: .git
+      - name: Install qlty
+        uses: qltysh/qlty-action/install@v1
 
-      - name: Install shfmt
-        run: |
-          curl -sS https://webi.sh/shfmt | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Run qlty (all files)
+        run: qlty check --all
 
-      - name: Run shfmt check
-        run: |
-          find . -name "*.sh" -type f -print0 | xargs -0 shfmt -d -i 2
+      - name: Run qlty (changed files)
+        run: qlty check
 
   Test:
     runs-on: ubuntu-latest

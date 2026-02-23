@@ -163,3 +163,7 @@ out/
 # Claude Code
 .claude/settings.local.json
 
+
+# Qlty configuration
+!.qlty/
+!.qlty/qlty.toml
