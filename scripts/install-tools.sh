@@ -25,7 +25,6 @@ should_skip() {
 main() {
   local installers=(
     shellcheck
-    go
     shfmt
     actionlint
     node

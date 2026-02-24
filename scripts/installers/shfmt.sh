@@ -17,8 +17,11 @@ main() {
   fi
 
   if ! command_exists go; then
-    fail "Go is required to install shfmt"
-    return 1
+    log "Go not found, installing Go first..."
+    if ! bash "$SCRIPT_DIR/go.sh"; then
+      fail "Go installation failed, cannot install shfmt"
+      return 1
+    fi
   fi
 
   log "Installing shfmt v${SHFMT_VERSION}..."
