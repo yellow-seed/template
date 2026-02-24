@@ -47,7 +47,8 @@ main() {
       continue
     fi
 
-    if ! bash "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
+    # shellcheck disable=SC1090
+    if ! source "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
       had_failure=true
       fail "Installer failed: $installer"
       if [ "$STRICT_MODE" != "true" ]; then
