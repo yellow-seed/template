@@ -17,7 +17,7 @@ main() {
   fi
 
   if ! detect_arch; then
-    return 0
+    return 1
   fi
 
   log "Installing Go ${GO_VERSION}..."
