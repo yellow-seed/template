@@ -44,6 +44,7 @@ matches_json() {
 
 if [ "$#" -gt 0 ]; then
   for file in "$@"; do
+    [ -L "$file" ] && continue
     if matches_markdown "$file" && ! is_excluded_markdown "$file"; then
       markdown_files+=("$file")
     fi
