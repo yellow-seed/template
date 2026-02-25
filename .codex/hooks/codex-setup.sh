@@ -8,7 +8,7 @@ set -euo pipefail
 LOG_PREFIX="[codex-setup]"
 
 log() {
-  echo "$LOG_PREFIX $1" >&2
+	echo "$LOG_PREFIX $1" >&2
 }
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
@@ -16,10 +16,10 @@ REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 log "Starting Codex setup..."
 
 if [ "${CODEX_REMOTE:-}" = "true" ]; then
-  log "1/5 Removing git remote origin..."
-  git -C "$REPO_ROOT" remote remove origin 2>/dev/null || true
+	log "1/5 Removing git remote origin..."
+	git -C "$REPO_ROOT" remote remove origin 2>/dev/null || true
 else
-  log "1/5 Skipping git remote removal (not a remote session)"
+	log "1/5 Skipping git remote removal (not a remote session)"
 fi
 
 log "2/5 Running gh CLI setup..."

@@ -9,5 +9,5 @@ export ENV_FILE="${CLAUDE_ENV_FILE:-}"
 bash "$REPO_ROOT/scripts/gh-setup.sh"
 
 if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]; then
-  bash "$REPO_ROOT/scripts/setup-git-hooks.sh"
+	bash "$REPO_ROOT/scripts/setup-git-hooks.sh"
 fi
