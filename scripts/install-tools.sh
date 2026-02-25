@@ -24,9 +24,7 @@ should_skip() {
 
 main() {
   local installers=(
-    shellcheck
-    go
-    shfmt
+    qlty
     actionlint
     node
     prettier

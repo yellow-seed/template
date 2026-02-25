@@ -1,6 +1,6 @@
 # Shell Development Environment
 # This Dockerfile provides a complete shell script development environment
-# with shellcheck, shfmt, bats-core, and actionlint installed.
+# with qlty, bats-core, and actionlint installed.
 
 FROM ubuntu:22.04
 
