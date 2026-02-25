@@ -17,3 +17,8 @@ name = "actionlint"
 
 [[plugin]]
 name = "prettier"
+version = "3.6.2"
+
+[[exclude]]
+plugins = ["prettier"]
+file_patterns = [".github/skills/**"]

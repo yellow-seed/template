@@ -7,7 +7,7 @@ set -e
 LOG_PREFIX="[env-setup]"
 
 log() {
-  echo "$LOG_PREFIX $*" >&2
+	echo "$LOG_PREFIX $*" >&2
 }
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)

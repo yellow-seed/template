@@ -18,33 +18,33 @@ GITHUB_SKILLS="${REPO_ROOT}/.github/skills"
 
 # Check if .github/skills exists
 if [ ! -d "${GITHUB_SKILLS}" ]; then
-  echo "✗ Error: .github/skills directory not found"
-  exit 1
+	echo "✗ Error: .github/skills directory not found"
+	exit 1
 fi
 
 setup_skills_dir() {
-  local target_dir="$1"
-  local dir_name="$2"
+	local target_dir="$1"
+	local dir_name="$2"
 
-  echo "Checking ${dir_name} setup..."
+	echo "Checking ${dir_name} setup..."
 
-  # Check if target directory exists and is a directory
-  if [ -d "${target_dir}" ]; then
-    echo "✓ ${dir_name} is already a directory (symlink or real directory)"
-    return 0
-  fi
+	# Check if target directory exists and is a directory
+	if [ -d "${target_dir}" ]; then
+		echo "✓ ${dir_name} is already a directory (symlink or real directory)"
+		return 0
+	fi
 
-  # Remove the file if it exists (e.g., text file from failed symlink)
-  if [ -e "${target_dir}" ]; then
-    echo "⚠ Removing non-directory ${dir_name}..."
-    rm -f "${target_dir}"
-  fi
+	# Remove the file if it exists (e.g., text file from failed symlink)
+	if [ -e "${target_dir}" ]; then
+		echo "⚠ Removing non-directory ${dir_name}..."
+		rm -f "${target_dir}"
+	fi
 
-  # Copy .github/skills to target directory
-  echo "Copying .github/skills to ${dir_name}..."
-  cp -r "${GITHUB_SKILLS}" "${target_dir}"
+	# Copy .github/skills to target directory
+	echo "Copying .github/skills to ${dir_name}..."
+	cp -r "${GITHUB_SKILLS}" "${target_dir}"
 
-  echo "✓ Successfully set up ${dir_name}"
+	echo "✓ Successfully set up ${dir_name}"
 }
 
 # Set up both .claude/skills and .codex/skills
