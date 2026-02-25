@@ -1,20 +1,19 @@
 config_version = "0"
 
-[settings]
-root = true
+[[source]]
+name = "default"
+default = true
 
 [[plugin]]
 name = "shellcheck"
-enabled = true
+version = "0.10.0"
 
 [[plugin]]
 name = "shfmt"
-enabled = true
+version = "3.8.0"
 
 [[plugin]]
 name = "actionlint"
-enabled = true
 
 [[plugin]]
 name = "prettier"
-enabled = true

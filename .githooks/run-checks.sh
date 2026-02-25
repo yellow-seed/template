@@ -24,46 +24,10 @@ if [ "$#" -eq 0 ]; then
   exit 0
 fi
 
-# Detect which categories of files changed
-has_shell=false
-has_docs=false
-has_workflows=false
-
-for file in "$@"; do
-  case "$file" in
-  *.sh) has_shell=true ;;
-  esac
-  case "$file" in
-  *.md | *.yml | *.yaml | *.json) has_docs=true ;;
-  esac
-  case "$file" in
-  .github/workflows/*) has_workflows=true ;;
-  esac
-done
-
-checked=false
-
-# Use the same commands as CI (ci.yml)
-if "$has_shell"; then
-  log "Running shell checks..."
-  "$REPO_ROOT/scripts/lint-shell.sh" "$@"
-  checked=true
+if ! command -v qlty >/dev/null 2>&1; then
+  log "qlty not found, skipping lint checks"
+  exit 0
 fi
 
-# Use the same commands as CI (doc-lint.yml)
-if "$has_docs"; then
-  log "Running document checks..."
-  "$REPO_ROOT/scripts/lint-docs.sh" "$@"
-  checked=true
-fi
-
-# Use the same commands as CI (actionlint.yml)
-if "$has_workflows"; then
-  log "Running actionlint..."
-  "$REPO_ROOT/scripts/lint-actions.sh" "$@"
-  checked=true
-fi
-
-if ! "$checked"; then
-  log "No relevant files to lint."
-fi
+log "Running qlty check..."
+qlty check "$@"
