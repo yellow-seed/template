@@ -1,0 +1,20 @@
+config_version = "0"
+
+[settings]
+root = true
+
+[[plugin]]
+name = "shellcheck"
+enabled = true
+
+[[plugin]]
+name = "shfmt"
+enabled = true
+
+[[plugin]]
+name = "actionlint"
+enabled = true
+
+[[plugin]]
+name = "prettier"
+enabled = true

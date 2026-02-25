@@ -14,9 +14,7 @@ jobs:
 
       - name: Verify installed tools
         run: |
-          go version
-          shellcheck --version
-          shfmt --version
+          qlty --version
           actionlint --version
           node --version
           npx prettier --version
