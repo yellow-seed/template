@@ -10,6 +10,6 @@
     "format:json": "npx --no-install prettier --check \".github/**/*.json\""
   },
   "devDependencies": {
-    "prettier": "3.4.2"
+    "prettier": "3.6.2"
   }
 }
