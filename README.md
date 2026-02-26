@@ -87,7 +87,7 @@ bash scripts/setup-git-hooks.sh
 
 `pre-commit` フックでは次の処理が実行されます。
 
-- `qlty` がインストールされている場合: `qlty check --all` を実行
+- `qlty` がインストールされている場合: `qlty check --all --verbose` を実行
 - `qlty` が未インストールの場合: 警告を表示してスキップ
 - ステージ済みファイルに対して `.githooks/run-checks.sh` を実行
 

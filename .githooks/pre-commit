@@ -15,8 +15,8 @@ fi
 cd "$REPO_ROOT"
 
 if command -v qlty >/dev/null 2>&1; then
-  log "Running qlty check --all..."
-  qlty check --all
+  log "Running qlty check --all --verbose..."
+  qlty check --all --verbose
 else
   log "Warning: qlty is not installed. Skipping qlty check."
 fi
