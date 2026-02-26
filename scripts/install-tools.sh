@@ -25,9 +25,6 @@ should_skip() {
 main() {
 	local installers=(
 		qlty
-		actionlint
-		node
-		prettier
 	)
 	local had_failure=false
 

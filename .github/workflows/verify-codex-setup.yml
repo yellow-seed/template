@@ -15,6 +15,3 @@ jobs:
       - name: Verify installed tools
         run: |
           qlty --version
-          actionlint --version
-          node --version
-          npx prettier --version

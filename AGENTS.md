@@ -145,7 +145,7 @@ This fix ensures all resources are cleaned up correctly.
 
 ### ドキュメント/設定ファイルのフォーマット
 
-- PrettierでMarkdown/YAML/JSONをフォーマットします
+- qltyでMarkdown/YAML/JSONをフォーマットします
 - ローカル実行:
   - `npm install`
   - `qlty check --all` (チェック)
