@@ -3,7 +3,6 @@
 <!-- CI/CD & Code Quality -->
 
 [![CI](https://github.com/yellow-seed/template/workflows/CI/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/ci.yml)
-[![Actionlint](https://github.com/yellow-seed/template/workflows/Actionlint/badge.svg)](https://github.com/yellow-seed/template/actions/workflows/actionlint.yml)
 [![codecov](https://codecov.io/gh/yellow-seed/template/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/template)
 
 <!-- Project Info -->

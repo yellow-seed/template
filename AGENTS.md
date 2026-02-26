@@ -145,14 +145,14 @@ This fix ensures all resources are cleaned up correctly.
 
 ### ドキュメント/設定ファイルのフォーマット
 
-- PrettierでMarkdown/YAML/JSONをフォーマットします
+- qltyでMarkdown/YAML/JSONをフォーマットします
 - ローカル実行:
   - `npm install`
-  - `npm run format:check` (チェック)
-  - `npm run format` (自動フォーマット)
+  - `qlty check --all` (チェック)
+  - `qlty fmt --all` (自動フォーマット)
 - Docker実行:
   - `docker build -t dev-env .`
-  - `docker run --rm -v $(pwd):/workspace dev-env lint-docs`
+  - `docker run --rm -v $(pwd):/workspace dev-env qlty check --all`
 
 ## Pull Request 作成
 
