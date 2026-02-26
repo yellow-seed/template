@@ -28,7 +28,6 @@ main() {
 		actionlint
 		node
 		prettier
-		helper-scripts
 	)
 	local had_failure=false
 
