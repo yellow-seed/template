@@ -24,4 +24,4 @@ jobs:
       - name: Run shell script linting
         run: |
           echo "Running shell linting checks..."
-          bash scripts/lint-shell.sh
+          qlty check --all
