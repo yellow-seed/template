@@ -26,7 +26,6 @@ install_helper_script() {
 
 main() {
 	ensure_path
-	install_helper_script "lint-shell"
 	install_helper_script "lint-docs"
 }
 

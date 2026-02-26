@@ -28,4 +28,4 @@ COPY scripts/ /workspace/scripts/
 RUN STRICT_MODE=true bash /workspace/scripts/install-tools.sh
 
 # Default command
-CMD ["lint-shell"]
+CMD ["qlty", "check", "--all"]
