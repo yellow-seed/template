@@ -14,6 +14,13 @@ fi
 
 cd "$REPO_ROOT"
 
+if command -v qlty >/dev/null 2>&1; then
+  log "Running qlty check --all --verbose..."
+  qlty check --all --verbose
+else
+  log "Warning: qlty is not installed. Skipping qlty check."
+fi
+
 mapfile -t changed_files < <(git diff --cached --name-only --diff-filter=ACMR)
 
 if [ "${#changed_files[@]}" -eq 0 ]; then
