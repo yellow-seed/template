@@ -37,9 +37,17 @@ jobs:
         run: scripts/run-checks.sh --all
 
   Test:
+    name: bats Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      - name: Run tests
-        run: echo "Add your test commands here"
+
+      - name: Install bats tooling
+        run: SKIP_INSTALLERS=qlty STRICT_MODE=true bash scripts/install-tools.sh
+
+      - name: Run bats tests
+        run: bats tests/*.bats
