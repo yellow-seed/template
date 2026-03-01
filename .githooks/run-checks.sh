@@ -29,5 +29,5 @@ if ! command -v qlty >/dev/null 2>&1; then
 	exit 0
 fi
 
-log "Running qlty check..."
-qlty check "$@"
+log "Running scripts/run-checks.sh..."
+"$REPO_ROOT/scripts/run-checks.sh" "$@"
