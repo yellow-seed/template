@@ -26,11 +26,13 @@ main() {
 	local installers=(
 		qlty
 	)
+	local apt_stamp_dir
 	local had_failure=false
 
-	APT_UPDATE_STAMP=$(mktemp)
+	apt_stamp_dir=$(mktemp -d)
+	APT_UPDATE_STAMP="$apt_stamp_dir/apt-update.stamp"
 	export APT_UPDATE_STAMP
-	trap 'rm -f "$APT_UPDATE_STAMP"' EXIT
+	trap 'rm -rf "${APT_UPDATE_STAMP%/*}"' EXIT
 
 	log "Starting tool installation"
 	ensure_path
