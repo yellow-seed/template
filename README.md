@@ -89,7 +89,7 @@ bash scripts/setup-git-hooks.sh
 
 - `qlty` がインストールされている場合: `qlty check --all --verbose` を実行
 - `qlty` が未インストールの場合: 警告を表示してスキップ
-- ステージ済みファイルに対して `.githooks/run-checks.sh` を実行
+- ステージ済みファイルに対して `.githooks/run-checks.sh` を実行（内部で `scripts/run-checks.sh` を呼び出し）
 
 ### GitHub Ruleset のセットアップ（オプション）
 

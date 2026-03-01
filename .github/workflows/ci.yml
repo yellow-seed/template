@@ -33,8 +33,8 @@ jobs:
       - name: Install qlty
         uses: qltysh/qlty-action/install@v1
 
-      - name: Run qlty check
-        run: qlty check --all --verbose
+      - name: Run checks
+        run: scripts/run-checks.sh --all
 
   Test:
     runs-on: ubuntu-latest

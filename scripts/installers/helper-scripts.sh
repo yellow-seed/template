@@ -40,6 +40,7 @@ main() {
 
 	install_helper_script "lint-shell" || had_error=true
 	install_helper_script "lint-docs" || had_error=true
+	install_helper_script "run-checks" || had_error=true
 
 	if [ "$had_error" = "true" ]; then
 		return 1
