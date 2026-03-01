@@ -1,6 +1,6 @@
 # Shell Development Environment
 # This Dockerfile provides a complete shell script development environment
-# with qlty and bats-core installed.
+# with qlty and bats-related tooling installed.
 
 FROM ubuntu:22.04
 
@@ -10,7 +10,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install prerequisites for tool installation
 RUN apt-get update && \
     apt-get install -y \
-    bats \
     ca-certificates \
     curl \
     git \

@@ -3,13 +3,16 @@
 # setup-branch-update-suggestion.sh のテスト
 
 # batsライブラリを環境に応じて読み込む
-# Ubuntu: /usr/lib/bats-support, macOS (Homebrew): /usr/local/lib/bats
 if [ -f "/usr/lib/bats-support/load.bash" ]; then
-    # Ubuntu (apt install bats-support bats-assert)
+    # Ubuntu (focal/jammy)
     load "/usr/lib/bats-support/load.bash"
     load "/usr/lib/bats-assert/load.bash"
+elif [ -f "/usr/lib/bats/bats-support/load.bash" ]; then
+    # Ubuntu (noble+)
+    load "/usr/lib/bats/bats-support/load.bash"
+    load "/usr/lib/bats/bats-assert/load.bash"
 elif [ -f "/usr/local/lib/bats/bats-support/load" ]; then
-    # macOS Homebrew
+    # macOS Homebrew (Intel)
     load "/usr/local/lib/bats/bats-support/load"
     load "/usr/local/lib/bats/bats-assert/load"
 elif [ -f "/opt/homebrew/lib/bats/bats-support/load" ]; then
@@ -21,7 +24,7 @@ fi
 setup() {
     # テスト用の一時ディレクトリを作成
     TEST_DIR=$(mktemp -d)
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    SCRIPT_DIR="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
 
     # モック用のパスを設定
     export PATH="$TEST_DIR:$PATH"
