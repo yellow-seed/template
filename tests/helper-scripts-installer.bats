@@ -25,7 +25,11 @@ SHELL
 #!/bin/bash
 exit 0
 DOCS
-	chmod +x "$WORK_DIR/scripts/lint-shell.sh" "$WORK_DIR/scripts/lint-docs.sh"
+	cat >"$WORK_DIR/scripts/run-checks.sh" <<'RUN'
+#!/bin/bash
+exit 0
+RUN
+	chmod +x "$WORK_DIR/scripts/lint-shell.sh" "$WORK_DIR/scripts/lint-docs.sh" "$WORK_DIR/scripts/run-checks.sh"
 }
 
 teardown() {
@@ -49,6 +53,7 @@ teardown() {
 	[[ "$output" == *"lint-docs.sh not found"* ]]
 
 	[ -x "$INSTALL_PREFIX/lint-shell" ]
+	[ -x "$INSTALL_PREFIX/run-checks" ]
 }
 
 @test "installer fails when chmod step fails" {
