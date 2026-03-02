@@ -44,7 +44,7 @@ jobs:
             console.log('✓ Permission check passed');
 
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup GitHub CLI
         run: |
