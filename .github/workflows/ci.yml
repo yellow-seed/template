@@ -34,7 +34,7 @@ jobs:
         uses: qltysh/qlty-action/install@v1
 
       - name: Run checks
-        run: scripts/run-checks.sh --all
+        run: scripts/run-checks.sh
 
   Test:
     runs-on: ubuntu-latest

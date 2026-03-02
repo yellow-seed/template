@@ -1,3 +1,8 @@
+# NOTE:
+# CI and helper script `scripts/run-checks.sh` run `qlty check --all`.
+# Keep this plugin list as the single source of truth for checks,
+# including shfmt/actionlint for shell formatting and GitHub Actions linting.
+
 config_version = "0"
 
 [[source]]
