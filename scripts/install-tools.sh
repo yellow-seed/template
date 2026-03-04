@@ -24,6 +24,7 @@ should_skip() {
 
 main() {
 	local installers=(
+		dotenvx
 		qlty
 	)
 	local apt_stamp_dir
