@@ -45,7 +45,13 @@ main() {
 	local sudo_cmd
 	sudo_cmd=$(use_sudo)
 
-	if ! $sudo_cmd bash "$tmp_dir/bats-core-${version}/install.sh" "$INSTALL_PREFIX"; then
+	# bats-core install.sh expects a prefix (e.g. /usr/local), not a bin dir.
+	# It will install the bats binary to $prefix/bin/bats, so derive the
+	# prefix from INSTALL_PREFIX by taking its parent directory.
+	local prefix
+	prefix=$(dirname "$INSTALL_PREFIX")
+
+	if ! $sudo_cmd bash "$tmp_dir/bats-core-${version}/install.sh" "$prefix"; then
 		fail "failed to install bats-core"
 		return 1
 	fi
