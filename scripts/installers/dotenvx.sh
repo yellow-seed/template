@@ -19,27 +19,29 @@ main() {
 	fi
 
 	log "Installing dotenvx..."
-	if ! curl -fsSL https://dotenvx.sh | sh; then
-		fail "failed to install dotenvx"
-		return 1
+	# When /usr/local/bin is not writable (e.g. non-root CI), install to $HOME/.local/bin
+	if [ -w /usr/local/bin ]; then
+		if ! curl -fsSL https://dotenvx.sh | sh; then
+			fail "failed to install dotenvx"
+			return 1
+		fi
+	else
+		mkdir -p "$HOME/.local/bin"
+		if ! curl -fsSL "https://dotenvx.sh?directory=$HOME/.local/bin" | sh; then
+			fail "failed to install dotenvx"
+			return 1
+		fi
 	fi
 
-	# Some installers place binaries in user-local locations (e.g. $HOME/.local/bin)
-	# that may not be on PATH in non-interactive shells. Try to detect such installs
-	# and update PATH before performing the post-install command_exists check.
-	for candidate in "$HOME/.local/bin/dotenvx"; do
-		if [ -x "$candidate" ]; then
-			dotenvx_dir=$(dirname "$candidate")
-			if [[ ":$PATH:" != *":$dotenvx_dir:"* ]]; then
-				export PATH="$dotenvx_dir:$PATH"
-				if [ -n "${ENV_FILE:-}" ]; then
-					echo "export PATH=\"$dotenvx_dir:\$PATH\"" >>"$ENV_FILE"
-				fi
-			fi
-			hash -r 2>/dev/null || true
-			break
+	# Detect user-local install path and update PATH before post-install check
+	dotenvx_local="$HOME/.local/bin"
+	if [ -x "$dotenvx_local/dotenvx" ] && [[ ":$PATH:" != *":$dotenvx_local:"* ]]; then
+		export PATH="$dotenvx_local:$PATH"
+		if [ -n "${ENV_FILE:-}" ]; then
+			echo "export PATH=\"$dotenvx_local:\$PATH\"" >>"$ENV_FILE"
 		fi
-	done
+		hash -r 2>/dev/null || true
+	fi
 
 	if ! command_exists dotenvx; then
 		fail "dotenvx command not found after install"
