@@ -41,9 +41,8 @@ main() {
 
 	log "Installing bats-core ${version}..."
 
-	local tmp_dir
 	tmp_dir=$(mktemp -d)
-	trap 'rm -rf "$tmp_dir"' EXIT
+	trap 'rm -rf "${tmp_dir:-}"' EXIT
 
 	local archive_url="https://github.com/bats-core/bats-core/archive/refs/tags/v${version}.tar.gz"
 	local archive="$tmp_dir/bats-core.tar.gz"
