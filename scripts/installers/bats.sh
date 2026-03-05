@@ -13,7 +13,7 @@ main() {
 
 	local version
 	if [ -n "${BATS_VERSION:-}" ]; then
-		version="$BATS_VERSION"
+		version="${BATS_VERSION#v}"
 		log "Using bats-core version from BATS_VERSION: ${version}"
 	else
 		log "Fetching latest bats-core version..."
