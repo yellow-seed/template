@@ -16,6 +16,12 @@ exit 0
 APT
   chmod +x "$WORK_DIR/bin/apt-get"
 
+  cat > "$WORK_DIR/bin/sudo" <<'SUDO'
+#!/bin/bash
+"$@"
+SUDO
+  chmod +x "$WORK_DIR/bin/sudo"
+
   export PATH="$WORK_DIR/bin:$PATH"
 }
 
