@@ -163,3 +163,8 @@ out/
 # Claude Code
 .claude/settings.local.json
 
+# qlty runtime files
+.qlty/logs
+.qlty/plugin_cachedir
+.qlty/results
+
