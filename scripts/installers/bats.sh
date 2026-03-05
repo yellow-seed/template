@@ -11,19 +11,32 @@ main() {
 		return 0
 	fi
 
-	log "Fetching latest bats-core version..."
-
-	local version_json
-	version_json=$(curl -fsSL https://api.github.com/repos/bats-core/bats-core/releases/latest 2>/dev/null) || {
-		fail "failed to fetch latest bats-core release info"
-		return 1
-	}
-
 	local version
-	version=$(printf '%s' "$version_json" | grep '"tag_name"' | head -n1 | sed 's/.*"tag_name": *"v\([^"]*\)".*/\1/')
-	if [ -z "$version" ]; then
-		fail "could not parse bats-core version from GitHub API response"
-		return 1
+	if [ -n "${BATS_VERSION:-}" ]; then
+		version="$BATS_VERSION"
+		log "Using bats-core version from BATS_VERSION: ${version}"
+	else
+		log "Fetching latest bats-core version..."
+
+		local version_json
+		if [ -n "${GITHUB_TOKEN:-}" ]; then
+			version_json=$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+				https://api.github.com/repos/bats-core/bats-core/releases/latest 2>/dev/null)
+		else
+			version_json=$(curl -fsSL \
+				https://api.github.com/repos/bats-core/bats-core/releases/latest 2>/dev/null)
+		fi
+
+		if [ -z "${version_json:-}" ]; then
+			fail "failed to fetch latest bats-core release info; consider setting GITHUB_TOKEN or BATS_VERSION"
+			return 1
+		fi
+
+		version=$(printf '%s' "$version_json" | grep '"tag_name"' | head -n1 | sed 's/.*"tag_name": *"v\([^"]*\)".*/\1/')
+		if [ -z "$version" ]; then
+			fail "could not parse bats-core version from GitHub API response; consider setting BATS_VERSION"
+			return 1
+		fi
 	fi
 
 	log "Installing bats-core ${version}..."
@@ -40,7 +53,10 @@ main() {
 		return 1
 	fi
 
-	tar -xzf "$archive" -C "$tmp_dir"
+	if ! tar -xzf "$archive" -C "$tmp_dir"; then
+		fail "failed to extract bats-core archive"
+		return 1
+	fi
 
 	local sudo_cmd
 	sudo_cmd=$(use_sudo)
@@ -48,6 +64,12 @@ main() {
 	# bats-core install.sh expects a prefix (e.g. /usr/local), not a bin dir.
 	# It will install the bats binary to $prefix/bin/bats, so derive the
 	# prefix from INSTALL_PREFIX by taking its parent directory.
+	# INSTALL_PREFIX must end with /bin so that bats lands in the same
+	# directory that ensure_path adds to PATH.
+	if [[ "$INSTALL_PREFIX" != */bin ]]; then
+		fail "INSTALL_PREFIX must end with /bin for bats-core installation (got: $INSTALL_PREFIX)"
+		return 1
+	fi
 	local prefix
 	prefix=$(dirname "$INSTALL_PREFIX")
 
