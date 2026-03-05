@@ -66,7 +66,7 @@ main() {
 	# prefix from INSTALL_PREFIX by taking its parent directory.
 	# INSTALL_PREFIX must end with /bin so that bats lands in the same
 	# directory that ensure_path adds to PATH.
-	if [[ "$INSTALL_PREFIX" != */bin ]]; then
+	if [[ $INSTALL_PREFIX != */bin ]]; then
 		fail "INSTALL_PREFIX must end with /bin for bats-core installation (got: $INSTALL_PREFIX)"
 		return 1
 	fi
