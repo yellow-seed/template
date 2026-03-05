@@ -5,10 +5,10 @@ Issue #207 の方針として、OpenSpec をテンプレートへそのまま導
 ## 追加されたもの
 
 - Claude Code 向けコマンド
-  - `.claude/commands/opsx/propose.md`
-  - `.claude/commands/opsx/explore.md`
-  - `.claude/commands/opsx/apply.md`
-  - `.claude/commands/opsx/archive.md`
+  - `.github/commands/opsx/propose.md`
+  - `.github/commands/opsx/explore.md`
+  - `.github/commands/opsx/apply.md`
+  - `.github/commands/opsx/archive.md`
 - Claude/Codex 共通スキル（`.github/skills/` 経由）
   - `openspec-propose`
   - `openspec-explore`

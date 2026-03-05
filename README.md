@@ -55,7 +55,7 @@ OpenSpec導入により、`openspec-propose` / `openspec-explore` / `openspec-ap
 
 **注意**: `.claude/skills/`は`.github/skills/`へのシンボリックリンクです。シンボリックリンクが機能しない環境（Windows管理者権限なしなど）では、`.claude/hooks/skills-setup.sh`を実行してください。
 
-### `.claude/commands/opsx/`
+### `.github/commands/opsx/`
 
 OpenSpec のワークフローコマンドを格納しています。
 
