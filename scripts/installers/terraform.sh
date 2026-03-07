@@ -21,7 +21,22 @@ main() {
 	detect_arch || return 1
 	local arch="$GO_ARCH"
 	local version="${TERRAFORM_VERSION:-1.11.4}"
-	local os="linux"
+	version="${version#v}"
+
+	local os
+	case "$(uname -s)" in
+	Linux)
+		os="linux"
+		;;
+	Darwin)
+		os="darwin"
+		;;
+	*)
+		fail "unsupported operating system: $(uname -s). This installer supports Linux and macOS (Darwin) only."
+		return 1
+		;;
+	esac
+
 	local zip_name="terraform_${version}_${os}_${arch}.zip"
 	local download_url="https://releases.hashicorp.com/terraform/${version}/${zip_name}"
 
@@ -32,12 +47,27 @@ main() {
 		install_packages unzip || return 1
 	fi
 
+	local tmp_dir
 	tmp_dir=$(mktemp -d)
 	trap 'rm -rf "${tmp_dir:-}"' EXIT
 
 	local archive="$tmp_dir/$zip_name"
 	if ! download_file "$download_url" "$archive"; then
 		fail "failed to download terraform archive"
+		return 1
+	fi
+
+	local checksums_url="https://releases.hashicorp.com/terraform/${version}/terraform_${version}_SHA256SUMS"
+	local checksums_file="$tmp_dir/terraform_${version}_SHA256SUMS"
+	if ! download_file "$checksums_url" "$checksums_file"; then
+		fail "failed to download terraform checksums"
+		return 1
+	fi
+	if ! (
+		cd "$tmp_dir" &&
+			grep " ${zip_name}\$" "$checksums_file" | sha256sum -c -
+	); then
+		fail "terraform archive checksum verification failed"
 		return 1
 	fi
 
@@ -72,7 +102,13 @@ main() {
 		return 1
 	fi
 
-	log "terraform installed successfully: $(terraform version | head -n1)"
+	local tf_version
+	if ! tf_version=$(terraform version 2>&1 | head -n1); then
+		fail "terraform binary installed but failed to run: ${tf_version}"
+		return 1
+	fi
+
+	log "terraform installed successfully: ${tf_version}"
 }
 
 main "$@"

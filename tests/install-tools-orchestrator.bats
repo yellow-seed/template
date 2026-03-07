@@ -3,6 +3,9 @@
 REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
 
 setup() {
+  unset SKIP_INSTALLERS
+  unset STRICT_MODE
+
   export WORK_DIR
   WORK_DIR="$(mktemp -d)"
   mkdir -p "$WORK_DIR/scripts/installers"
@@ -14,10 +17,7 @@ setup() {
   : >"$INSTALL_LOG"
 
   for installer in bats dotenvx qlty terraform; do
-    cat >"$WORK_DIR/scripts/installers/${installer}.sh" <<SCRIPT
-#!/bin/bash
-echo "${installer}" >>"$INSTALL_LOG"
-SCRIPT
+    printf '#!/bin/bash\necho "%s" >>"$INSTALL_LOG"\n' "$installer" >"$WORK_DIR/scripts/installers/${installer}.sh"
     chmod +x "$WORK_DIR/scripts/installers/${installer}.sh"
   done
 }
