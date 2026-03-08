@@ -27,6 +27,7 @@ main() {
 		bats
 		dotenvx
 		qlty
+		terraform
 	)
 	local apt_stamp_dir
 	local had_failure=false
