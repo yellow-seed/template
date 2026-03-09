@@ -25,40 +25,6 @@ project/
 
 ## 開発環境のセットアップ
 
-### Claude Code での GitHub CLI (gh) のセットアップ
-
-Claude Code on the Web などのリモート環境で GitHub CLI (`gh`) コマンドを使用する場合は、以下のhookスクリプトを実行してください：
-
-```bash
-bash .claude/hooks/gh-setup.sh
-```
-
-### リモート環境での gh コマンド使用方法
-
-gitのremoteがローカルプロキシを経由している環境では、`gh` コマンドがリポジトリを自動認識できない場合があります。その場合は以下の方法を使用してください：
-
-方法: `-R` フラグでリポジトリを明示的に指定
-
-sample
-
-```bash
-gh issue list -R yellow-seed/template
-gh pr view 123 -R yellow-seed/template
-gh discussion list -R yellow-seed/template
-```
-
-`gh-setup.sh` により、以下の拡張機能が自動インストールされます。
-
-- `yahsan2/gh-sub-issue`
-- `harakeishi/gh-discussion`
-
-Discussions を操作する場合は、次のように `-R` を指定して実行してください。
-
-```bash
-gh discussion list -R yellow-seed/template
-gh discussion view 123 -R yellow-seed/template
-```
-
 ### スキルディレクトリのセットアップ（Windows環境など）
 
 このリポジトリでは、`.claude/skills` と `.codex/skills` は `.github/skills` へのシンボリックリンクとして構成されています。
