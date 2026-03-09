@@ -44,6 +44,19 @@ sample
 ```bash
 gh issue list -R yellow-seed/template
 gh pr view 123 -R yellow-seed/template
+gh discussion list -R yellow-seed/template
+```
+
+`gh-setup.sh` により、以下の拡張機能が自動インストールされます。
+
+- `yahsan2/gh-sub-issue`
+- `harakeishi/gh-discussion`
+
+Discussions を操作する場合は、次のように `-R` を指定して実行してください。
+
+```bash
+gh discussion list -R yellow-seed/template
+gh discussion view 123 -R yellow-seed/template
 ```
 
 ### スキルディレクトリのセットアップ（Windows環境など）

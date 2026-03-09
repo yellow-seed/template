@@ -1,6 +1,6 @@
 #!/bin/bash
 # Common GitHub CLI setup script for remote environments
-# This script installs gh CLI and gh-sub-issue extension when running remotely.
+# This script installs gh CLI and required gh extensions when running remotely.
 
 set -e
 
@@ -10,21 +10,31 @@ log() {
 	echo "$LOG_PREFIX $1" >&2
 }
 
-install_gh_sub_issue() {
+install_gh_extension() {
 	local gh_cmd="$1"
-	log "Checking gh-sub-issue extension..."
+	local extension_repo="$2"
+	local extension_name="${extension_repo#*/}"
 
-	if "$gh_cmd" extension list 2>/dev/null | grep -q "yahsan2/gh-sub-issue"; then
-		log "gh-sub-issue extension already installed"
+	log "Checking ${extension_name} extension..."
+
+	if "$gh_cmd" extension list 2>/dev/null | grep -q "$extension_repo"; then
+		log "${extension_name} extension already installed"
 		return 0
 	fi
 
-	log "Installing gh-sub-issue extension..."
-	if "$gh_cmd" extension install yahsan2/gh-sub-issue 2>/dev/null; then
-		log "gh-sub-issue extension installed successfully"
+	log "Installing ${extension_name} extension..."
+	if "$gh_cmd" extension install "$extension_repo" 2>/dev/null; then
+		log "${extension_name} extension installed successfully"
 	else
-		log "Failed to install gh-sub-issue extension (non-critical, continuing)"
+		log "Failed to install ${extension_name} extension (non-critical, continuing)"
 	fi
+}
+
+install_gh_extensions() {
+	local gh_cmd="$1"
+
+	install_gh_extension "$gh_cmd" "yahsan2/gh-sub-issue"
+	install_gh_extension "$gh_cmd" "harakeishi/gh-discussion"
 }
 
 if [ -z "${REMOTE_ENV_VAR:-}" ]; then
@@ -45,7 +55,7 @@ mkdir -p "$LOCAL_BIN"
 
 if command -v gh &>/dev/null; then
 	log "gh CLI already available: $(gh --version | head -1)"
-	install_gh_sub_issue "gh"
+	install_gh_extensions "gh"
 	exit 0
 fi
 
@@ -58,7 +68,7 @@ if [ -x "$LOCAL_BIN/gh" ]; then
 			log "PATH updated in ENV_FILE"
 		fi
 	fi
-	install_gh_sub_issue "$LOCAL_BIN/gh"
+	install_gh_extensions "$LOCAL_BIN/gh"
 	exit 0
 fi
 
@@ -114,6 +124,6 @@ fi
 
 log "gh CLI installed successfully: $("$LOCAL_BIN/gh" --version | head -1)"
 
-install_gh_sub_issue "$LOCAL_BIN/gh"
+install_gh_extensions "$LOCAL_BIN/gh"
 
 exit 0
