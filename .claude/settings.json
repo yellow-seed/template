@@ -6,6 +6,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "./.claude/hooks/dotenvx-load.sh"
+          },
+          {
+            "type": "command",
             "command": "./.claude/hooks/gh-setup.sh"
           }
         ]
