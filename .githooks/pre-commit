@@ -4,31 +4,55 @@ set -euo pipefail
 LOG_PREFIX="[pre-commit]"
 
 log() {
-  echo "$LOG_PREFIX $*" >&2
+	echo "$LOG_PREFIX $*" >&2
+}
+
+ensure_qlty() {
+	if command -v qlty >/dev/null 2>&1; then
+		return 0
+	fi
+
+	if [ -x "$HOME/.qlty/bin/qlty" ]; then
+		export PATH="$HOME/.qlty/bin:$PATH"
+	fi
+
+	if command -v qlty >/dev/null 2>&1; then
+		return 0
+	fi
+
+	log "qlty not found. Installing..."
+	bash scripts/installers/qlty.sh >/dev/null
+
+	if [ -x "$HOME/.qlty/bin/qlty" ]; then
+		export PATH="$HOME/.qlty/bin:$PATH"
+	fi
+
+	if ! command -v qlty >/dev/null 2>&1; then
+		log "Error: qlty installation failed. Aborting commit."
+		exit 1
+	fi
 }
 
 if ! REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null); then
-  log "Not inside a git repository."
-  exit 0
+	log "Not inside a git repository."
+	exit 0
 fi
 
 cd "$REPO_ROOT"
 
-if command -v qlty >/dev/null 2>&1; then
-  log "Running qlty check --all --verbose..."
-  qlty check --all --verbose
-else
-  log "Warning: qlty is not installed. Skipping qlty check."
-fi
+ensure_qlty
+
+log "Running qlty check --all --verbose..."
+qlty check --all --verbose
 
 changed_files=()
 while IFS= read -r file; do
-  [[ -n "$file" ]] && changed_files+=("$file")
-done <<< "$(git diff --cached --name-only --diff-filter=ACMR)"
+	[[ -n "$file" ]] && changed_files+=("$file")
+done <<<"$(git diff --cached --name-only --diff-filter=ACMR)"
 
 if [ "${#changed_files[@]}" -eq 0 ]; then
-  log "No staged files to check."
-  exit 0
+	log "No staged files to check."
+	exit 0
 fi
 
 log "Running checks for staged files..."

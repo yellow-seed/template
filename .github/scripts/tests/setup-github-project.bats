@@ -5,15 +5,15 @@
 load "test_helper.bash"
 
 setup() {
-    # テスト用の一時ディレクトリを作成
-    TEST_DIR=$(mktemp -d)
-    SCRIPT_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
+	# テスト用の一時ディレクトリを作成
+	TEST_DIR=$(mktemp -d)
+	SCRIPT_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
 
-    # モック用のパスを設定
-    export PATH="$TEST_DIR:$PATH"
+	# モック用のパスを設定
+	export PATH="$TEST_DIR:$PATH"
 
-    # モックのghコマンドを作成
-    cat > "$TEST_DIR/gh" <<'EOF'
+	# モックのghコマンドを作成
+	cat >"$TEST_DIR/gh" <<'EOF'
 #!/bin/bash
 case "$1" in
     auth)
@@ -59,56 +59,56 @@ case "$1" in
 esac
 exit 0
 EOF
-    chmod +x "$TEST_DIR/gh"
+	chmod +x "$TEST_DIR/gh"
 }
 
 teardown() {
-    # 一時ディレクトリを削除
-    rm -rf "$TEST_DIR"
+	# 一時ディレクトリを削除
+	rm -rf "$TEST_DIR"
 }
 
 @test "setup-github-project.sh が存在する" {
-    assert [ -f "$SCRIPT_DIR/setup-github-project.sh" ]
+	assert [ -f "$SCRIPT_DIR/setup-github-project.sh" ]
 }
 
 @test "setup-github-project.sh が実行可能である" {
-    assert [ -x "$SCRIPT_DIR/setup-github-project.sh" ]
+	assert [ -x "$SCRIPT_DIR/setup-github-project.sh" ]
 }
 
 @test "setup-github-project.sh が正しいshebangを持っている" {
-    run head -n 1 "$SCRIPT_DIR/setup-github-project.sh"
-    assert_output "#!/bin/bash"
+	run head -n 1 "$SCRIPT_DIR/setup-github-project.sh"
+	assert_output "#!/bin/bash"
 }
 
 @test "ghコマンドが見つからない場合にエラーを表示する" {
-    run env PATH="/bin" bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
-    assert_failure
-    assert_output --partial "GitHub CLI (gh) がインストールされていません"
+	run env PATH="/bin" bash "$SCRIPT_DIR/setup-github-project.sh" <<<""
+	assert_failure
+	assert_output --partial "GitHub CLI (gh) がインストールされていません"
 }
 
 @test "DRY_RUNモードで実行できる" {
-    export DRY_RUN=1
-    run bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
-    # DRY_RUNモードでは実際の変更は行わない
-    assert_success || assert_failure  # モックのため、どちらでもOK
-    assert_output --partial "DRY-RUN モード"
+	export DRY_RUN=1
+	run bash "$SCRIPT_DIR/setup-github-project.sh" <<<""
+	# DRY_RUNモードでは実際の変更は行わない
+	assert_success || assert_failure # モックのため、どちらでもOK
+	assert_output --partial "DRY-RUN モード"
 }
 
 @test "リポジトリ情報を正しく取得する" {
-    export DRY_RUN=1
-    run bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
-    assert_output --partial "test-owner/test-repo" || true
+	export DRY_RUN=1
+	run bash "$SCRIPT_DIR/setup-github-project.sh" <<<""
+	assert_output --partial "test-owner/test-repo" || true
 }
 
 @test "Project作成メッセージが表示される" {
-    export DRY_RUN=1
-    run bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
-    assert_output --partial "GitHub Project" || true
+	export DRY_RUN=1
+	run bash "$SCRIPT_DIR/setup-github-project.sh" <<<""
+	assert_output --partial "GitHub Project" || true
 }
 
 @test "gh repo viewが失敗した場合にgit configから取得する" {
-    # gh repo viewを失敗させるモック
-    cat > "$TEST_DIR/gh" <<'EOF'
+	# gh repo viewを失敗させるモック
+	cat >"$TEST_DIR/gh" <<'EOF'
 #!/bin/bash
 case "$1" in
     auth)
@@ -158,26 +158,26 @@ case "$1" in
 esac
 exit 0
 EOF
-    chmod +x "$TEST_DIR/gh"
+	chmod +x "$TEST_DIR/gh"
 
-    # git configのモックを作成
-    cat > "$TEST_DIR/git" <<'EOF'
+	# git configのモックを作成
+	cat >"$TEST_DIR/git" <<'EOF'
 #!/bin/bash
 if [ "$1" = "config" ] && [ "$2" = "--get" ] && [ "$3" = "remote.origin.url" ]; then
     echo "https://github.com/fallback-owner/fallback-repo.git"
 fi
 exit 0
 EOF
-    chmod +x "$TEST_DIR/git"
+	chmod +x "$TEST_DIR/git"
 
-    export DRY_RUN=1
-    run bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
-    assert_output --partial "fallback-owner/fallback-repo"
+	export DRY_RUN=1
+	run bash "$SCRIPT_DIR/setup-github-project.sh" <<<""
+	assert_output --partial "fallback-owner/fallback-repo"
 }
 
 @test "gh repo viewとgit configの両方が失敗した場合にエラー" {
-    # gh repo viewを失敗させるモック
-    cat > "$TEST_DIR/gh" <<'EOF'
+	# gh repo viewを失敗させるモック
+	cat >"$TEST_DIR/gh" <<'EOF'
 #!/bin/bash
 case "$1" in
     auth)
@@ -191,16 +191,16 @@ case "$1" in
 esac
 exit 1
 EOF
-    chmod +x "$TEST_DIR/gh"
+	chmod +x "$TEST_DIR/gh"
 
-    # git configも失敗させる
-    cat > "$TEST_DIR/git" <<'EOF'
+	# git configも失敗させる
+	cat >"$TEST_DIR/git" <<'EOF'
 #!/bin/bash
 exit 1
 EOF
-    chmod +x "$TEST_DIR/git"
+	chmod +x "$TEST_DIR/git"
 
-    run bash "$SCRIPT_DIR/setup-github-project.sh" <<< ""
-    assert_failure
-    assert_output --partial "リポジトリ情報を取得できませんでした"
+	run bash "$SCRIPT_DIR/setup-github-project.sh" <<<""
+	assert_failure
+	assert_output --partial "リポジトリ情報を取得できませんでした"
 }

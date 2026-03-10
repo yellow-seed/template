@@ -21,12 +21,14 @@ fi
 
 if ! command -v assert_success >/dev/null 2>&1; then
 	assert_success() {
+		# shellcheck disable=SC2154
 		[ "$status" -eq 0 ]
 	}
 fi
 
 if ! command -v assert_failure >/dev/null 2>&1; then
 	assert_failure() {
+		# shellcheck disable=SC2154
 		[ "$status" -ne 0 ]
 	}
 fi
@@ -35,11 +37,13 @@ if ! command -v assert_output >/dev/null 2>&1; then
 	assert_output() {
 		if [ "${1:-}" = "--partial" ]; then
 			local expected=${2:-}
+			# shellcheck disable=SC2154
 			[[ "$output" == *"$expected"* ]]
 			return
 		fi
 
 		local expected=${1:-}
+		# shellcheck disable=SC2154
 		[ "$output" = "$expected" ]
 	}
 fi

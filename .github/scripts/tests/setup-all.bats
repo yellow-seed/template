@@ -5,67 +5,67 @@
 load "test_helper.bash"
 
 setup() {
-    # テスト用の一時ディレクトリを作成
-    TEST_DIR=$(mktemp -d)
-    SCRIPT_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
-    
-    # モック用のパスを設定
-    export PATH="$TEST_DIR:$PATH"
+	# テスト用の一時ディレクトリを作成
+	TEST_DIR=$(mktemp -d)
+	SCRIPT_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
+
+	# モック用のパスを設定
+	export PATH="$TEST_DIR:$PATH"
 }
 
 teardown() {
-    # 一時ディレクトリを削除
-    rm -rf "$TEST_DIR"
+	# 一時ディレクトリを削除
+	rm -rf "$TEST_DIR"
 }
 
 @test "setup-all.sh が存在する" {
-    assert [ -f "$SCRIPT_DIR/setup-all.sh" ]
+	assert [ -f "$SCRIPT_DIR/setup-all.sh" ]
 }
 
 @test "setup-all.sh が実行可能である" {
-    assert [ -x "$SCRIPT_DIR/setup-all.sh" ]
+	assert [ -x "$SCRIPT_DIR/setup-all.sh" ]
 }
 
 @test "setup-all.sh が正しいshebangを持っている" {
-    run head -n 1 "$SCRIPT_DIR/setup-all.sh"
-    assert_output "#!/bin/bash"
+	run head -n 1 "$SCRIPT_DIR/setup-all.sh"
+	assert_output "#!/bin/bash"
 }
 
 @test "setup-all.sh が他のスクリプトを呼び出す" {
-    # モックスクリプトを作成
-    cat > "$TEST_DIR/setup-rulesets.sh" <<'EOF'
+	# モックスクリプトを作成
+	cat >"$TEST_DIR/setup-rulesets.sh" <<'EOF'
 #!/bin/bash
 echo "setup-rulesets.sh called"
 EOF
-    chmod +x "$TEST_DIR/setup-rulesets.sh"
+	chmod +x "$TEST_DIR/setup-rulesets.sh"
 
-    cat > "$TEST_DIR/setup-branch-auto-delete.sh" <<'EOF'
+	cat >"$TEST_DIR/setup-branch-auto-delete.sh" <<'EOF'
 #!/bin/bash
 echo "setup-branch-auto-delete.sh called"
 EOF
-    chmod +x "$TEST_DIR/setup-branch-auto-delete.sh"
+	chmod +x "$TEST_DIR/setup-branch-auto-delete.sh"
 
-    cat > "$TEST_DIR/setup-labels.sh" <<'EOF'
+	cat >"$TEST_DIR/setup-labels.sh" <<'EOF'
 #!/bin/bash
 echo "setup-labels.sh called"
 EOF
-    chmod +x "$TEST_DIR/setup-labels.sh"
+	chmod +x "$TEST_DIR/setup-labels.sh"
 
-    cat > "$TEST_DIR/setup-github-project.sh" <<'EOF'
+	cat >"$TEST_DIR/setup-github-project.sh" <<'EOF'
 #!/bin/bash
 echo "setup-github-project.sh called"
 EOF
-    chmod +x "$TEST_DIR/setup-github-project.sh"
+	chmod +x "$TEST_DIR/setup-github-project.sh"
 
-    # スクリプトを実行（実際のスクリプトは呼ばれないようにモックを使用）
-    run bash "$SCRIPT_DIR/setup-all.sh"
+	# スクリプトを実行（実際のスクリプトは呼ばれないようにモックを使用）
+	run bash "$SCRIPT_DIR/setup-all.sh"
 
-    # 実際のスクリプトはモックを呼び出すため、エラーになる可能性がある
-    # このテストはスクリプトの構造を確認するだけ
-    assert_success || assert_failure  # どちらでもOK（モックのため）
+	# 実際のスクリプトはモックを呼び出すため、エラーになる可能性がある
+	# このテストはスクリプトの構造を確認するだけ
+	assert_success || assert_failure # どちらでもOK（モックのため）
 }
 
 @test "setup-all.sh がsetup-github-project.shを含む" {
-    run grep -q "setup-github-project.sh" "$SCRIPT_DIR/setup-all.sh"
-    assert_success
+	run grep -q "setup-github-project.sh" "$SCRIPT_DIR/setup-all.sh"
+	assert_success
 }

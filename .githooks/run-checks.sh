@@ -24,9 +24,13 @@ if [ "$#" -eq 0 ]; then
 	exit 0
 fi
 
+if ! command -v qlty >/dev/null 2>&1 && [ -x "$HOME/.qlty/bin/qlty" ]; then
+	export PATH="$HOME/.qlty/bin:$PATH"
+fi
+
 if ! command -v qlty >/dev/null 2>&1; then
-	log "qlty not found, skipping lint checks"
-	exit 0
+	log "qlty not found. Aborting checks."
+	exit 1
 fi
 
 log "Running scripts/run-checks.sh..."

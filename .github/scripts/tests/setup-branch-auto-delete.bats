@@ -5,15 +5,15 @@
 load "test_helper.bash"
 
 setup() {
-    # テスト用の一時ディレクトリを作成
-    TEST_DIR=$(mktemp -d)
-    SCRIPT_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
-    
-    # モック用のパスを設定
-    export PATH="$TEST_DIR:$PATH"
-    
-    # モックのghコマンドを作成
-    cat > "$TEST_DIR/gh" <<'EOF'
+	# テスト用の一時ディレクトリを作成
+	TEST_DIR=$(mktemp -d)
+	SCRIPT_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
+
+	# モック用のパスを設定
+	export PATH="$TEST_DIR:$PATH"
+
+	# モックのghコマンドを作成
+	cat >"$TEST_DIR/gh" <<'EOF'
 #!/bin/bash
 case "$1" in
     auth)
@@ -40,36 +40,36 @@ case "$1" in
 esac
 exit 0
 EOF
-    chmod +x "$TEST_DIR/gh"
+	chmod +x "$TEST_DIR/gh"
 }
 
 teardown() {
-    # 一時ディレクトリを削除
-    rm -rf "$TEST_DIR"
+	# 一時ディレクトリを削除
+	rm -rf "$TEST_DIR"
 }
 
 @test "setup-branch-auto-delete.sh が存在する" {
-    assert [ -f "$SCRIPT_DIR/setup-branch-auto-delete.sh" ]
+	assert [ -f "$SCRIPT_DIR/setup-branch-auto-delete.sh" ]
 }
 
 @test "setup-branch-auto-delete.sh が実行可能である" {
-    assert [ -x "$SCRIPT_DIR/setup-branch-auto-delete.sh" ]
+	assert [ -x "$SCRIPT_DIR/setup-branch-auto-delete.sh" ]
 }
 
 @test "setup-branch-auto-delete.sh が正しいshebangを持っている" {
-    run head -n 1 "$SCRIPT_DIR/setup-branch-auto-delete.sh"
-    assert_output "#!/bin/bash"
+	run head -n 1 "$SCRIPT_DIR/setup-branch-auto-delete.sh"
+	assert_output "#!/bin/bash"
 }
 
 @test "ghコマンドが見つからない場合にエラーを表示する" {
-    run env PATH="/bin" bash "$SCRIPT_DIR/setup-branch-auto-delete.sh" <<< ""
-    assert_failure
-    assert_output --partial "GitHub CLI (gh) がインストールされていません"
+	run env PATH="/bin" bash "$SCRIPT_DIR/setup-branch-auto-delete.sh" <<<""
+	assert_failure
+	assert_output --partial "GitHub CLI (gh) がインストールされていません"
 }
 
 @test "既に設定が有効な場合は成功する" {
-    # モックを更新して既に有効な設定を返す
-    cat > "$TEST_DIR/gh" <<'EOF'
+	# モックを更新して既に有効な設定を返す
+	cat >"$TEST_DIR/gh" <<'EOF'
 #!/bin/bash
 case "$1" in
     auth)
@@ -90,17 +90,17 @@ case "$1" in
 esac
 exit 0
 EOF
-    chmod +x "$TEST_DIR/gh"
-    
-    run bash "$SCRIPT_DIR/setup-branch-auto-delete.sh" <<< ""
-    # スクリプトは対話的であるため、完全なテストは難しい
-    # ただし、基本的な構造は確認できる
-    assert_success || assert_failure  # どちらでもOK（モックのため）
+	chmod +x "$TEST_DIR/gh"
+
+	run bash "$SCRIPT_DIR/setup-branch-auto-delete.sh" <<<""
+	# スクリプトは対話的であるため、完全なテストは難しい
+	# ただし、基本的な構造は確認できる
+	assert_success || assert_failure # どちらでもOK（モックのため）
 }
 
 @test "gh repo viewが失敗した場合にgit configから取得する" {
-    # gh repo viewを失敗させるモック
-    cat > "$TEST_DIR/gh" <<'EOF'
+	# gh repo viewを失敗させるモック
+	cat >"$TEST_DIR/gh" <<'EOF'
 #!/bin/bash
 case "$1" in
     auth)
@@ -121,26 +121,26 @@ case "$1" in
 esac
 exit 0
 EOF
-    chmod +x "$TEST_DIR/gh"
+	chmod +x "$TEST_DIR/gh"
 
-    # git configのモックを作成
-    cat > "$TEST_DIR/git" <<'EOF'
+	# git configのモックを作成
+	cat >"$TEST_DIR/git" <<'EOF'
 #!/bin/bash
 if [ "$1" = "config" ] && [ "$2" = "--get" ] && [ "$3" = "remote.origin.url" ]; then
     echo "https://github.com/fallback-owner/fallback-repo.git"
 fi
 exit 0
 EOF
-    chmod +x "$TEST_DIR/git"
+	chmod +x "$TEST_DIR/git"
 
-    export DRY_RUN=1
-    run bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
-    assert_output --partial "fallback-owner/fallback-repo"
+	export DRY_RUN=1
+	run bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
+	assert_output --partial "fallback-owner/fallback-repo"
 }
 
 @test "gh repo viewとgit configの両方が失敗した場合にエラー" {
-    # gh repo viewを失敗させるモック
-    cat > "$TEST_DIR/gh" <<'EOF'
+	# gh repo viewを失敗させるモック
+	cat >"$TEST_DIR/gh" <<'EOF'
 #!/bin/bash
 case "$1" in
     auth)
@@ -154,16 +154,16 @@ case "$1" in
 esac
 exit 1
 EOF
-    chmod +x "$TEST_DIR/gh"
+	chmod +x "$TEST_DIR/gh"
 
-    # git configも失敗させる
-    cat > "$TEST_DIR/git" <<'EOF'
+	# git configも失敗させる
+	cat >"$TEST_DIR/git" <<'EOF'
 #!/bin/bash
 exit 1
 EOF
-    chmod +x "$TEST_DIR/git"
+	chmod +x "$TEST_DIR/git"
 
-    run bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
-    assert_failure
-    assert_output --partial "リポジトリ情報を取得できませんでした"
+	run bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
+	assert_failure
+	assert_output --partial "リポジトリ情報を取得できませんでした"
 }
