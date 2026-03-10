@@ -180,10 +180,14 @@ if [[ -n "${name:-}" ]]; then
   echo "name is set"
 fi
 
+# 存在チェックだけをしたい場合
 if ! grep -q "token" config.txt; then
   echo "token が見つかりません" >&2
   exit 1
 fi
+
+# 先頭のマッチ行を取得したい場合（pipefail でも安全）
+first_token_line="$(grep -m 1 "token" config.txt)"
 ```
 
 ## 7. 参考資料
