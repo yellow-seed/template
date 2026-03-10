@@ -30,8 +30,8 @@ while read -r local_ref local_sha _ remote_sha; do
   fi
 
   while IFS= read -r file; do
-    changed_files+=("$file")
-  done < <(git diff --name-only --diff-filter=ACMR "$base_sha" "$local_sha")
+    [[ -n "$file" ]] && changed_files+=("$file")
+  done <<< "$(git diff --name-only --diff-filter=ACMR "$base_sha" "$local_sha")"
 done
 
 if [ "${#changed_files[@]}" -eq 0 ]; then
