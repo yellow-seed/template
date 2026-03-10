@@ -147,7 +147,7 @@ NC='\033[0m'
 
 log_info() {
   local message="$1"
-  printf '%b[INFO]%b %s\n' "$GREEN" "$NC" "$message"
+  printf '%b[INFO]%b %s\n' "$GREEN" "$NC" "$message" >&2
 }
 
 log_error() {
