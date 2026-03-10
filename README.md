@@ -144,7 +144,10 @@ bash scripts/setup-git-hooks.sh
 
 ### GitHub Ruleset のセットアップ（オプション）
 
-ブランチ保護や自動削除設定を適用する場合、以下のいずれかの方法で実行できます：
+ブランチ保護などの設定を適用する場合、以下のいずれかの方法で実行できます。
+
+> **補足**: `delete_branch_on_merge` / `allow_update_branch` は Terraform で管理します。
+> `.github/terraform/repository-settings/README.md` を参照してください。
 
 #### 方法1: GitHub Actions で実行（推奨）
 

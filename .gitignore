@@ -168,3 +168,9 @@ out/
 .qlty/plugin_cachedir
 .qlty/results
 
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl

@@ -36,10 +36,12 @@ run_script() {
 }
 
 run_script "1" "Ruleset のセットアップ" "$SCRIPT_DIR/setup-rulesets.sh"
-run_script "2" "ブランチ自動削除の設定" "$SCRIPT_DIR/setup-branch-auto-delete.sh"
-run_script "3" "PRブランチ更新提案の設定" "$SCRIPT_DIR/setup-branch-update-suggestion.sh"
-run_script "4" "ラベルの設定" "$SCRIPT_DIR/setup-labels.sh"
-run_script "5" "GitHub Project のセットアップ" "$SCRIPT_DIR/setup-github-project.sh"
+run_script "2" "ラベルの設定" "$SCRIPT_DIR/setup-labels.sh"
+run_script "3" "GitHub Project のセットアップ" "$SCRIPT_DIR/setup-github-project.sh"
+
+echo "※ ブランチ自動削除と PR ブランチ更新提案は Terraform で管理します"
+echo "   .github/terraform/repository-settings/README.md を参照してください"
+echo ""
 
 echo "=============================="
 echo "実行結果サマリー"
