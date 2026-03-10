@@ -163,6 +163,9 @@ out/
 # Claude Code
 .claude/settings.local.json
 
+# Local binaries
+actionlint
+
 # qlty runtime files
 .qlty/logs
 .qlty/plugin_cachedir
