@@ -21,7 +21,10 @@ else
   log "Warning: qlty is not installed. Skipping qlty check."
 fi
 
-mapfile -t changed_files < <(git diff --cached --name-only --diff-filter=ACMR)
+changed_files=()
+while IFS= read -r file; do
+  [[ -n "$file" ]] && changed_files+=("$file")
+done <<< "$(git diff --cached --name-only --diff-filter=ACMR)"
 
 if [ "${#changed_files[@]}" -eq 0 ]; then
   log "No staged files to check."

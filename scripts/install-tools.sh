@@ -24,6 +24,7 @@ should_skip() {
 
 main() {
 	local installers=(
+		mise
 		bats
 		dotenvx
 		qlty
