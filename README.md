@@ -104,7 +104,7 @@ bash scripts/installers/mise.sh
 **または公式インストーラーで直接インストール:**
 
 ```bash
-curl https://mise.run | sh
+curl -fsSL https://mise.run | sh
 ```
 
 インストール後、シェルの設定ファイル（`~/.bashrc` / `~/.zshrc` など）に以下を追記してください。
