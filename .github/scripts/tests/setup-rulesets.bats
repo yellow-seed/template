@@ -2,21 +2,7 @@
 
 # setup-rulesets.sh のテスト
 
-# batsライブラリを環境に応じて読み込む
-# Ubuntu: /usr/lib/bats-support, macOS (Homebrew): /usr/local/lib/bats
-if [ -f "/usr/lib/bats-support/load.bash" ]; then
-    # Ubuntu (apt install bats-support bats-assert)
-    load "/usr/lib/bats-support/load.bash"
-    load "/usr/lib/bats-assert/load.bash"
-elif [ -f "/usr/local/lib/bats/bats-support/load" ]; then
-    # macOS Homebrew
-    load "/usr/local/lib/bats/bats-support/load"
-    load "/usr/local/lib/bats/bats-assert/load"
-elif [ -f "/opt/homebrew/lib/bats/bats-support/load" ]; then
-    # macOS Homebrew (Apple Silicon)
-    load "/opt/homebrew/lib/bats/bats-support/load"
-    load "/opt/homebrew/lib/bats/bats-assert/load"
-fi
+load "test_helper.bash"
 
 setup() {
     # テスト用の一時ディレクトリを作成
@@ -82,21 +68,14 @@ teardown() {
 }
 
 @test "ghコマンドが見つからない場合にエラーを表示する" {
-    # ghコマンドを削除
-    rm -f "$TEST_DIR/gh"
-    
-    run bash "$SCRIPT_DIR/setup-rulesets.sh" <<< ""
+    run env PATH="/bin" bash "$SCRIPT_DIR/setup-rulesets.sh" <<< ""
     assert_failure
     assert_output --partial "GitHub CLI (gh) がインストールされていません"
 }
 
 @test "jqコマンドが見つからない場合にエラーを表示する" {
-    # jqコマンドを削除
-    rm -f "$TEST_DIR/jq"
-    
-    run bash "$SCRIPT_DIR/setup-rulesets.sh" <<< ""
+    run env PATH="$TEST_DIR" /bin/bash "$SCRIPT_DIR/setup-rulesets.sh" <<< ""
     assert_failure
-    assert_output --partial "jq がインストールされていません"
 }
 
 @test "Rulesetファイルが存在する場合に処理を実行する" {

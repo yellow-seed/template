@@ -2,26 +2,12 @@
 
 # setup-all.sh のテスト
 
-# batsライブラリを環境に応じて読み込む
-# Ubuntu: /usr/lib/bats-support, macOS (Homebrew): /usr/local/lib/bats
-if [ -f "/usr/lib/bats-support/load.bash" ]; then
-    # Ubuntu (apt install bats-support bats-assert)
-    load "/usr/lib/bats-support/load.bash"
-    load "/usr/lib/bats-assert/load.bash"
-elif [ -f "/usr/local/lib/bats/bats-support/load" ]; then
-    # macOS Homebrew
-    load "/usr/local/lib/bats/bats-support/load"
-    load "/usr/local/lib/bats/bats-assert/load"
-elif [ -f "/opt/homebrew/lib/bats/bats-support/load" ]; then
-    # macOS Homebrew (Apple Silicon)
-    load "/opt/homebrew/lib/bats/bats-support/load"
-    load "/opt/homebrew/lib/bats/bats-assert/load"
-fi
+load "test_helper.bash"
 
 setup() {
     # テスト用の一時ディレクトリを作成
     TEST_DIR=$(mktemp -d)
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    SCRIPT_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")/.." && pwd)"
     
     # モック用のパスを設定
     export PATH="$TEST_DIR:$PATH"
