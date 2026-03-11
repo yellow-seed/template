@@ -37,6 +37,9 @@ bash .claude/hooks/skills-setup.sh
 
 このスクリプトは`.github/skills`を`.claude/skills`と`.codex/skills`にコピーします。
 
+また、リモート環境向けの`gh-setup`では`origin`リモートが未設定の場合に
+`GITHUB_REPOSITORY`（または関連設定）から自動構成します。
+
 **注意事項**:
 
 - シンボリックリンク環境では、すべてのディレクトリは自動的に同期されます
