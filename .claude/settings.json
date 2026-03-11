@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "./.claude/hooks/gh-setup.sh"
+          },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/env-setup.sh"
           }
         ]
       }
