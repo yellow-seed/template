@@ -37,6 +37,90 @@ install_gh_extensions() {
 	install_gh_extension "$gh_cmd" "harakeishi/gh-discussion"
 }
 
+extract_repo_slug() {
+	local value="$1"
+
+	if [ -z "$value" ]; then
+		return 1
+	fi
+
+	value="${value#git@}"
+	value="${value#ssh://git@}"
+	value="${value#https://}"
+	value="${value#http://}"
+	value="${value#*/}"
+	value="${value#*:}"
+	value="${value%.git}"
+
+	if [[ "$value" =~ ^[^/]+/[^/]+$ ]]; then
+		echo "$value"
+		return 0
+	fi
+
+	return 1
+}
+
+resolve_repository_slug() {
+	local repository="${GITHUB_REPOSITORY:-}"
+
+	if [ -n "$repository" ]; then
+		echo "$repository"
+		return 0
+	fi
+
+	if repository=$(git config --get remote.upstream.url 2>/dev/null); then
+		extract_repo_slug "$repository" && return 0
+	fi
+
+	if repository=$(git config --get github.repository 2>/dev/null); then
+		extract_repo_slug "$repository" && return 0
+	fi
+
+	return 1
+}
+
+resolve_remote_base_url() {
+	if [ -n "${GITHUB_REMOTE_URL_BASE:-}" ]; then
+		echo "${GITHUB_REMOTE_URL_BASE%/}"
+		return 0
+	fi
+
+	if [ -n "${GITHUB_SERVER_URL:-}" ]; then
+		echo "${GITHUB_SERVER_URL%/}"
+		return 0
+	fi
+
+	echo "https://github.com"
+}
+
+ensure_origin_remote() {
+	if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+		log "Not in a git repository, skipping origin remote setup"
+		return 0
+	fi
+
+	if git remote get-url origin >/dev/null 2>&1; then
+		log "origin remote already configured, skipping"
+		return 0
+	fi
+
+	local repository
+	if ! repository=$(resolve_repository_slug); then
+		log "Could not resolve repository slug, skipping origin remote setup"
+		return 0
+	fi
+
+	local base_url
+	base_url=$(resolve_remote_base_url)
+	local origin_url="${base_url}/${repository}.git"
+
+	if git remote add origin "$origin_url"; then
+		log "Configured origin remote: $origin_url"
+	else
+		log "Failed to configure origin remote (non-critical, continuing)"
+	fi
+}
+
 if [ -z "${REMOTE_ENV_VAR:-}" ]; then
 	log "REMOTE_ENV_VAR is not set, skipping gh setup"
 	exit 0
@@ -47,6 +131,8 @@ if [ "$REMOTE_ENV_VALUE" != "true" ]; then
 	log "Not a remote session, skipping gh setup"
 	exit 0
 fi
+
+ensure_origin_remote
 
 log "Remote session detected, checking gh CLI..."
 
