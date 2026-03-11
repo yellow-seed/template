@@ -22,6 +22,10 @@ export INSTALL_PREFIX
 export ENV_FILE
 export STRICT_MODE
 
-bash "$REPO_ROOT/scripts/install-tools.sh"
+if [ "${CODEX_SKIP_TOOL_INSTALL:-0}" = "1" ]; then
+	log "Skipping install-tools.sh (already handled by caller)"
+else
+	bash "$REPO_ROOT/scripts/install-tools.sh"
+fi
 
 log "Development environment setup completed successfully!"
