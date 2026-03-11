@@ -30,8 +30,14 @@ main() {
 		qlty
 		terraform
 	)
+	local mise_managed_installers=(
+		bats
+		dotenvx
+		terraform
+	)
 	local apt_stamp_dir
 	local had_failure=false
+	local installer
 
 	apt_stamp_dir=$(mktemp -d)
 	APT_UPDATE_STAMP="$apt_stamp_dir/apt-update.stamp"
@@ -41,20 +47,55 @@ main() {
 	log "Starting tool installation"
 	ensure_path
 
-	for installer in "${installers[@]}"; do
-		if should_skip "$installer"; then
-			log "Skipping $installer (SKIP_INSTALLERS)"
-			continue
-		fi
-
-		if ! bash "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
-			had_failure=true
-			fail "Installer failed: $installer"
-			if [ "$STRICT_MODE" != "true" ]; then
-				log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
+	if command_exists mise; then
+		if should_skip "mise"; then
+			log "Skipping mise install (SKIP_INSTALLERS)"
+		else
+			log "mise found. Running mise install"
+			if ! mise install; then
+				had_failure=true
+				fail "mise install failed"
+				if [ "$STRICT_MODE" != "true" ]; then
+					log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
+				fi
 			fi
 		fi
-	done
+
+		for installer in "${mise_managed_installers[@]}"; do
+			if should_skip "$installer"; then
+				log "Skipping $installer (SKIP_INSTALLERS)"
+			fi
+		done
+
+		if should_skip "qlty"; then
+			log "Skipping qlty (SKIP_INSTALLERS)"
+		else
+			if ! bash "$ORCHESTRATOR_DIR/installers/qlty.sh"; then
+				had_failure=true
+				fail "Installer failed: qlty"
+				if [ "$STRICT_MODE" != "true" ]; then
+					log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
+				fi
+			fi
+		fi
+	else
+		log "mise not found. Using individual installers"
+
+		for installer in "${installers[@]}"; do
+			if should_skip "$installer"; then
+				log "Skipping $installer (SKIP_INSTALLERS)"
+				continue
+			fi
+
+			if ! bash "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
+				had_failure=true
+				fail "Installer failed: $installer"
+				if [ "$STRICT_MODE" != "true" ]; then
+					log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
+				fi
+			fi
+		done
+	fi
 
 	if [ "$had_failure" = "true" ]; then
 		log "Tool installation completed with errors"
