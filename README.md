@@ -35,13 +35,9 @@ CI/CD、コードレビュー、コード品質チェックなどの自動化ワ
 
 統一されたPull Request形式を提供するテンプレートです。
 
-### `.github/rulesets/`
-
-ブランチ保護ルールやフィーチャーブランチルールなど、GitHub Ruleset用のJSONテンプレートを格納しています。
-
 ### `.github/scripts/`
 
-Rulesetの適用、ブランチ自動削除、GitHub Project作成など、リポジトリセットアップを自動化するスクリプトを格納しています。詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
+ラベル設定やGitHub Project作成など、リポジトリセットアップを自動化するスクリプトを格納しています。
 
 ### `.github/dependabot.yml`
 
@@ -146,7 +142,8 @@ bash scripts/setup-git-hooks.sh
 
 ブランチ保護などの設定を適用する場合、以下のいずれかの方法で実行できます。
 
-> **補足**: `delete_branch_on_merge` / `allow_update_branch` は Terraform で管理します。
+> **補足**: Ruleset（branch protection / feature branch）と
+> `delete_branch_on_merge` / `allow_update_branch` は Terraform で管理します。
 > `.github/terraform/repository-settings/README.md` を参照してください。
 
 #### 方法1: GitHub Actions で実行（推奨）
@@ -165,22 +162,14 @@ bash scripts/setup-git-hooks.sh
 - Dry-run モードで事前確認可能
 - ローカル環境不要
 
-#### 方法2: ローカルでスクリプトを実行
+#### 方法2: Terraform をローカルで実行
 
 ```bash
-# すべての設定を一括で適用
-chmod +x .github/scripts/setup-all.sh
-./.github/scripts/setup-all.sh
-
-# または個別に適用
-chmod +x .github/scripts/setup-rulesets.sh
-./.github/scripts/setup-rulesets.sh
-
-chmod +x .github/scripts/setup-branch-auto-delete.sh
-./.github/scripts/setup-branch-auto-delete.sh
-
-chmod +x .github/scripts/setup-github-project.sh
-./.github/scripts/setup-github-project.sh
+cd .github/terraform/repository-settings
+terraform init
+terraform plan
+terraform apply
 ```
 
-詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) を参照してください。
+詳細は [GITHUB_RULESET_SETUP.md](docs/GITHUB_RULESET_SETUP.md) と
+[.github/terraform/repository-settings/README.md](.github/terraform/repository-settings/README.md) を参照してください。

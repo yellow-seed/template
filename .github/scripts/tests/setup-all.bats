@@ -47,18 +47,6 @@ teardown() {
 
 @test "setup-all.sh が他のスクリプトを呼び出す" {
     # モックスクリプトを作成
-    cat > "$TEST_DIR/setup-rulesets.sh" <<'EOF'
-#!/bin/bash
-echo "setup-rulesets.sh called"
-EOF
-    chmod +x "$TEST_DIR/setup-rulesets.sh"
-
-    cat > "$TEST_DIR/setup-branch-auto-delete.sh" <<'EOF'
-#!/bin/bash
-echo "setup-branch-auto-delete.sh called"
-EOF
-    chmod +x "$TEST_DIR/setup-branch-auto-delete.sh"
-
     cat > "$TEST_DIR/setup-labels.sh" <<'EOF'
 #!/bin/bash
 echo "setup-labels.sh called"
