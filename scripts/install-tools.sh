@@ -23,13 +23,6 @@ should_skip() {
 }
 
 main() {
-	local installers=(
-		mise
-		bats
-		dotenvx
-		qlty
-		terraform
-	)
 	local mise_managed_installers=(
 		bats
 		dotenvx
@@ -47,54 +40,43 @@ main() {
 	log "Starting tool installation"
 	ensure_path
 
-	if command_exists mise; then
-		if should_skip "mise"; then
-			log "Skipping mise install (SKIP_INSTALLERS)"
-		else
-			log "mise found. Running mise install"
-			if ! mise install; then
-				had_failure=true
-				fail "mise install failed"
-				if [ "$STRICT_MODE" != "true" ]; then
-					log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
-				fi
-			fi
-		fi
-
-		for installer in "${mise_managed_installers[@]}"; do
-			if should_skip "$installer"; then
-				log "Skipping $installer (SKIP_INSTALLERS)"
-			fi
-		done
-
-		if should_skip "qlty"; then
-			log "Skipping qlty (SKIP_INSTALLERS)"
-		else
-			if ! bash "$ORCHESTRATOR_DIR/installers/qlty.sh"; then
-				had_failure=true
-				fail "Installer failed: qlty"
-				if [ "$STRICT_MODE" != "true" ]; then
-					log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
-				fi
-			fi
-		fi
+	if should_skip "mise"; then
+		log "Skipping mise install (SKIP_INSTALLERS)"
 	else
-		log "mise not found. Using individual installers"
-
-		for installer in "${installers[@]}"; do
-			if should_skip "$installer"; then
-				log "Skipping $installer (SKIP_INSTALLERS)"
-				continue
+		if ! bash "$ORCHESTRATOR_DIR/installers/mise.sh"; then
+			had_failure=true
+			fail "Installer failed: mise"
+			if [ "$STRICT_MODE" != "true" ]; then
+				log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
 			fi
+		fi
 
-			if ! bash "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
-				had_failure=true
-				fail "Installer failed: $installer"
-				if [ "$STRICT_MODE" != "true" ]; then
-					log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
-				fi
+		log "Running mise install"
+		if ! mise install; then
+			had_failure=true
+			fail "mise install failed"
+			if [ "$STRICT_MODE" != "true" ]; then
+				log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
 			fi
-		done
+		fi
+	fi
+
+	for installer in "${mise_managed_installers[@]}"; do
+		if should_skip "$installer"; then
+			log "Skipping $installer (SKIP_INSTALLERS)"
+		fi
+	done
+
+	if should_skip "qlty"; then
+		log "Skipping qlty (SKIP_INSTALLERS)"
+	else
+		if ! bash "$ORCHESTRATOR_DIR/installers/qlty.sh"; then
+			had_failure=true
+			fail "Installer failed: qlty"
+			if [ "$STRICT_MODE" != "true" ]; then
+				log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
+			fi
+		fi
 	fi
 
 	if [ "$had_failure" = "true" ]; then

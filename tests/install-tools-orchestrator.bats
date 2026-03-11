@@ -17,7 +17,18 @@ setup() {
     ln -s "$(command -v "$cmd")" "$WORK_DIR/bin/$cmd"
   done
 
-  for installer in mise bats dotenvx qlty terraform; do
+  cat >"$WORK_DIR/scripts/installers/mise.sh" <<'SCRIPT'
+#!/bin/bash
+echo "mise-installer" >>"$INSTALL_LOG"
+cat >"$WORK_DIR/bin/mise" <<'MISE'
+#!/bin/bash
+echo "mise-install" >>"$INSTALL_LOG"
+MISE
+chmod +x "$WORK_DIR/bin/mise"
+SCRIPT
+  chmod +x "$WORK_DIR/scripts/installers/mise.sh"
+
+  for installer in bats dotenvx qlty terraform; do
     cat >"$WORK_DIR/scripts/installers/${installer}.sh" <<SCRIPT
 #!/bin/bash
 echo "${installer}" >>"$INSTALL_LOG"
@@ -30,25 +41,11 @@ teardown() {
   rm -rf "$WORK_DIR"
 }
 
-@test "install-tools uses individual installers when mise is unavailable" {
-  run env -i PATH="$WORK_DIR/bin" HOME="$HOME" INSTALL_LOG="$INSTALL_LOG" bash "$WORK_DIR/scripts/install-tools.sh"
+@test "install-tools runs mise installer then mise install and qlty installer" {
+  run env -i PATH="$WORK_DIR/bin" HOME="$HOME" INSTALL_LOG="$INSTALL_LOG" WORK_DIR="$WORK_DIR" bash "$WORK_DIR/scripts/install-tools.sh"
   [ "$status" -eq 0 ]
 
-  run grep -x "terraform" "$INSTALL_LOG"
-  [ "$status" -eq 0 ]
-
-  run grep -x "mise" "$INSTALL_LOG"
-  [ "$status" -eq 0 ]
-}
-
-@test "install-tools runs mise install and qlty installer when mise is available" {
-  cat >"$WORK_DIR/bin/mise" <<'MISE'
-#!/bin/bash
-echo "mise-install" >>"$INSTALL_LOG"
-MISE
-  chmod +x "$WORK_DIR/bin/mise"
-
-  run env -i PATH="$WORK_DIR/bin" HOME="$HOME" INSTALL_LOG="$INSTALL_LOG" bash "$WORK_DIR/scripts/install-tools.sh"
+  run grep -x "mise-installer" "$INSTALL_LOG"
   [ "$status" -eq 0 ]
 
   run grep -x "mise-install" "$INSTALL_LOG"
@@ -65,13 +62,10 @@ MISE
 }
 
 @test "install-tools skips qlty when requested in mise mode" {
-  cat >"$WORK_DIR/bin/mise" <<'MISE'
-#!/bin/bash
-echo "mise-install" >>"$INSTALL_LOG"
-MISE
-  chmod +x "$WORK_DIR/bin/mise"
+  run env -i PATH="$WORK_DIR/bin" HOME="$HOME" INSTALL_LOG="$INSTALL_LOG" WORK_DIR="$WORK_DIR" SKIP_INSTALLERS="qlty" bash "$WORK_DIR/scripts/install-tools.sh"
+  [ "$status" -eq 0 ]
 
-  run env -i PATH="$WORK_DIR/bin" HOME="$HOME" INSTALL_LOG="$INSTALL_LOG" SKIP_INSTALLERS="qlty" bash "$WORK_DIR/scripts/install-tools.sh"
+  run grep -x "mise-installer" "$INSTALL_LOG"
   [ "$status" -eq 0 ]
 
   run grep -x "mise-install" "$INSTALL_LOG"
