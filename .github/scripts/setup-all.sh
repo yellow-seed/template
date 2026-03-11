@@ -35,11 +35,10 @@ run_script() {
 	echo ""
 }
 
-run_script "1" "Ruleset のセットアップ" "$SCRIPT_DIR/setup-rulesets.sh"
-run_script "2" "ラベルの設定" "$SCRIPT_DIR/setup-labels.sh"
-run_script "3" "GitHub Project のセットアップ" "$SCRIPT_DIR/setup-github-project.sh"
+run_script "1" "ラベルの設定" "$SCRIPT_DIR/setup-labels.sh"
+run_script "2" "GitHub Project のセットアップ" "$SCRIPT_DIR/setup-github-project.sh"
 
-echo "※ ブランチ自動削除と PR ブランチ更新提案は Terraform で管理します"
+echo "※ Ruleset とリポジトリ保護設定は Terraform で管理します"
 echo "   .github/terraform/repository-settings/README.md を参照してください"
 echo ""
 
