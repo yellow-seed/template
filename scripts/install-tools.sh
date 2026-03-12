@@ -89,8 +89,11 @@ main() {
 		fi
 
 		if [ "$use_mise" = "true" ] && [[ " ${mise_managed_installers[*]} " == *" $installer "* ]]; then
-			log "Skipping $installer (managed by mise)"
-			continue
+			if command_exists "$installer"; then
+				log "Skipping $installer (managed by mise)"
+				continue
+			fi
+			log "$installer is not available after mise install; running installer"
 		fi
 
 		run_step "$installer" "bash '$ORCHESTRATOR_DIR/installers/${installer}.sh'"

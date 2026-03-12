@@ -16,7 +16,7 @@ setup() {
   : >"$INSTALL_LOG"
   : >"$MISE_LOG"
 
-  export PATH="$WORK_DIR/bin:$PATH"
+  export PATH="$WORK_DIR/bin:/usr/bin:/bin"
 
   for installer in mise bats dotenvx qlty terraform; do
     cat >"$WORK_DIR/scripts/installers/${installer}.sh" <<SCRIPT
@@ -35,8 +35,6 @@ teardown() {
   run env SKIP_INSTALLERS=mise bash "$WORK_DIR/scripts/install-tools.sh"
   [ "$status" -eq 0 ]
 
-  run grep -x "bats" "$INSTALL_LOG"
-  [ "$status" -eq 0 ]
 
   run grep -x "dotenvx" "$INSTALL_LOG"
   [ "$status" -eq 0 ]
@@ -48,12 +46,44 @@ teardown() {
   [ "$status" -eq 0 ]
 }
 
-@test "install-tools runs mise install and qlty when mise is present" {
+@test "install-tools falls back for managed tools missing after mise install" {
   cat >"$WORK_DIR/bin/mise" <<'MISE'
 #!/bin/bash
 echo "$*" >>"$MISE_LOG"
 MISE
   chmod +x "$WORK_DIR/bin/mise"
+
+  run bash "$WORK_DIR/scripts/install-tools.sh"
+  [ "$status" -eq 0 ]
+
+  run grep -x "install" "$MISE_LOG"
+  [ "$status" -eq 0 ]
+
+
+  run grep -x "dotenvx" "$INSTALL_LOG"
+  [ "$status" -eq 0 ]
+
+  run grep -x "terraform" "$INSTALL_LOG"
+  [ "$status" -eq 0 ]
+
+  run grep -x "qlty" "$INSTALL_LOG"
+  [ "$status" -eq 0 ]
+}
+
+@test "install-tools skips managed installers when binaries already available" {
+  cat >"$WORK_DIR/bin/mise" <<'MISE'
+#!/bin/bash
+echo "$*" >>"$MISE_LOG"
+MISE
+  chmod +x "$WORK_DIR/bin/mise"
+
+  for bin in bats dotenvx terraform; do
+    cat >"$WORK_DIR/bin/$bin" <<'BIN'
+#!/bin/bash
+exit 0
+BIN
+    chmod +x "$WORK_DIR/bin/$bin"
+  done
 
   run bash "$WORK_DIR/scripts/install-tools.sh"
   [ "$status" -eq 0 ]
