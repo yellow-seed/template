@@ -2,4 +2,8 @@
 set -u
 set -o pipefail
 
-exec qlty check --all "$@"
+if [ "$#" -eq 0 ]; then
+	exec qlty check --all
+else
+	exec qlty check "$@"
+fi
