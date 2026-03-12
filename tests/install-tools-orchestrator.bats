@@ -13,16 +13,21 @@ setup() {
   export INSTALL_LOG="$WORK_DIR/installers.log"
   : >"$INSTALL_LOG"
 
-  for cmd in bash dirname mkdir mktemp rm id touch; do
+  for cmd in bash cat chmod dirname mkdir mktemp rm id touch; do
     ln -s "$(command -v "$cmd")" "$WORK_DIR/bin/$cmd"
   done
 
+  # mise stub: installer creates mise binary that simulates installing managed tools into PATH
   cat >"$WORK_DIR/scripts/installers/mise.sh" <<'SCRIPT'
 #!/bin/bash
 echo "mise-installer" >>"$INSTALL_LOG"
 cat >"$WORK_DIR/bin/mise" <<'MISE'
 #!/bin/bash
 echo "mise-install" >>"$INSTALL_LOG"
+for tool in bats dotenvx terraform; do
+  echo "#!/bin/bash" >"$WORK_DIR/bin/$tool"
+  chmod +x "$WORK_DIR/bin/$tool"
+done
 MISE
 chmod +x "$WORK_DIR/bin/mise"
 SCRIPT
@@ -54,6 +59,7 @@ teardown() {
   run grep -x "qlty" "$INSTALL_LOG"
   [ "$status" -eq 0 ]
 
+  # bats and terraform are installed by mise into PATH, so individual installers should not be called
   run grep -x "terraform" "$INSTALL_LOG"
   [ "$status" -ne 0 ]
 
@@ -73,4 +79,37 @@ teardown() {
 
   run grep -x "qlty" "$INSTALL_LOG"
   [ "$status" -ne 0 ]
+}
+
+@test "install-tools falls back to individual installer when mise does not install the tool" {
+  # Override mise stub: mise installs but does NOT put managed tools into PATH
+  cat >"$WORK_DIR/scripts/installers/mise.sh" <<'SCRIPT'
+#!/bin/bash
+echo "mise-installer" >>"$INSTALL_LOG"
+cat >"$WORK_DIR/bin/mise" <<'MISE'
+#!/bin/bash
+echo "mise-install" >>"$INSTALL_LOG"
+MISE
+chmod +x "$WORK_DIR/bin/mise"
+SCRIPT
+  chmod +x "$WORK_DIR/scripts/installers/mise.sh"
+
+  run env -i PATH="$WORK_DIR/bin" HOME="$HOME" INSTALL_LOG="$INSTALL_LOG" WORK_DIR="$WORK_DIR" bash "$WORK_DIR/scripts/install-tools.sh"
+  [ "$status" -eq 0 ]
+
+  run grep -x "mise-installer" "$INSTALL_LOG"
+  [ "$status" -eq 0 ]
+
+  run grep -x "mise-install" "$INSTALL_LOG"
+  [ "$status" -eq 0 ]
+
+  # bats and terraform individual installers called as fallback
+  run grep -x "bats" "$INSTALL_LOG"
+  [ "$status" -eq 0 ]
+
+  run grep -x "terraform" "$INSTALL_LOG"
+  [ "$status" -eq 0 ]
+
+  run grep -x "qlty" "$INSTALL_LOG"
+  [ "$status" -eq 0 ]
 }

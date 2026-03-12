@@ -64,6 +64,17 @@ main() {
 	for installer in "${mise_managed_installers[@]}"; do
 		if should_skip "$installer"; then
 			log "Skipping $installer (SKIP_INSTALLERS)"
+			continue
+		fi
+		if ! command_exists "$installer"; then
+			log "Falling back to individual installer for $installer (not found after mise install)"
+			if ! bash "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
+				had_failure=true
+				fail "Installer failed: $installer"
+				if [ "$STRICT_MODE" != "true" ]; then
+					log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
+				fi
+			fi
 		fi
 	done
 
