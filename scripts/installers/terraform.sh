@@ -20,7 +20,9 @@ main() {
 
 	detect_arch || return 1
 	local arch="$GO_ARCH"
-	local version="${TERRAFORM_VERSION:-1.11.4}"
+	local mise_version
+	mise_version=$(get_mise_tool_version terraform || true)
+	local version="${TERRAFORM_VERSION:-${mise_version:-1.11.4}}"
 	local os="linux"
 	local zip_name="terraform_${version}_${os}_${arch}.zip"
 	local download_url="https://releases.hashicorp.com/terraform/${version}/${zip_name}"
