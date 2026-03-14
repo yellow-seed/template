@@ -44,3 +44,25 @@ teardown() {
   [ -n "$install_line" ]
   [ "$update_line" -lt "$install_line" ]
 }
+
+@test "get_mise_tool_version reads tool version from .mise.toml" {
+  cat > "$WORK_DIR/.mise.toml" <<'MISE'
+[tools]
+terraform = "1.11.4"
+MISE
+
+  run bash -c "source '$REPO_ROOT/scripts/installers/_common.sh'; REPO_ROOT='$WORK_DIR'; get_mise_tool_version terraform"
+  [ "$status" -eq 0 ]
+  [ "$output" = "1.11.4" ]
+}
+
+@test "get_mise_tool_version returns empty when tool is not defined" {
+  cat > "$WORK_DIR/.mise.toml" <<'MISE'
+[tools]
+bats = "1.11.1"
+MISE
+
+  run bash -c "source '$REPO_ROOT/scripts/installers/_common.sh'; REPO_ROOT='$WORK_DIR'; get_mise_tool_version terraform"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}

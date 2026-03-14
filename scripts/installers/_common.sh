@@ -68,6 +68,34 @@ trim() {
 	printf '%s' "$value"
 }
 
+get_mise_tool_version() {
+	local tool="$1"
+	local config_path="${REPO_ROOT}/.mise.toml"
+
+	if [ ! -f "$config_path" ]; then
+		return 1
+	fi
+
+	awk -F'=' -v tool="$tool" '
+		BEGIN { in_tools = 0 }
+		/^[[:space:]]*\[/ {
+			in_tools = ($0 ~ /^[[:space:]]*\[tools\][[:space:]]*$/)
+			next
+		}
+		in_tools {
+			key = $1
+			gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
+			if (key == tool) {
+				value = $2
+				gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+				gsub(/^"|"$/, "", value)
+				print value
+				exit
+			}
+		}
+	' "$config_path"
+}
+
 install_packages() {
 	local packages=("$@")
 	local sudo_cmd
