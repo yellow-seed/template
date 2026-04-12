@@ -1,187 +1,91 @@
 # GitHub Ruleset とブランチ保護設定ガイド
 
-このドキュメントでは、GitHub Ruleset とブランチ保護設定をテンプレート化して適用する方法を説明します。
-このテンプレートを取り込んだ他リポジトリでは不要だと思われます。必要に応じて削除してください。
+このドキュメントでは、GitHub Ruleset と関連するリポジトリ設定を
+Terraform で管理する方法を説明します。
+このテンプレートを取り込んだ他リポジトリでは不要だと思われます。
+必要に応じて削除してください。
 
 ## 概要
 
-GitHub Ruleset を使用することで、以下の設定をコード化して管理できます：
+GitHub の以下設定を Terraform でコード管理できます。
 
-- ブランチ保護ルール
-- プルリクエストの必須レビュー
-- ステータスチェックの必須化
-- ブランチ削除の制限
-- Bypass 設定（特定のユーザーやチームがルールを回避できる設定）
+- Branch Protection Ruleset（`main` / `develop` / `release/*`）
+- Feature Branch Ruleset（`feature/*` / `feat/*`）
+- `delete_branch_on_merge`
+- `allow_update_branch`
 
 ## 前提条件
 
-- GitHub CLI (gh) がインストールされていること
-- リポジトリへの管理者権限があること
-
-### GitHub CLI のインストール
-
-```bash
-# macOS
-brew install gh
-
-# Linux
-# https://cli.github.com/manual/installation を参照
-
-# Windows
-# https://cli.github.com/manual/installation を参照
-```
-
-### GitHub CLI へのログイン
-
-```bash
-gh auth login
-```
+- Terraform がインストールされていること
+- GitHub リポジトリへの管理者権限があること
+- リポジトリ設定変更可能な GitHub Personal Access Token を持っていること
 
 ## セットアップ方法
 
-### 方法1: 一括セットアップ（推奨）
+```bash
+cd .github/terraform/repository-settings
+terraform init
+```
 
-すべての設定を一度に適用する場合：
+環境変数を設定してください。
 
 ```bash
-chmod +x .github/scripts/setup-all.sh
-./.github/scripts/setup-all.sh
+export TF_VAR_github_owner="yellow-seed"
+export TF_VAR_repository_name="template"
+export TF_VAR_github_token="<PAT>"
 ```
 
-### 方法2: 個別セットアップ
+## 既存設定の import
 
-#### Ruleset の設定
+既存の設定を Terraform 管理へ移行する場合は、先に import してください。
 
 ```bash
-chmod +x .github/scripts/setup-rulesets.sh
-./.github/scripts/setup-rulesets.sh
+terraform import github_repository.template template
+terraform import github_repository_ruleset.branch_protection <branch-protection-ruleset-id>
+terraform import github_repository_ruleset.feature_branch <feature-branch-ruleset-id>
 ```
 
-このスクリプトは以下の Ruleset を適用します：
-
-- **Branch Protection Ruleset**: `main`, `develop`, `release/*` ブランチ用
-  - プルリクエスト必須
-  - 1名以上の承認必須
-  - CI ステータスチェック必須
-  - ブランチ削除保護
-  - 組織管理者は Bypass 可能
-
-- **Feature Branch Ruleset**: `feature/*`, `feat/*` ブランチ用
-  - プルリクエスト必須
-  - 1名以上の承認必須
-  - ステータスチェックは任意
-
-#### リポジトリ基本設定（Terraform 管理）
-
-`delete_branch_on_merge` と `allow_update_branch` は Terraform で管理します。
-手順は `.github/terraform/repository-settings/README.md` を参照してください。
-
-## Ruleset テンプレートのカスタマイズ
-
-### ブランチ保護 Ruleset のカスタマイズ
-
-`.github/rulesets/branch-protection-ruleset.json` を編集して、以下の設定を変更できます：
-
-#### 対象ブランチの変更
-
-```json
-{
-  "conditions": {
-    "ref_name": {
-      "include": ["main", "develop", "release/*"]
-    }
-  }
-}
-```
-
-#### 必須レビュー数の変更
-
-```json
-{
-  "rules": [
-    {
-      "type": "pull_request",
-      "parameters": {
-        "required_approving_review_count": 2 // 2名以上の承認を必須にする
-      }
-    }
-  ]
-}
-```
-
-#### Bypass 設定の変更
-
-```json
-{
-  "bypass_actors": [
-    {
-      "actor_id": 123456, // チームIDまたはユーザーID
-      "actor_type": "Team", // Team, Integration, OrganizationAdmin
-      "bypass_mode": "always" // always, pull_request
-    }
-  ]
-}
-```
-
-**Bypass Actor の ID を取得する方法：**
+Ruleset ID は GitHub CLI で確認できます。
 
 ```bash
-# チームIDを取得
-gh api orgs/OWNER/teams --jq '.[] | select(.name == "TEAM_NAME") | {id: .id, name: .name}'
-
-# ユーザーIDを取得
-gh api users/USERNAME --jq '{id: .id, login: .login}'
+gh api repos/OWNER/REPO/rulesets --jq '.[] | {id: .id, name: .name}'
 ```
 
-### Feature Branch Ruleset のカスタマイズ
-
-`.github/rulesets/feature-branch-ruleset.json` を編集して、フィーチャーブランチ用のルールをカスタマイズできます。
-
-## 手動設定（UI を使用する場合）
-
-スクリプトを使用しない場合は、GitHub の Web UI から手動で設定することもできます。
-
-### Ruleset の手動設定
-
-1. リポジトリの Settings > Rules > Rulesets に移動
-2. "New ruleset" をクリック
-3. "New branch ruleset" を選択
-4. `.github/rulesets/` 内の JSON ファイルの内容を参考に設定
-
-## 既存の Ruleset の確認
+## 差分確認と適用
 
 ```bash
-# すべての Ruleset を一覧表示
-gh api repos/OWNER/REPO/rulesets --jq '.[] | {id: .id, name: .name, enforcement: .enforcement}'
-
-# 特定の Ruleset の詳細を表示
-gh api repos/OWNER/REPO/rulesets/RULESET_ID
+terraform plan
+terraform apply
 ```
 
-## トラブルシューティング
+移行後は `terraform plan` でゼロ差分になることを確認してください。
 
-### 権限エラー
+## 管理中の Ruleset 内容
 
-リポジトリへの管理者権限が必要です。権限を確認してください：
+### Branch Protection Ruleset
 
-```bash
-gh api repos/OWNER/REPO --jq '.permissions'
-```
+- 対象: `refs/heads/main`, `refs/heads/develop`, `refs/heads/release/*`
+- Pull Request 必須
+- 承認 1 名以上
+- stale review dismiss 有効
+- status check `ci` 必須（strict）
+- non-fast-forward / deletion / update 制御
+- `RepositoryRole`（actor_id: 5）の bypass 設定あり
 
-### Ruleset が適用されない
+### Feature Branch Ruleset
 
-1. Ruleset の `enforcement` が `active` になっているか確認
-2. ブランチ名が `conditions.ref_name.include` のパターンに一致しているか確認
-3. Ruleset の順序を確認（複数の Ruleset がある場合、最初に一致したものが適用されます）
+- 対象: `refs/heads/feature/*`, `refs/heads/feat/*`
+- Pull Request 必須
+- 承認 1 名以上
+- stale review dismiss 有効
+- `RepositoryRole`（actor_id: 5）の bypass 設定あり
 
-### Bypass が機能しない
+## 補足
 
-1. `actor_id` が正しいか確認
-2. `actor_type` が正しいか確認（Team, Integration, OrganizationAdmin）
-3. `bypass_mode` が適切か確認（`always` または `pull_request`）
+旧 Ruleset JSON と `setup-rulesets.sh` は互換目的で残してあります。
+実運用では Terraform 側を正としてください。
 
 ## 参考資料
 
+- [Terraform GitHub Provider](https://registry.terraform.io/providers/integrations/github/latest/docs)
 - [GitHub Rulesets API ドキュメント](https://docs.github.com/en/rest/repos/rules)
-- [Creating rulesets for a repository](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository)
-- [GitHub CLI ドキュメント](https://cli.github.com/manual/)

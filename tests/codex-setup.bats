@@ -22,7 +22,8 @@ setup() {
     "$WORK_DIR/.codex/hooks/gh-setup.sh" \
     "$WORK_DIR/.codex/hooks/env-setup.sh" \
     "$WORK_DIR/.claude/hooks/skills-setup.sh" \
-    "$WORK_DIR/scripts/setup-git-hooks.sh"; do
+    "$WORK_DIR/scripts/setup-git-hooks.sh" \
+    "$WORK_DIR/scripts/install-tools.sh"; do
     printf '#!/bin/bash\nexit 0\n' >"$stub"
     chmod +x "$stub"
   done
@@ -34,6 +35,10 @@ setup() {
 
 teardown() {
   rm -rf "$WORK_DIR"
+}
+
+@test "codex-setup.sh installs tools via scripts/install-tools.sh" {
+  grep -q 'scripts/install-tools.sh' "$SCRIPT"
 }
 
 @test "codex-setup.sh contains CODEX_REMOTE-guarded git remote remove step" {
