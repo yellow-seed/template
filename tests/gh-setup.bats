@@ -36,6 +36,10 @@ GH
   export PATH="$WORK_DIR/bin:$PATH"
   export REMOTE_ENV_VAR="TEST_REMOTE"
   export TEST_REMOTE=true
+
+  export TEST_REPO="$WORK_DIR/repo"
+  mkdir -p "$TEST_REPO"
+  git init "$TEST_REPO" >/dev/null
 }
 
 teardown() {
@@ -65,4 +69,42 @@ EXT
   run awk '/^extension install / { count++ } END { print count + 0 }' "$GH_LOG"
   [ "$status" -eq 0 ]
   [ "$output" -eq 0 ]
+}
+
+@test "gh-setup configures origin from GITHUB_REPOSITORY when missing" {
+  cd "$TEST_REPO"
+  export GITHUB_REPOSITORY="yellow-seed/template"
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+
+  run git remote get-url origin
+  [ "$status" -eq 0 ]
+  [ "$output" = "https://github.com/yellow-seed/template.git" ]
+}
+
+@test "gh-setup does not overwrite existing origin" {
+  cd "$TEST_REPO"
+  git remote add origin "https://example.com/custom/repo.git"
+  export GITHUB_REPOSITORY="yellow-seed/template"
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+
+  run git remote get-url origin
+  [ "$status" -eq 0 ]
+  [ "$output" = "https://example.com/custom/repo.git" ]
+}
+
+@test "gh-setup uses custom remote base URL when provided" {
+  cd "$TEST_REPO"
+  export GITHUB_REPOSITORY="yellow-seed/template"
+  export GITHUB_REMOTE_URL_BASE="https://proxy.local/github"
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+
+  run git remote get-url origin
+  [ "$status" -eq 0 ]
+  [ "$output" = "https://proxy.local/github/yellow-seed/template.git" ]
 }
