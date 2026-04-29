@@ -60,39 +60,33 @@ secrets/
 
 ## 新規に dotenvx を入れる
 
-新しい環境ファイルを作る場合は、ユーザーに対象環境と変数名を確認してから進める。実値はユーザーのローカルシェルで入力する。
+新しい環境ファイルを作る場合は、ユーザーに対象環境と変数名を確認してから進める。実値はユーザーがターミナルで直接書き換えて実行する。
 
-local 例:
+値をインラインで渡す1コマンド形式にすることで、書き換え箇所を最小限にする。
+履歴に残したくない場合は先頭にスペースを付けること（zsh の `HIST_IGNORE_SPACE` が有効な場合）。
+
+local 例（`値` の部分だけ書き換えて実行）:
 
 ```bash
-VAR_NAME=VARIABLE_NAME
-read -rsp "$VAR_NAME: " SECRET_VALUE; echo
-dotenvx set -f .env.local "$VAR_NAME" "$SECRET_VALUE"
-unset SECRET_VALUE
-mkdir -p secrets
-mv .env.keys secrets/.env.local.keys
-chmod 600 secrets/.env.local.keys
+ dotenvx set VARIABLE_NAME '値' -f .env.local
+```
+```bash
+mkdir -p secrets && mv .env.keys secrets/.env.local.keys && chmod 600 secrets/.env.local.keys
 ```
 
-remote 例:
+remote 例（`値` の部分だけ書き換えて実行）:
 
 ```bash
-VAR_NAME=VARIABLE_NAME
-read -rsp "$VAR_NAME: " SECRET_VALUE; echo
-dotenvx set -f .env.remote "$VAR_NAME" "$SECRET_VALUE"
-unset SECRET_VALUE
-mkdir -p secrets
-mv .env.keys secrets/.env.remote.keys
-chmod 600 secrets/.env.remote.keys
+ dotenvx set VARIABLE_NAME '値' -f .env.remote
+```
+```bash
+mkdir -p secrets && mv .env.keys secrets/.env.remote.keys && chmod 600 secrets/.env.remote.keys
 ```
 
-prd 例:
+prd 例（`値` の部分だけ書き換えて実行）:
 
 ```bash
-VAR_NAME=VARIABLE_NAME
-read -rsp "$VAR_NAME: " SECRET_VALUE; echo
-dotenvx set -f .env.production "$VAR_NAME" "$SECRET_VALUE"
-unset SECRET_VALUE
+ dotenvx set VARIABLE_NAME '値' -f .env.production
 ```
 
 prd の復号鍵は原則としてリポジトリ配下へ置かず、本番の secret manager に保存する。検証用に一時生成された `.env.keys` がある場合も commit しない。
@@ -107,28 +101,22 @@ VARIABLE_NAME=
 
 既存の `.env.<env>` を更新する場合は、その環境専用の復号鍵を人間のローカルシェルで読み込んでから `dotenvx set` する。
 
-local 例:
+local 例（`値` の部分だけ書き換えて実行）:
 
 ```bash
-set -a
-. secrets/.env.local.keys
-set +a
-VAR_NAME=VARIABLE_NAME
-read -rsp "$VAR_NAME: " SECRET_VALUE; echo
-dotenvx set -f .env.local "$VAR_NAME" "$SECRET_VALUE"
-unset SECRET_VALUE
+set -a; . secrets/.env.local.keys; set +a
+```
+```bash
+ dotenvx set VARIABLE_NAME '値' -f .env.local
 ```
 
-remote 例:
+remote 例（`値` の部分だけ書き換えて実行）:
 
 ```bash
-set -a
-. secrets/.env.remote.keys
-set +a
-VAR_NAME=VARIABLE_NAME
-read -rsp "$VAR_NAME: " SECRET_VALUE; echo
-dotenvx set -f .env.remote "$VAR_NAME" "$SECRET_VALUE"
-unset SECRET_VALUE
+set -a; . secrets/.env.remote.keys; set +a
+```
+```bash
+ dotenvx set VARIABLE_NAME '値' -f .env.remote
 ```
 
 prd は、ローカルファイルの鍵ではなく本番 secret manager の運用に従う。AI に prd 用復号鍵を渡さない。
