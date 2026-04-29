@@ -34,13 +34,13 @@ install_gh_extensions() {
 	install_gh_extension "${gh_cmd}" "harakeishi/gh-discussion"
 }
 
-if [[ -z "${REMOTE_ENV_VAR:-}" ]]; then
+if [[ -z ${REMOTE_ENV_VAR:-} ]]; then
 	log_info "REMOTE_ENV_VAR is not set, skipping gh setup"
 	exit 0
 fi
 
 REMOTE_ENV_VALUE="${!REMOTE_ENV_VAR:-}"
-if [[ "${REMOTE_ENV_VALUE}" != "true" ]]; then
+if [[ ${REMOTE_ENV_VALUE} != "true" ]]; then
 	log_info "Not a remote session, skipping gh setup"
 	exit 0
 fi
@@ -60,7 +60,7 @@ if [[ -x "${LOCAL_BIN}/gh" ]]; then
 	log_info "gh found in ${LOCAL_BIN}"
 	if [[ ":${PATH}:" != *":${LOCAL_BIN}:"* ]]; then
 		export PATH="${LOCAL_BIN}:${PATH}"
-		if [[ -n "${ENV_FILE:-}" ]]; then
+		if [[ -n ${ENV_FILE:-} ]]; then
 			echo "export PATH=\"${LOCAL_BIN}:\${PATH}\"" >>"${ENV_FILE}"
 			log_info "PATH updated in ENV_FILE"
 		fi
@@ -114,7 +114,7 @@ chmod +x "${LOCAL_BIN}/gh"
 
 export PATH="${LOCAL_BIN}:${PATH}"
 
-if [[ -n "${ENV_FILE:-}" ]]; then
+if [[ -n ${ENV_FILE:-} ]]; then
 	echo "export PATH=\"${LOCAL_BIN}:\${PATH}\"" >>"${ENV_FILE}"
 	log_info "PATH persisted to ENV_FILE"
 fi

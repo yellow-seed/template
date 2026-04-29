@@ -20,12 +20,12 @@ setup_env_from_remote() {
 	local env_remote="${REPO_ROOT}/.env.remote"
 	local env_file="${REPO_ROOT}/.env"
 
-	if [[ ! -f "${env_remote}" ]]; then
+	if [[ ! -f ${env_remote} ]]; then
 		log_info ".env.remote not found, skipping env decryption"
 		return 0
 	fi
 
-	if [[ -z "${DOTENV_PRIVATE_KEY_REMOTE:-}" ]]; then
+	if [[ -z ${DOTENV_PRIVATE_KEY_REMOTE:-} ]]; then
 		log_info "DOTENV_PRIVATE_KEY_REMOTE not set, skipping env decryption"
 		return 0
 	fi
@@ -37,9 +37,10 @@ setup_env_from_remote() {
 
 	log_info "Decrypting .env.remote..."
 	cd "${REPO_ROOT}"
+	# shellcheck disable=SC2016
 	dotenvx run -f .env.remote -- sh -c 'umask 077; printf "GH_TOKEN=%s\n" "$GH_TOKEN" > .env'
 
-	if [[ ! -s "${env_file}" ]]; then
+	if [[ ! -s ${env_file} ]]; then
 		log_error "failed to generate .env from .env.remote"
 		return 1
 	fi
