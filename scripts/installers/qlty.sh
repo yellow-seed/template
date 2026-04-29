@@ -30,8 +30,12 @@ main() {
 	if [ -x "$qlty_bin/qlty" ]; then
 		mkdir -p "$INSTALL_PREFIX"
 		if [ -w "$INSTALL_PREFIX" ]; then
-			ln -sf "$qlty_bin/qlty" "$INSTALL_PREFIX/qlty"
-			log "qlty exposed at $INSTALL_PREFIX/qlty"
+			if ln -sf "$qlty_bin/qlty" "$INSTALL_PREFIX/qlty"; then
+				log "qlty exposed at $INSTALL_PREFIX/qlty"
+			else
+				fail "failed to expose qlty at $INSTALL_PREFIX/qlty"
+				return 1
+			fi
 		else
 			log "Skipping qlty link because $INSTALL_PREFIX is not writable"
 		fi

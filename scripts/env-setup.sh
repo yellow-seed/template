@@ -39,6 +39,7 @@ setup_env_from_remote() {
 	cd "${REPO_ROOT}"
 	# shellcheck disable=SC2016
 	dotenvx run -f .env.remote -- sh -c 'umask 077; printf "GH_TOKEN=%s\n" "$GH_TOKEN" > .env'
+	chmod 600 "${env_file}"
 
 	if [[ ! -s ${env_file} ]]; then
 		log_error "failed to generate .env from .env.remote"
