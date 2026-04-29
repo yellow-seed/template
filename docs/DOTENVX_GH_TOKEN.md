@@ -1,7 +1,10 @@
-# dotenvx による GH_TOKEN 管理
+# dotenvx による Remote AI 用 GH_TOKEN 管理
 
-このリポジトリでは、GitHub CLI 用の `GH_TOKEN` を環境ごとに分けて dotenvx で暗号化します。
-作業用の `.env` は Git 管理せず、PC(local) または Remote の起動時に生成します。
+このドキュメントは、Remote(Web 版 Claude Code / Codex) で AI エージェントに GitHub CLI を使わせるための `GH_TOKEN` 運用を記録します。
+汎用的な dotenvx 環境変数の追加・変更手順は [.claude/skills/dotenvx-env/SKILL.md](../.claude/skills/dotenvx-env/SKILL.md) を参照してください。
+
+`GH_TOKEN` は Remote AI に必要な場合だけ扱い、PC(local) 用 token や本番用 token と混在させません。
+作業用の `.env` は Git 管理せず、Remote の起動時に生成します。
 
 ## 管理するファイル
 
@@ -16,37 +19,49 @@
 
 `secrets/` はリポジトリ内に置けますが、devcontainer / Docker / Remote workspace へコピーまたはマウントしません。
 
-## PC(local) 用 token を作成する
+## PC(local) で Remote AI 用 token を作成する
 
 `GH_TOKEN` の実値はチャット、Issue、ログに貼らず、人間のローカルシェルで入力してください。
-
-```bash
-dotenvx set -f .env.local GH_TOKEN "実際のトークン"
-mkdir -p secrets
-mv .env.keys secrets/.env.local.keys
-```
-
-人間が明示的に GitHub CLI を使う場合だけ、PC(local) 用の復号鍵を読み込みます。
-
-```bash
-export $(grep '^DOTENV_PRIVATE_KEY' secrets/.env.local.keys)
-dotenvx run -f .env.local -- gh auth status
-```
-
-## Remote AI 用 token を作成する
-
-Remote(Web 版 Claude Code / Codex) には、AI 用に権限を絞った別の Fine-grained PAT を使います。
+Remote AI 用には、AI 用に権限を絞った別の Fine-grained PAT を使います。
 PC(local) 用 token や本番用 token と同じ値にしないでください。
 
 ```bash
-dotenvx set -f .env.remote GH_TOKEN "AI用のFine-grained PAT"
+VAR_NAME=GH_TOKEN
+read -rsp "$VAR_NAME: " SECRET_VALUE; echo
+dotenvx set -f .env.remote "$VAR_NAME" "$SECRET_VALUE"
+unset SECRET_VALUE
 mkdir -p secrets
 mv .env.keys secrets/.env.remote.keys
+chmod 600 secrets/.env.remote.keys
 ```
 
 Claude Code on the web / Codex on the web 側の secret / environment variable には、`GH_TOKEN` の実値ではなく `.env.remote` 用の `DOTENV_PRIVATE_KEY*` だけを登録します。
 `GH_TOKEN` をローテーションするときは `.env.remote` の暗号化値を更新して commit / push します。
 `.env.remote` 用の復号鍵を作り直さない限り、Web 側 secret は原則更新しません。
+
+## PC(local) 用 token について
+
+人間が PC(local) で GitHub CLI を使う token が必要な場合は、Remote AI 用とは別に `.env.local` で管理します。
+この token は AI エージェントへ渡しません。
+
+```bash
+VAR_NAME=GH_TOKEN
+read -rsp "$VAR_NAME: " SECRET_VALUE; echo
+dotenvx set -f .env.local "$VAR_NAME" "$SECRET_VALUE"
+unset SECRET_VALUE
+mkdir -p secrets
+mv .env.keys secrets/.env.local.keys
+chmod 600 secrets/.env.local.keys
+```
+
+人間が明示的に GitHub CLI を使う場合だけ、PC(local) 用の復号鍵を読み込みます。
+
+```bash
+set -a
+. secrets/.env.local.keys
+set +a
+dotenvx run -f .env.local -- gh auth status
+```
 
 ## Remote 起動時に .env を生成する
 
@@ -125,7 +140,7 @@ Remote(Web 版 Claude Code / Codex):
 env | cut -d= -f1 | grep '^DOTENV_PRIVATE_KEY' || true
 scripts/setup-remote-env
 test -f .env
-grep '^GH_TOKEN=' .env
+grep -q '^GH_TOKEN=' .env
 scripts/gh-remote auth status
 ```
 
