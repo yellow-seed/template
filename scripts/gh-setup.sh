@@ -1,19 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-
 LOG_PREFIX="[gh-setup]"
 
 log_info() {
 	local message="$1"
 	echo "${LOG_PREFIX} ${message}" >&2
-}
-
-log_error() {
-	local message="$1"
-	echo "${LOG_PREFIX} ERROR: ${message}" >&2
 }
 
 install_gh_extension() {
@@ -42,42 +34,6 @@ install_gh_extensions() {
 	install_gh_extension "${gh_cmd}" "harakeishi/gh-discussion"
 }
 
-setup_env_from_remote() {
-	local env_remote="${REPO_ROOT}/.env.remote"
-	local env_file="${REPO_ROOT}/.env"
-
-	if [[ ! -f "${env_remote}" ]]; then
-		log_info ".env.remote not found, skipping env decryption"
-		return 0
-	fi
-
-	if [[ -z "${DOTENV_PRIVATE_KEY_REMOTE:-}" ]]; then
-		log_info "DOTENV_PRIVATE_KEY_REMOTE not set, skipping env decryption"
-		return 0
-	fi
-
-	if ! command -v dotenvx >/dev/null 2>&1; then
-		log_info "dotenvx not found, skipping env decryption"
-		return 0
-	fi
-
-	log_info "Decrypting .env.remote..."
-	cd "${REPO_ROOT}"
-	dotenvx run -f .env.remote -- sh -c 'umask 077; printf "GH_TOKEN=%s\n" "$GH_TOKEN" > .env'
-
-	if [[ ! -s "${env_file}" ]]; then
-		log_error "failed to generate .env from .env.remote"
-		return 1
-	fi
-
-	log_info "Generated ${env_file}"
-
-	set -a
-	# shellcheck source=/dev/null
-	. "${env_file}"
-	set +a
-}
-
 if [[ -z "${REMOTE_ENV_VAR:-}" ]]; then
 	log_info "REMOTE_ENV_VAR is not set, skipping gh setup"
 	exit 0
@@ -89,11 +45,7 @@ if [[ "${REMOTE_ENV_VALUE}" != "true" ]]; then
 	exit 0
 fi
 
-log_info "Remote session detected, setting up environment..."
-
-setup_env_from_remote
-
-log_info "Checking gh CLI..."
+log_info "Remote session detected, checking gh CLI..."
 
 LOCAL_BIN="${HOME}/.local/bin"
 mkdir -p "${LOCAL_BIN}"
