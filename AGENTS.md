@@ -43,6 +43,18 @@ bash .claude/hooks/skills-setup.sh
 - コピー環境では、`.github/skills`を変更した場合、再度`skills-setup.sh`を実行して同期する必要があります
 - 新しいスキルを追加する際は、必ず`.github/skills/`に配置してください
 
+### dotenvx による環境変数管理
+
+dotenvx で secret を扱う場合は、local / remote / prd の環境を分けて管理します。
+
+- `local`: 人間のPC上で使う環境変数。復号鍵はAIエージェントへ渡さない
+- `remote`: Claude Code on the web / Codex on the web など、AIのWeb実行環境専用の環境変数。AIに使わせてよい最小限の値だけを置く
+- `prd`: 本番環境の環境変数。復号鍵や値をAIエージェントへ渡さない
+
+Remote 用 `.env.remote` は local / prd の代替ではなく、AI作業用に分離した専用ファイルです。
+Web 側 secret / environment variable には、値の実体ではなく `.env.remote` 用の `DOTENV_PRIVATE_KEY*` だけを登録します。
+dotenvx の新規導入、環境変数の追加、値の変更、ローテーションを行う場合は [.claude/skills/dotenvx-env/SKILL.md](.claude/skills/dotenvx-env/SKILL.md) を参照してください。
+
 ## コーディング規約
 
 <!-- プロジェクトで使用しているコーディング規約を記述してください -->

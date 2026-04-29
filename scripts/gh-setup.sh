@@ -1,13 +1,11 @@
-#!/bin/bash
-# Common GitHub CLI setup script for remote environments
-# This script installs gh CLI and required gh extensions when running remotely.
-
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 LOG_PREFIX="[gh-setup]"
 
-log() {
-	echo "$LOG_PREFIX $1" >&2
+log_info() {
+	local message="$1"
+	echo "${LOG_PREFIX} ${message}" >&2
 }
 
 install_gh_extension() {
@@ -15,70 +13,69 @@ install_gh_extension() {
 	local extension_repo="$2"
 	local extension_name="${extension_repo#*/}"
 
-	log "Checking ${extension_name} extension..."
+	log_info "Checking ${extension_name} extension..."
 
-	if "$gh_cmd" extension list 2>/dev/null | grep -q "$extension_repo"; then
-		log "${extension_name} extension already installed"
+	if "${gh_cmd}" extension list 2>/dev/null | grep -q "${extension_repo}"; then
+		log_info "${extension_name} extension already installed"
 		return 0
 	fi
 
-	log "Installing ${extension_name} extension..."
-	if "$gh_cmd" extension install "$extension_repo" 2>/dev/null; then
-		log "${extension_name} extension installed successfully"
+	log_info "Installing ${extension_name} extension..."
+	if "${gh_cmd}" extension install "${extension_repo}" 2>/dev/null; then
+		log_info "${extension_name} extension installed successfully"
 	else
-		log "Failed to install ${extension_name} extension (non-critical, continuing)"
+		log_info "Failed to install ${extension_name} extension (non-critical, continuing)"
 	fi
 }
 
 install_gh_extensions() {
 	local gh_cmd="$1"
-
-	install_gh_extension "$gh_cmd" "yahsan2/gh-sub-issue"
-	install_gh_extension "$gh_cmd" "harakeishi/gh-discussion"
+	install_gh_extension "${gh_cmd}" "yahsan2/gh-sub-issue"
+	install_gh_extension "${gh_cmd}" "harakeishi/gh-discussion"
 }
 
-if [ -z "${REMOTE_ENV_VAR:-}" ]; then
-	log "REMOTE_ENV_VAR is not set, skipping gh setup"
+if [[ -z ${REMOTE_ENV_VAR:-} ]]; then
+	log_info "REMOTE_ENV_VAR is not set, skipping gh setup"
 	exit 0
 fi
 
 REMOTE_ENV_VALUE="${!REMOTE_ENV_VAR:-}"
-if [ "$REMOTE_ENV_VALUE" != "true" ]; then
-	log "Not a remote session, skipping gh setup"
+if [[ ${REMOTE_ENV_VALUE} != "true" ]]; then
+	log_info "Not a remote session, skipping gh setup"
 	exit 0
 fi
 
-log "Remote session detected, checking gh CLI..."
+log_info "Remote session detected, checking gh CLI..."
 
-LOCAL_BIN="$HOME/.local/bin"
-mkdir -p "$LOCAL_BIN"
+LOCAL_BIN="${HOME}/.local/bin"
+mkdir -p "${LOCAL_BIN}"
 
 if command -v gh &>/dev/null; then
-	log "gh CLI already available: $(gh --version | head -1)"
+	log_info "gh CLI already available: $(gh --version | head -1)"
 	install_gh_extensions "gh"
 	exit 0
 fi
 
-if [ -x "$LOCAL_BIN/gh" ]; then
-	log "gh found in $LOCAL_BIN"
-	if [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
-		export PATH="$LOCAL_BIN:$PATH"
-		if [ -n "${ENV_FILE:-}" ]; then
-			echo "export PATH=\"$LOCAL_BIN:\$PATH\"" >>"$ENV_FILE"
-			log "PATH updated in ENV_FILE"
+if [[ -x "${LOCAL_BIN}/gh" ]]; then
+	log_info "gh found in ${LOCAL_BIN}"
+	if [[ ":${PATH}:" != *":${LOCAL_BIN}:"* ]]; then
+		export PATH="${LOCAL_BIN}:${PATH}"
+		if [[ -n ${ENV_FILE:-} ]]; then
+			echo "export PATH=\"${LOCAL_BIN}:\${PATH}\"" >>"${ENV_FILE}"
+			log_info "PATH updated in ENV_FILE"
 		fi
 	fi
-	install_gh_extensions "$LOCAL_BIN/gh"
+	install_gh_extensions "${LOCAL_BIN}/gh"
 	exit 0
 fi
 
-log "Installing gh CLI to $LOCAL_BIN..."
+log_info "Installing gh CLI to ${LOCAL_BIN}..."
 
-TEMP_DIR=$(mktemp -d)
-trap 'rm -rf "$TEMP_DIR"' EXIT
+TEMP_DIR="$(mktemp -d)"
+trap 'rm -rf "${TEMP_DIR}"' EXIT
 
-ARCH=$(uname -m)
-case "$ARCH" in
+ARCH="$(uname -m)"
+case "${ARCH}" in
 x86_64)
 	GH_ARCH="amd64"
 	;;
@@ -86,7 +83,7 @@ aarch64 | arm64)
 	GH_ARCH="arm64"
 	;;
 *)
-	log "Unsupported architecture: $ARCH"
+	log_info "Unsupported architecture: ${ARCH}"
 	exit 0
 	;;
 esac
@@ -95,35 +92,35 @@ GH_VERSION="2.62.0"
 GH_TARBALL="gh_${GH_VERSION}_linux_${GH_ARCH}.tar.gz"
 GH_URL="https://github.com/cli/cli/releases/download/v${GH_VERSION}/${GH_TARBALL}"
 
-log "Downloading gh v${GH_VERSION} for ${GH_ARCH}..."
+log_info "Downloading gh v${GH_VERSION} for ${GH_ARCH}..."
 
-if ! curl -sL "$GH_URL" -o "$TEMP_DIR/$GH_TARBALL"; then
-	log "Failed to download gh CLI"
+if ! curl -sL "${GH_URL}" -o "${TEMP_DIR}/${GH_TARBALL}"; then
+	log_info "Failed to download gh CLI"
 	exit 0
 fi
 
-log "Extracting..."
-if ! tar -xzf "$TEMP_DIR/$GH_TARBALL" -C "$TEMP_DIR"; then
-	log "Failed to extract gh CLI"
+log_info "Extracting..."
+if ! tar -xzf "${TEMP_DIR}/${GH_TARBALL}" -C "${TEMP_DIR}"; then
+	log_info "Failed to extract gh CLI"
 	exit 0
 fi
 
-if ! mv "$TEMP_DIR/gh_${GH_VERSION}_linux_${GH_ARCH}/bin/gh" "$LOCAL_BIN/gh"; then
-	log "Failed to install gh CLI"
+if ! mv "${TEMP_DIR}/gh_${GH_VERSION}_linux_${GH_ARCH}/bin/gh" "${LOCAL_BIN}/gh"; then
+	log_info "Failed to install gh CLI"
 	exit 0
 fi
 
-chmod +x "$LOCAL_BIN/gh"
+chmod +x "${LOCAL_BIN}/gh"
 
-export PATH="$LOCAL_BIN:$PATH"
+export PATH="${LOCAL_BIN}:${PATH}"
 
-if [ -n "${ENV_FILE:-}" ]; then
-	echo "export PATH=\"$LOCAL_BIN:\$PATH\"" >>"$ENV_FILE"
-	log "PATH persisted to ENV_FILE"
+if [[ -n ${ENV_FILE:-} ]]; then
+	echo "export PATH=\"${LOCAL_BIN}:\${PATH}\"" >>"${ENV_FILE}"
+	log_info "PATH persisted to ENV_FILE"
 fi
 
-log "gh CLI installed successfully: $("$LOCAL_BIN/gh" --version | head -1)"
+log_info "gh CLI installed successfully: $("${LOCAL_BIN}/gh" --version | head -1)"
 
-install_gh_extensions "$LOCAL_BIN/gh"
+install_gh_extensions "${LOCAL_BIN}/gh"
 
 exit 0

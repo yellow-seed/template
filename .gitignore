@@ -130,8 +130,14 @@ lerna-debug.log*
 
 # Environment variables
 .env
-.env.local
-.env.*.local
+.env.keys
+.env.*.keys
+secrets/
+
+# dotenvx encrypted and sample environment files are intentionally allowed.
+!.env.sample
+!.env.local
+!.env.remote
 
 # Temporary files
 tmp/
