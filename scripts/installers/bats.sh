@@ -16,26 +16,32 @@ main() {
 		version="${BATS_VERSION#v}"
 		log "Using bats-core version from BATS_VERSION: ${version}"
 	else
-		log "Fetching latest bats-core version..."
-
-		local version_json
-		if [ -n "${GITHUB_TOKEN:-}" ]; then
-			version_json=$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-				https://api.github.com/repos/bats-core/bats-core/releases/latest 2>/dev/null)
+		version=$(get_mise_tool_version bats || true)
+		if [ -n "$version" ] && [ "$version" != "latest" ]; then
+			version="${version#v}"
+			log "Using bats-core version from .mise.toml: ${version}"
 		else
-			version_json=$(curl -fsSL \
-				https://api.github.com/repos/bats-core/bats-core/releases/latest 2>/dev/null)
-		fi
+			log "Fetching latest bats-core version..."
 
-		if [ -z "${version_json:-}" ]; then
-			fail "failed to fetch latest bats-core release info; consider setting GITHUB_TOKEN or BATS_VERSION"
-			return 1
-		fi
+			local version_json
+			if [ -n "${GITHUB_TOKEN:-}" ]; then
+				version_json=$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+					https://api.github.com/repos/bats-core/bats-core/releases/latest 2>/dev/null)
+			else
+				version_json=$(curl -fsSL \
+					https://api.github.com/repos/bats-core/bats-core/releases/latest 2>/dev/null)
+			fi
 
-		version=$(printf '%s' "$version_json" | grep '"tag_name"' | head -n1 | sed 's/.*"tag_name": *"v\([^"]*\)".*/\1/')
-		if [ -z "$version" ]; then
-			fail "could not parse bats-core version from GitHub API response; consider setting BATS_VERSION"
-			return 1
+			if [ -z "${version_json:-}" ]; then
+				fail "failed to fetch latest bats-core release info; consider setting GITHUB_TOKEN or BATS_VERSION"
+				return 1
+			fi
+
+			version=$(printf '%s' "$version_json" | grep '"tag_name"' | head -n1 | sed 's/.*"tag_name": *"v\([^"]*\)".*/\1/')
+			if [ -z "$version" ]; then
+				fail "could not parse bats-core version from GitHub API response; consider setting BATS_VERSION"
+				return 1
+			fi
 		fi
 	fi
 
