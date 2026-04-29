@@ -25,4 +25,7 @@ REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
 
   run git -C "$REPO_ROOT" check-ignore .env.remote
   [ "$status" -eq 1 ]
+
+  run git -C "$REPO_ROOT" check-ignore .env.production
+  [ "$status" -eq 1 ]
 }

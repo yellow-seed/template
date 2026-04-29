@@ -1,7 +1,7 @@
 # dotenvx による Remote AI 用 GH_TOKEN 管理
 
 このドキュメントは、Remote(Web 版 Claude Code / Codex) で AI エージェントに GitHub CLI を使わせるための `GH_TOKEN` 運用を記録します。
-汎用的な dotenvx 環境変数の追加・変更手順は [.claude/skills/dotenvx-env/SKILL.md](../.claude/skills/dotenvx-env/SKILL.md) を参照してください。
+汎用的な dotenvx 環境変数の追加・変更手順は [.github/skills/dotenvx-env/SKILL.md](../.github/skills/dotenvx-env/SKILL.md) を参照してください。
 
 `GH_TOKEN` は Remote AI に必要な場合だけ扱い、PC(local) 用 token や本番用 token と混在させません。
 作業用の `.env` は Git 管理せず、Remote の起動時に生成します。
@@ -68,7 +68,7 @@ dotenvx run -f .env.local -- gh auth status
 Remote には dotenvx CLI が必要です。未導入の場合は `bash scripts/installers/dotenvx.sh` などで用意してください。
 
 ```bash
-scripts/setup-remote-env
+bash scripts/env-setup.sh
 ```
 
 このスクリプトは `.env.remote` を復号し、Git 管理されない `.env` に `GH_TOKEN` だけを書き出します。
@@ -77,7 +77,8 @@ scripts/setup-remote-env
 `.env` を生成するだけでは既存 shell の環境変数にはならないため、次のどちらかで `gh` を実行します。
 
 ```bash
-scripts/gh-remote auth status
+set -a; . ./.env; set +a
+gh auth status
 ```
 
 または Remote shell の初期化で次を実行します。
@@ -138,10 +139,11 @@ Remote(Web 版 Claude Code / Codex):
 
 ```bash
 env | cut -d= -f1 | grep '^DOTENV_PRIVATE_KEY' || true
-scripts/setup-remote-env
+bash scripts/env-setup.sh
 test -f .env
 grep -q '^GH_TOKEN=' .env
-scripts/gh-remote auth status
+set -a; . ./.env; set +a
+gh auth status
 ```
 
 PRD:
