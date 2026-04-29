@@ -27,6 +27,16 @@ main() {
 		fi
 	fi
 
+	if [ -x "$qlty_bin/qlty" ]; then
+		mkdir -p "$INSTALL_PREFIX"
+		if [ -w "$INSTALL_PREFIX" ]; then
+			ln -sf "$qlty_bin/qlty" "$INSTALL_PREFIX/qlty"
+			log "qlty exposed at $INSTALL_PREFIX/qlty"
+		else
+			log "Skipping qlty link because $INSTALL_PREFIX is not writable"
+		fi
+	fi
+
 	log "qlty installed successfully: $(qlty --version)"
 }
 
