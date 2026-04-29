@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+ENV_REMOTE="$REPO_ROOT/.env.remote"
+ENV_FILE="$REPO_ROOT/.env"
+
+log_error() {
+  local message="$1"
+  printf '[setup-remote-env] %s\n' "$message" >&2
+}
+
+if [[ ! -f "$ENV_REMOTE" ]]; then
+  log_error ".env.remote is required. Create it with dotenvx before running this script."
+  exit 1
+fi
+
+if ! command -v dotenvx >/dev/null 2>&1; then
+  log_error "dotenvx command is required to decrypt .env.remote."
+  exit 1
+fi
+
+cd "$REPO_ROOT"
+dotenvx run -f .env.remote -- sh -c 'umask 077; printf "GH_TOKEN=%s\n" "$GH_TOKEN" > .env'
+
+if [[ ! -s "$ENV_FILE" ]]; then
+  log_error "failed to generate .env"
+  exit 1
+fi
+
+printf '[setup-remote-env] generated %s\n' "$ENV_FILE" >&2

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   shell-dev:
     build:
@@ -7,4 +5,5 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/workspace
+      - /workspace/secrets
     working_dir: /workspace
