@@ -41,3 +41,13 @@ teardown() {
   run grep -x "mise" "$INSTALL_LOG"
   [ "$status" -eq 0 ]
 }
+
+@test "install-tools logs installer timing" {
+  export SKIP_INSTALLERS="bats,dotenvx,qlty,terraform"
+
+  run bash "$WORK_DIR/scripts/install-tools.sh"
+  [ "$status" -eq 0 ]
+
+  [[ "$output" == *"[install-tools] START installer: mise"* ]]
+  [[ "$output" =~ \[install-tools\]\ DONE\ installer:\ mise\ \([0-9]+s\) ]]
+}

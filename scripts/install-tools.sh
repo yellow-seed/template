@@ -47,13 +47,29 @@ main() {
 			continue
 		fi
 
+		local started_at
+		local finished_at
+		local duration
+
+		started_at=$(date +%s)
+		log "START installer: $installer"
+
 		if ! bash "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
+			finished_at=$(date +%s)
+			duration=$((finished_at - started_at))
+			log "FAILED installer: $installer (${duration}s)"
+
 			had_failure=true
 			fail "Installer failed: $installer"
 			if [ "$STRICT_MODE" != "true" ]; then
 				log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
 			fi
+			continue
 		fi
+
+		finished_at=$(date +%s)
+		duration=$((finished_at - started_at))
+		log "DONE installer: $installer (${duration}s)"
 	done
 
 	if [ "$had_failure" = "true" ]; then
