@@ -25,10 +25,22 @@ if command -v gh >/dev/null 2>&1; then
 	exit 0
 fi
 
-log_info "Fetching latest gh CLI release..."
-
-OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+OS_NAME="$(uname -s)"
 ARCH="$(uname -m)"
+case "${OS_NAME}" in
+Linux)
+	OS="linux"
+	EXT="tar.gz"
+	;;
+Darwin)
+	OS="macOS"
+	EXT="zip"
+	;;
+*)
+	log_error "Unsupported OS: ${OS_NAME}"
+	exit 1
+	;;
+esac
 case "${ARCH}" in
 x86_64) ARCH="amd64" ;;
 aarch64 | arm64) ARCH="arm64" ;;
@@ -38,10 +50,17 @@ aarch64 | arm64) ARCH="arm64" ;;
 	;;
 esac
 
-VERSION="$(curl -sfLS "https://api.github.com/repos/cli/cli/releases/latest" | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+FALLBACK_VERSION="${GH_BOOTSTRAP_FALLBACK_VERSION:-2.62.0}"
+VERSION=""
+
+log_info "Fetching latest gh CLI release..."
+if RELEASE_JSON="$(curl -sfLS "https://api.github.com/repos/cli/cli/releases/latest")"; then
+	VERSION="$(printf '%s\n' "${RELEASE_JSON}" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v\([^"]*\)".*/\1/p' | head -1)"
+fi
+
 if [[ -z ${VERSION} ]]; then
-	log_error "Failed to fetch latest gh version"
-	exit 1
+	VERSION="${FALLBACK_VERSION}"
+	log_info "Falling back to gh v${VERSION}"
 fi
 
 log_info "Downloading gh v${VERSION} (${OS}/${ARCH})..."
@@ -49,7 +68,7 @@ log_info "Downloading gh v${VERSION} (${OS}/${ARCH})..."
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "${TMP_DIR}"' EXIT
 
-ARCHIVE="gh_${VERSION}_${OS}_${ARCH}.tar.gz"
+ARCHIVE="gh_${VERSION}_${OS}_${ARCH}.${EXT}"
 DOWNLOAD_URL="https://github.com/cli/cli/releases/download/v${VERSION}/${ARCHIVE}"
 
 if ! curl -sfLS "${DOWNLOAD_URL}" -o "${TMP_DIR}/${ARCHIVE}"; then
@@ -57,7 +76,11 @@ if ! curl -sfLS "${DOWNLOAD_URL}" -o "${TMP_DIR}/${ARCHIVE}"; then
 	exit 1
 fi
 
-tar -xzf "${TMP_DIR}/${ARCHIVE}" -C "${TMP_DIR}"
+if [[ ${EXT} == "zip" ]]; then
+	unzip -q "${TMP_DIR}/${ARCHIVE}" -d "${TMP_DIR}"
+else
+	tar -xzf "${TMP_DIR}/${ARCHIVE}" -C "${TMP_DIR}"
+fi
 cp "${TMP_DIR}/gh_${VERSION}_${OS}_${ARCH}/bin/gh" "${INSTALL_DIR}/gh"
 chmod +x "${INSTALL_DIR}/gh"
 

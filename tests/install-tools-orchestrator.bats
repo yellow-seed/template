@@ -91,10 +91,10 @@ teardown() {
 	run bash "$WORK_DIR/scripts/install-tools.sh"
 	[ "$status" -eq 0 ]
 
-	run grep -Fx "export PATH=\"$HOME/.local/bin:\$PATH\"" "$HOME/.bashrc"
+	run grep -Fx 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.bashrc"
 	[ "$status" -eq 0 ]
 
-	run grep -Fx "export PATH=\"$HOME/.local/share/mise/shims:\$PATH\"" "$HOME/.bashrc"
+	run grep -Fx 'export PATH="$HOME/.local/share/mise/shims:$PATH"' "$HOME/.bashrc"
 	[ "$status" -eq 0 ]
 }
 

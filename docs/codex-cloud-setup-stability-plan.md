@@ -65,10 +65,10 @@ bash .codex/hooks/codex-setup.sh
 default profile で行うこと:
 
 - Codex remote session では `origin` を外す
-- `scripts/bootstrap-dotenvx.sh` で `dotenvx` を cURL bootstrap する
-- `scripts/bootstrap-gh.sh` で `gh` を cURL bootstrap する
+- `.codex/hooks/bootstrap-dotenvx.sh` で `dotenvx` を cURL bootstrap する
+- `.codex/hooks/bootstrap-gh.sh` で `gh` を cURL bootstrap する
 - `.env.remote` から AI 用 `GH_TOKEN` だけを `.env` に生成する
-- `scripts/setup-remote-env.sh` が `.env` を source し、agent phase 用に `~/.bashrc` も整える
+- `.codex/hooks/setup-remote-env.sh` が `.env` を source し、agent phase 用に `~/.bashrc` も整える
 - `gh` を用意したうえで `.codex/hooks/gh-setup.sh` を実行する
 - skills directory を同期する
 - git hooks を設定する
@@ -208,9 +208,9 @@ Remote setup ではどちらも `mise` 経由で入れるのではなく、`.env
 
 - Codex universal image に既にあればそれを使う
 - なければ cURL で公式配布物を `~/.local/bin` に入れる
-- `dotenvx` は `scripts/bootstrap-dotenvx.sh` が管理する
-- `gh` は `scripts/bootstrap-gh.sh` が管理する
-- `.env.remote` の復号と `.bashrc` 設定は `scripts/setup-remote-env.sh` が管理する
+- `dotenvx` は `.codex/hooks/bootstrap-dotenvx.sh` が管理する
+- `gh` は `.codex/hooks/bootstrap-gh.sh` が管理する
+- `.env.remote` の復号と `.bashrc` 設定は `.codex/hooks/setup-remote-env.sh` が管理する
 
 ### 5. `dotenvx` を mise 管理にしている
 
@@ -256,10 +256,10 @@ cURL bootstrap に寄せない対象:
 
 Cloud 版 script の責務は次の順にする。
 
-1. `scripts/bootstrap-dotenvx.sh` で `dotenvx` を bootstrap する
-2. `scripts/bootstrap-gh.sh` で `gh` を bootstrap する
-3. `scripts/setup-remote-env.sh` で `.env.remote` から `.env` を生成する
-4. `scripts/setup-remote-env.sh` が `.env` を source して `GH_TOKEN` を使える状態にする
+1. `.codex/hooks/bootstrap-dotenvx.sh` で `dotenvx` を bootstrap する
+2. `.codex/hooks/bootstrap-gh.sh` で `gh` を bootstrap する
+3. `.codex/hooks/setup-remote-env.sh` で `.env.remote` から `.env` を生成する
+4. `.codex/hooks/setup-remote-env.sh` が `.env` を source して `GH_TOKEN` を使える状態にする
 5. `gh-setup.sh` を実行する
 6. `mise install` は qlty / terraform など後段の任意 tool install として扱う
 
@@ -267,9 +267,9 @@ Cloud 版 script の責務は次の順にする。
 
 | Script                         | 責務                                                  | やらないこと                           |
 | ------------------------------ | ----------------------------------------------------- | -------------------------------------- |
-| `scripts/bootstrap-dotenvx.sh` | `dotenvx` を `~/.local/bin` に入れる                  | `.env.remote` の復号、`gh` install     |
-| `scripts/bootstrap-gh.sh`      | GitHub 公式 CLI `gh` を `~/.local/bin` に入れる       | `dotenvx` install、gh extensions setup |
-| `scripts/setup-remote-env.sh`  | `.env.remote` から `.env` を生成し `.bashrc` を整える | tool install、gh extensions setup      |
+| `.codex/hooks/bootstrap-dotenvx.sh` | `dotenvx` を `~/.local/bin` に入れる                  | `.env.remote` の復号、`gh` install     |
+| `.codex/hooks/bootstrap-gh.sh`      | GitHub 公式 CLI `gh` を `~/.local/bin` に入れる       | `dotenvx` install、gh extensions setup |
+| `.codex/hooks/setup-remote-env.sh`  | `.env.remote` から `.env` を生成し `.bashrc` を整える | tool install、gh extensions setup      |
 | `.codex/hooks/gh-setup.sh`     | gh extensions setup                                   | `dotenvx` install、`.env.remote` 復号  |
 | `scripts/install-tools.sh`     | 任意の開発ツールを mise で入れる                      | Cloud core tools install               |
 
@@ -405,7 +405,7 @@ export PATH="$HOME/.local/share/mise/shims:$PATH"
 3. それぞれ独立した bootstrap script で管理する
 
 `dotenvx` は `GH_TOKEN` を用意するための前提で、`gh` は Remote 作業の主要 CLI なので、どちらも `scripts/install-tools.sh` の成功に依存させない。
-ただし、1つの巨大な `bootstrap-cloud-core-tools.sh` にはまとめない。ファイル名と責務を一致させるため、`scripts/bootstrap-dotenvx.sh` と `scripts/bootstrap-gh.sh` に分ける。
+ただし、1つの巨大な `bootstrap-cloud-core-tools.sh` にはまとめない。ファイル名と責務を一致させるため、`.codex/hooks/bootstrap-dotenvx.sh` と `.codex/hooks/bootstrap-gh.sh` に分ける。
 
 ### G. tool version pin を検討する
 
@@ -429,10 +429,10 @@ export PATH="$HOME/.local/share/mise/shims:$PATH"
 7. `tests/codex-setup.bats` に profile ごとの実行範囲テストを追加する
 8. `scripts/install-tools.sh` の `mise install` が `MISE_YES=1` / `MISE_TRUSTED_CONFIG_PATHS` を渡すことを確認する
 9. `tests/install-tools-orchestrator.bats` で非対話化を検証する
-10. `.mise.toml` から `dotenvx` と `gh` を外す
-11. `scripts/bootstrap-dotenvx.sh` を追加する
-12. `scripts/bootstrap-gh.sh` を追加する
-13. `scripts/setup-remote-env.sh` を追加する
+10. `.mise.toml` の `dotenvx` と `gh` は shared setup path 用に維持する
+11. `.codex/hooks/bootstrap-dotenvx.sh` を追加する
+12. `.codex/hooks/bootstrap-gh.sh` を追加する
+13. `.codex/hooks/setup-remote-env.sh` を追加する
 14. `scripts/env-setup.sh` は `DOTENV_PRIVATE_KEY_REMOTE` を「外から渡された secret」として読むだけにする
 15. `.env.remote` 復号処理と `gh` bootstrap を tool install から分離し、Cloud core tools が `mise install` に依存しないことをテストする
 16. Web 画面の Setup script / Maintenance script は単一 entrypoint のまま維持し、手順変更は `.codex/hooks/codex-setup.sh` 側で吸収する
