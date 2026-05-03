@@ -20,7 +20,7 @@ ensure_local_bin_in_path() {
 
 source_repo_env() {
 	local env_file="${REPO_ROOT}/.env"
-	if [[ -f "${env_file}" ]]; then
+	if [[ -f ${env_file} ]]; then
 		set -a
 		# shellcheck source=/dev/null
 		. "${env_file}"
@@ -29,7 +29,7 @@ source_repo_env() {
 }
 
 setup_default() {
-	if [[ "${CODEX_REMOTE:-}" == "true" ]]; then
+	if [[ ${CODEX_REMOTE:-} == "true" ]]; then
 		log_info "Removing git remote origin..."
 		git -C "${REPO_ROOT}" remote remove origin 2>/dev/null || true
 	fi
@@ -81,19 +81,19 @@ setup_session() {
 log_info "Starting Codex setup (profile: ${PROFILE})..."
 
 case "${PROFILE}" in
-	default)
-		setup_default
-		;;
-	full)
-		setup_full
-		;;
-	session)
-		setup_session
-		;;
-	*)
-		log_info "Unknown profile: ${PROFILE}" >&2
-		exit 1
-		;;
+default)
+	setup_default
+	;;
+full)
+	setup_full
+	;;
+session)
+	setup_session
+	;;
+*)
+	log_info "Unknown profile: ${PROFILE}" >&2
+	exit 1
+	;;
 esac
 
 log_info "Codex setup completed (profile: ${PROFILE})."

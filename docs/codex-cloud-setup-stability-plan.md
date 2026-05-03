@@ -129,22 +129,22 @@ Codex cloud の secret は setup script 後に削除されるため、agent phas
 
 次の値は Web 画面に直接設定しない。
 
-| 値         | 理由                                                                 |
-| ---------- | -------------------------------------------------------------------- |
-| `GH_TOKEN` | 実値を Web secret / environment variable に直接置かず、`.env.remote` で暗号化管理する |
-| PC(local) 用の `DOTENV_PRIVATE_KEY*` | AI agent に渡さない。Remote 用の復号鍵だけを secret に登録する |
-| PRD 用 secret | Codex cloud の開発作業用 environment には置かない                   |
+| 値                                   | 理由                                                                                  |
+| ------------------------------------ | ------------------------------------------------------------------------------------- |
+| `GH_TOKEN`                           | 実値を Web secret / environment variable に直接置かず、`.env.remote` で暗号化管理する |
+| PC(local) 用の `DOTENV_PRIVATE_KEY*` | AI agent に渡さない。Remote 用の復号鍵だけを secret に登録する                        |
+| PRD 用 secret                        | Codex cloud の開発作業用 environment には置かない                                     |
 
 ## Web 画面設定の完成形
 
 timeout 回避を優先する現在の完成形は次の状態にする。
 
-| 設定欄                | 指定内容                                                                 |
-| --------------------- | ------------------------------------------------------------------------ |
-| Setup script          | `bash .codex/hooks/codex-setup.sh`                                       |
-| Maintenance script    | `CODEX_SETUP_PROFILE=session bash .codex/hooks/codex-setup.sh`           |
-| Environment variables | `CODEX_REMOTE=true`                                                      |
-| Secrets               | `DOTENV_PRIVATE_KEY_REMOTE=<.env.remote 用の復号鍵>`                     |
+| 設定欄                | 指定内容                                                       |
+| --------------------- | -------------------------------------------------------------- |
+| Setup script          | `bash .codex/hooks/codex-setup.sh`                             |
+| Maintenance script    | `CODEX_SETUP_PROFILE=session bash .codex/hooks/codex-setup.sh` |
+| Environment variables | `CODEX_REMOTE=true`                                            |
+| Secrets               | `DOTENV_PRIVATE_KEY_REMOTE=<.env.remote 用の復号鍵>`           |
 
 この設定により、初回 setup でも `mise install` を実行せず、timeout の主因を避ける。
 同時に、`.env.remote` から `GH_TOKEN` を生成してから `gh-setup.sh` を実行するため、gh setup も意味を持つ。
@@ -154,12 +154,12 @@ full tool install は、script 側を軽量化してから段階的に戻す。
 
 Cloud setup の timeout が解消し、`full` profile の tool install が安定した後だけ、Setup script を次に変更できる。
 
-| 設定欄                | 指定内容                                                   |
-| --------------------- | ---------------------------------------------------------- |
-| Setup script          | `CODEX_SETUP_PROFILE=full bash .codex/hooks/codex-setup.sh` |
+| 設定欄                | 指定内容                                                       |
+| --------------------- | -------------------------------------------------------------- |
+| Setup script          | `CODEX_SETUP_PROFILE=full bash .codex/hooks/codex-setup.sh`    |
 | Maintenance script    | `CODEX_SETUP_PROFILE=session bash .codex/hooks/codex-setup.sh` |
-| Environment variables | `CODEX_REMOTE=true`                                       |
-| Secrets               | `DOTENV_PRIVATE_KEY_REMOTE=<.env.remote 用の復号鍵>`       |
+| Environment variables | `CODEX_REMOTE=true`                                            |
+| Secrets               | `DOTENV_PRIVATE_KEY_REMOTE=<.env.remote 用の復号鍵>`           |
 
 この設定に変更する条件:
 
@@ -265,13 +265,13 @@ Cloud 版 script の責務は次の順にする。
 
 ### 8. script の責務境界
 
-| Script                         | 責務                                           | やらないこと                         |
-| ------------------------------ | ---------------------------------------------- | ------------------------------------ |
-| `scripts/bootstrap-dotenvx.sh`  | `dotenvx` を `~/.local/bin` に入れる            | `.env.remote` の復号、`gh` install   |
-| `scripts/bootstrap-gh.sh`       | GitHub 公式 CLI `gh` を `~/.local/bin` に入れる | `dotenvx` install、gh extensions setup |
-| `scripts/setup-remote-env.sh`   | `.env.remote` から `.env` を生成し `.bashrc` を整える | tool install、gh extensions setup    |
-| `.codex/hooks/gh-setup.sh`      | gh extensions setup                            | `dotenvx` install、`.env.remote` 復号 |
-| `scripts/install-tools.sh`      | 任意の開発ツールを mise で入れる               | Cloud core tools install             |
+| Script                         | 責務                                                  | やらないこと                           |
+| ------------------------------ | ----------------------------------------------------- | -------------------------------------- |
+| `scripts/bootstrap-dotenvx.sh` | `dotenvx` を `~/.local/bin` に入れる                  | `.env.remote` の復号、`gh` install     |
+| `scripts/bootstrap-gh.sh`      | GitHub 公式 CLI `gh` を `~/.local/bin` に入れる       | `dotenvx` install、gh extensions setup |
+| `scripts/setup-remote-env.sh`  | `.env.remote` から `.env` を生成し `.bashrc` を整える | tool install、gh extensions setup      |
+| `.codex/hooks/gh-setup.sh`     | gh extensions setup                                   | `dotenvx` install、`.env.remote` 復号  |
+| `scripts/install-tools.sh`     | 任意の開発ツールを mise で入れる                      | Cloud core tools install               |
 
 ### 9. `latest` 指定で再現性が低い
 

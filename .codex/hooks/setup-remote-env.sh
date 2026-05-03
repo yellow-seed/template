@@ -24,12 +24,12 @@ if [[ ":${PATH}:" != *":${LOCAL_BIN}:"* ]]; then
 fi
 
 decrypt_env() {
-	if [[ ! -f "${ENV_REMOTE}" ]]; then
+	if [[ ! -f ${ENV_REMOTE} ]]; then
 		log_info ".env.remote not found, skipping env decryption"
 		return 0
 	fi
 
-	if [[ -z "${DOTENV_PRIVATE_KEY_REMOTE:-}" ]]; then
+	if [[ -z ${DOTENV_PRIVATE_KEY_REMOTE:-} ]]; then
 		log_info "DOTENV_PRIVATE_KEY_REMOTE not set, skipping env decryption"
 		return 0
 	fi
@@ -44,7 +44,7 @@ decrypt_env() {
 	# shellcheck disable=SC2016
 	dotenvx run -f .env.remote -- sh -c 'umask 077; printf "GH_TOKEN=%s\n" "$GH_TOKEN" > .env'
 
-	if [[ ! -s "${ENV_FILE}" ]]; then
+	if [[ ! -s ${ENV_FILE} ]]; then
 		log_error "failed to generate .env from .env.remote"
 		return 1
 	fi
@@ -53,7 +53,7 @@ decrypt_env() {
 }
 
 source_env() {
-	if [[ ! -f "${ENV_FILE}" ]]; then
+	if [[ ! -f ${ENV_FILE} ]]; then
 		return 0
 	fi
 
@@ -69,7 +69,9 @@ setup_bashrc() {
 	mkdir -p "${HOME}"
 	touch "${bashrc}"
 
+	# shellcheck disable=SC2016
 	if ! grep -qF 'export PATH="$HOME/.local/bin:$PATH"' "${bashrc}"; then
+		# shellcheck disable=SC2016
 		echo 'export PATH="$HOME/.local/bin:$PATH"' >>"${bashrc}"
 		log_info "Added ~/.local/bin to PATH in ~/.bashrc"
 	fi

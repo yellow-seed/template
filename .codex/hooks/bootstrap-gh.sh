@@ -30,16 +30,16 @@ log_info "Fetching latest gh CLI release..."
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 ARCH="$(uname -m)"
 case "${ARCH}" in
-	x86_64) ARCH="amd64" ;;
-	aarch64 | arm64) ARCH="arm64" ;;
-	*)
-		log_error "Unsupported architecture: ${ARCH}"
-		exit 1
-		;;
+x86_64) ARCH="amd64" ;;
+aarch64 | arm64) ARCH="arm64" ;;
+*)
+	log_error "Unsupported architecture: ${ARCH}"
+	exit 1
+	;;
 esac
 
 VERSION="$(curl -sfLS "https://api.github.com/repos/cli/cli/releases/latest" | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
-if [[ -z "${VERSION}" ]]; then
+if [[ -z ${VERSION} ]]; then
 	log_error "Failed to fetch latest gh version"
 	exit 1
 fi
