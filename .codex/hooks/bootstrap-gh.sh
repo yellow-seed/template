@@ -14,6 +14,8 @@ log_error() {
 }
 
 INSTALL_DIR="${HOME}/.local/bin"
+CONNECT_TIMEOUT_SECONDS="${CODEX_BOOTSTRAP_CONNECT_TIMEOUT_SECONDS:-10}"
+MAX_TIME_SECONDS="${CODEX_BOOTSTRAP_MAX_TIME_SECONDS:-45}"
 mkdir -p "${INSTALL_DIR}"
 
 if [[ ":${PATH}:" != *":${INSTALL_DIR}:"* ]]; then
@@ -54,7 +56,7 @@ FALLBACK_VERSION="${GH_BOOTSTRAP_FALLBACK_VERSION:-2.62.0}"
 VERSION=""
 
 log_info "Fetching latest gh CLI release..."
-if RELEASE_JSON="$(curl -sfLS "https://api.github.com/repos/cli/cli/releases/latest")"; then
+if RELEASE_JSON="$(curl --connect-timeout "${CONNECT_TIMEOUT_SECONDS}" --max-time "${MAX_TIME_SECONDS}" -sfLS "https://api.github.com/repos/cli/cli/releases/latest")"; then
 	VERSION="$(printf '%s\n' "${RELEASE_JSON}" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v\([^"]*\)".*/\1/p' | head -1)"
 fi
 
@@ -71,7 +73,7 @@ trap 'rm -rf "${TMP_DIR}"' EXIT
 ARCHIVE="gh_${VERSION}_${OS}_${ARCH}.${EXT}"
 DOWNLOAD_URL="https://github.com/cli/cli/releases/download/v${VERSION}/${ARCHIVE}"
 
-if ! curl -sfLS "${DOWNLOAD_URL}" -o "${TMP_DIR}/${ARCHIVE}"; then
+if ! curl --connect-timeout "${CONNECT_TIMEOUT_SECONDS}" --max-time "${MAX_TIME_SECONDS}" -sfLS "${DOWNLOAD_URL}" -o "${TMP_DIR}/${ARCHIVE}"; then
 	log_error "Failed to download gh from ${DOWNLOAD_URL}"
 	exit 1
 fi

@@ -150,6 +150,26 @@ timeout 回避を優先する現在の完成形は次の状態にする。
 同時に、`.env.remote` から `GH_TOKEN` を生成してから `gh-setup.sh` を実行するため、gh setup も意味を持つ。
 full tool install は、script 側を軽量化してから段階的に戻す。
 
+### 完成形でも `Running setup scripts...` で止まる場合
+
+`mise install` を外しても、次の外部コマンドはネットワーク状態によって待ち続ける可能性がある。
+
+- `.codex/hooks/bootstrap-dotenvx.sh` の `curl https://dotenvx.sh/install.sh`
+- `.codex/hooks/bootstrap-gh.sh` の GitHub release API / archive download
+- `scripts/gh-setup.sh` の `gh extension install`
+
+そのため、Cloud bootstrap の `curl` には接続 timeout と全体 timeout を設定し、`gh extension` 操作にも command timeout を設定する。
+既定値は次のとおり。
+
+| 変数                                      | 既定値 | 用途                                  |
+| ----------------------------------------- | ------ | ------------------------------------- |
+| `CODEX_BOOTSTRAP_CONNECT_TIMEOUT_SECONDS` | `10`   | bootstrap 用 `curl` の接続 timeout    |
+| `CODEX_BOOTSTRAP_MAX_TIME_SECONDS`        | `45`   | bootstrap 用 `curl` の全体 timeout    |
+| `GH_SETUP_COMMAND_TIMEOUT_SECONDS`        | `30`   | `gh extension` 操作の command timeout |
+
+`gh extension install` は non-critical として扱い、失敗しても setup 全体は継続する。
+また、`GH_PROMPT_DISABLED=1` を設定して GitHub CLI の対話 prompt を無効化する。
+
 ## 将来の full setup 設定
 
 Cloud setup の timeout が解消し、`full` profile の tool install が安定した後だけ、Setup script を次に変更できる。

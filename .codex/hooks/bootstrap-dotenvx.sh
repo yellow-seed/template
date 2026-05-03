@@ -14,6 +14,8 @@ log_error() {
 }
 
 INSTALL_DIR="${HOME}/.local/bin"
+CONNECT_TIMEOUT_SECONDS="${CODEX_BOOTSTRAP_CONNECT_TIMEOUT_SECONDS:-10}"
+MAX_TIME_SECONDS="${CODEX_BOOTSTRAP_MAX_TIME_SECONDS:-45}"
 mkdir -p "${INSTALL_DIR}"
 
 if [[ ":${PATH}:" != *":${INSTALL_DIR}:"* ]]; then
@@ -26,7 +28,7 @@ if command -v dotenvx >/dev/null 2>&1; then
 fi
 
 log_info "Installing dotenvx to ${INSTALL_DIR}..."
-if ! curl -sfLS "https://dotenvx.sh/install.sh" | DOTENVX_INSTALL_DIR="${INSTALL_DIR}" sh; then
+if ! curl --connect-timeout "${CONNECT_TIMEOUT_SECONDS}" --max-time "${MAX_TIME_SECONDS}" -sfLS "https://dotenvx.sh/install.sh" | DOTENVX_INSTALL_DIR="${INSTALL_DIR}" sh; then
 	log_error "dotenvx install failed"
 	exit 1
 fi
