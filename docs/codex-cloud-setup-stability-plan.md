@@ -265,13 +265,13 @@ Cloud 版 script の責務は次の順にする。
 
 ### 8. script の責務境界
 
-| Script                         | 責務                                                  | やらないこと                           |
-| ------------------------------ | ----------------------------------------------------- | -------------------------------------- |
+| Script                              | 責務                                                  | やらないこと                           |
+| ----------------------------------- | ----------------------------------------------------- | -------------------------------------- |
 | `.codex/hooks/bootstrap-dotenvx.sh` | `dotenvx` を `~/.local/bin` に入れる                  | `.env.remote` の復号、`gh` install     |
 | `.codex/hooks/bootstrap-gh.sh`      | GitHub 公式 CLI `gh` を `~/.local/bin` に入れる       | `dotenvx` install、gh extensions setup |
 | `.codex/hooks/setup-remote-env.sh`  | `.env.remote` から `.env` を生成し `.bashrc` を整える | tool install、gh extensions setup      |
-| `.codex/hooks/gh-setup.sh`     | gh extensions setup                                   | `dotenvx` install、`.env.remote` 復号  |
-| `scripts/install-tools.sh`     | 任意の開発ツールを mise で入れる                      | Cloud core tools install               |
+| `.codex/hooks/gh-setup.sh`          | gh extensions setup                                   | `dotenvx` install、`.env.remote` 復号  |
+| `scripts/install-tools.sh`          | 任意の開発ツールを mise で入れる                      | Cloud core tools install               |
 
 ### 9. `latest` 指定で再現性が低い
 

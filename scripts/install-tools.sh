@@ -9,7 +9,8 @@ append_path() {
 	local bashrc_path_entry="$path_entry"
 
 	if [[ $path_entry == "$HOME" ]]; then
-		bashrc_path_entry="\$HOME"
+		# shellcheck disable=SC2016
+		bashrc_path_entry='$HOME'
 	elif [[ $path_entry == "$HOME/"* ]]; then
 		bashrc_path_entry="\$HOME/${path_entry#"$HOME/"}"
 	fi

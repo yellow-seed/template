@@ -20,7 +20,7 @@ if [[ ":${PATH}:" != *":${INSTALL_DIR}:"* ]]; then
 	export PATH="${INSTALL_DIR}:${PATH}"
 fi
 
-if command -v gh >/dev/null 2>&1; then
+if [[ ${GH_BOOTSTRAP_FORCE_INSTALL:-false} != "true" ]] && command -v gh >/dev/null 2>&1; then
 	log_info "gh already available: $(gh --version 2>&1 | head -1)"
 	exit 0
 fi

@@ -26,6 +26,15 @@ GH
 }
 
 @test "bootstrap-gh falls back to pinned version when release API lookup fails" {
+	cat >"$WORK_DIR/bin/uname" <<'UNAME'
+#!/usr/bin/env bash
+case "$1" in
+  -s) echo Linux ;;
+  -m) echo x86_64 ;;
+esac
+UNAME
+	chmod +x "$WORK_DIR/bin/uname"
+
 	cat >"$WORK_DIR/bin/curl" <<'CURL'
 #!/usr/bin/env bash
 if [[ "$*" == *"api.github.com/repos/cli/cli/releases/latest"* ]]; then
@@ -60,7 +69,9 @@ chmod +x "$out_dir/gh_2.62.0_linux_amd64/bin/gh"
 TAR
 	chmod +x "$WORK_DIR/bin/tar"
 
+	export GH_BOOTSTRAP_FORCE_INSTALL=true
 	run bash "$SCRIPT"
+	unset GH_BOOTSTRAP_FORCE_INSTALL
 	[ "$status" -eq 0 ]
 	[[ "$output" == *"Falling back to gh v2.62.0"* ]]
 	[ -x "$HOME/.local/bin/gh" ]
@@ -115,7 +126,9 @@ chmod +x "$out_dir/gh_2.90.0_macOS_arm64/bin/gh"
 UNZIP
 	chmod +x "$WORK_DIR/bin/unzip"
 
+	export GH_BOOTSTRAP_FORCE_INSTALL=true
 	run bash "$SCRIPT"
+	unset GH_BOOTSTRAP_FORCE_INSTALL
 	[ "$status" -eq 0 ]
 	[[ "$output" == *"Downloading gh v2.90.0 (macOS/arm64)"* ]]
 	[ -x "$HOME/.local/bin/gh" ]
