@@ -46,12 +46,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install bats
+      - name: Install tools
         run: |
-          bash scripts/installers/mise.sh
-          export PATH="$HOME/.local/bin:$PATH"
-          mise install bats
-          echo "$HOME/.local/share/mise/shims" >> "$GITHUB_PATH"
+          bash scripts/install-tools.sh
 
       - name: Run bats tests
         run: bats tests/*.bats

@@ -15,6 +15,8 @@ setup() {
 
 	export CALL_LOG="$WORK_DIR/calls.log"
 	: >"$CALL_LOG"
+	export GITHUB_PATH="$WORK_DIR/github_path"
+	: >"$GITHUB_PATH"
 
 	# Stub mise.sh: records invocation and plants a fake mise binary in $HOME/.local/bin
 	cat >"$WORK_DIR/scripts/installers/mise.sh" <<SCRIPT
@@ -57,4 +59,44 @@ teardown() {
 
 	run grep "^mise install" "$CALL_LOG"
 	[ "$status" -eq 0 ]
+}
+
+@test "install-tools persists mise paths for later GitHub Actions steps" {
+	run bash "$WORK_DIR/scripts/install-tools.sh"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx "$HOME/.local/bin" "$GITHUB_PATH"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx "$HOME/.local/share/mise/shims" "$GITHUB_PATH"
+	[ "$status" -eq 0 ]
+}
+
+@test "install-tools continues installer failures when strict mode is false" {
+	cat >"$WORK_DIR/scripts/installers/helper-scripts.sh" <<SCRIPT
+#!/bin/bash
+echo "helper-scripts.sh failed" >>"$CALL_LOG"
+exit 1
+SCRIPT
+	chmod +x "$WORK_DIR/scripts/installers/helper-scripts.sh"
+
+	export STRICT_MODE=false
+	run bash "$WORK_DIR/scripts/install-tools.sh"
+	[ "$status" -eq 0 ]
+	[[ "$output" == *"Installing helper scripts... failed"* ]]
+	[[ "$output" == *"Tool installation completed"* ]]
+}
+
+@test "install-tools fails installer failures when strict mode is true" {
+	cat >"$WORK_DIR/scripts/installers/helper-scripts.sh" <<SCRIPT
+#!/bin/bash
+echo "helper-scripts.sh failed" >>"$CALL_LOG"
+exit 1
+SCRIPT
+	chmod +x "$WORK_DIR/scripts/installers/helper-scripts.sh"
+
+	export STRICT_MODE=true
+	run bash "$WORK_DIR/scripts/install-tools.sh"
+	[ "$status" -ne 0 ]
+	[[ "$output" == *"Installing helper scripts... failed"* ]]
 }

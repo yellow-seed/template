@@ -4,28 +4,52 @@ set -euo pipefail
 ORCHESTRATOR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$ORCHESTRATOR_DIR/installers/_common.sh"
 
-main() {
-	log "Installing mise..."
-	bash "$ORCHESTRATOR_DIR/installers/mise.sh"
+append_path() {
+	local path_entry="$1"
 
-	local mise_bin="$HOME/.local/bin"
-	if [[ ":$PATH:" != *":$mise_bin:"* ]]; then
-		export PATH="$mise_bin:$PATH"
-	fi
-
-	log "Installing tools via mise..."
-	(cd "$REPO_ROOT" && mise install)
-
-	local shims_dir="$HOME/.local/share/mise/shims"
-	if [[ ":$PATH:" != *":$shims_dir:"* ]]; then
-		export PATH="$shims_dir:$PATH"
+	if [[ ":$PATH:" != *":$path_entry:"* ]]; then
+		export PATH="$path_entry:$PATH"
 	fi
 	if [[ -n ${ENV_FILE:-} ]]; then
-		echo "export PATH=\"$shims_dir:\$PATH\"" >>"$ENV_FILE"
+		echo "export PATH=\"$path_entry:\$PATH\"" >>"$ENV_FILE"
+	fi
+	if [[ -n ${GITHUB_PATH:-} ]]; then
+		echo "$path_entry" >>"$GITHUB_PATH"
+	fi
+}
+
+run_step() {
+	local description="$1"
+	shift
+
+	log "$description"
+	if "$@"; then
+		return 0
 	fi
 
-	log "Installing helper scripts..."
-	bash "$ORCHESTRATOR_DIR/installers/helper-scripts.sh"
+	fail "$description failed"
+	if [[ $STRICT_MODE == "true" ]]; then
+		return 1
+	fi
+	return 0
+}
+
+install_mise_tools() {
+	(cd "$REPO_ROOT" && mise install)
+}
+
+main() {
+	run_step "Installing mise..." bash "$ORCHESTRATOR_DIR/installers/mise.sh"
+
+	local mise_bin="$HOME/.local/bin"
+	append_path "$mise_bin"
+
+	run_step "Installing tools via mise..." install_mise_tools
+
+	local shims_dir="$HOME/.local/share/mise/shims"
+	append_path "$shims_dir"
+
+	run_step "Installing helper scripts..." bash "$ORCHESTRATOR_DIR/installers/helper-scripts.sh"
 
 	log "Tool installation completed"
 }
