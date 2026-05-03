@@ -49,7 +49,7 @@ jobs:
       - name: Install bats
         run: |
           bash scripts/installers/mise.sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.local/bin:$PATH"
           mise install bats
           echo "$HOME/.local/share/mise/shims" >> "$GITHUB_PATH"
 
