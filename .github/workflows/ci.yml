@@ -46,8 +46,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install bats tooling
-        run: SKIP_INSTALLERS=qlty STRICT_MODE=true bash scripts/install-tools.sh
+      - name: Install bats
+        run: |
+          bash scripts/installers/mise.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          mise install bats
+          echo "$HOME/.local/share/mise/shims" >> "$GITHUB_PATH"
 
       - name: Run bats tests
         run: bats tests/*.bats

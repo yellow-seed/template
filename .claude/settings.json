@@ -6,11 +6,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/gh-setup.sh"
+            "command": "./.claude/hooks/env-setup.sh"
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/env-setup.sh"
+            "command": "./.claude/hooks/gh-setup.sh"
           }
         ]
       }

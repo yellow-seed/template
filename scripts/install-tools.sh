@@ -1,65 +1,31 @@
-#!/bin/bash
-set -u
-set -o pipefail
+#!/usr/bin/env bash
+set -euo pipefail
 
-ORCHESTRATOR_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-source "$ORCHESTRATOR_DIR/installers/_common.sh"
-
-SKIP_INSTALLERS="${SKIP_INSTALLERS:-}"
-
-should_skip() {
-	local name="$1"
-	local token
-
-	IFS=',' read -r -a skip_items <<<"$SKIP_INSTALLERS"
-	for token in "${skip_items[@]}"; do
-		token=$(trim "$token")
-		if [ "$token" = "$name" ]; then
-			return 0
-		fi
-	done
-
-	return 1
-}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/installers/_common.sh"
 
 main() {
-	local installers=(
-		mise
-		bats
-		dotenvx
-		qlty
-		terraform
-	)
-	local apt_stamp_dir
-	local had_failure=false
+	log "Installing mise..."
+	bash "$SCRIPT_DIR/installers/mise.sh"
 
-	apt_stamp_dir=$(mktemp -d)
-	APT_UPDATE_STAMP="$apt_stamp_dir/apt-update.stamp"
-	export APT_UPDATE_STAMP
-	trap 'rm -rf "${APT_UPDATE_STAMP%/*}"' EXIT
-
-	log "Starting tool installation"
-	ensure_path
-
-	for installer in "${installers[@]}"; do
-		if should_skip "$installer"; then
-			log "Skipping $installer (SKIP_INSTALLERS)"
-			continue
-		fi
-
-		if ! bash "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
-			had_failure=true
-			fail "Installer failed: $installer"
-			if [ "$STRICT_MODE" != "true" ]; then
-				log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
-			fi
-		fi
-	done
-
-	if [ "$had_failure" = "true" ]; then
-		log "Tool installation completed with errors"
-		return 1
+	local mise_bin="$HOME/.local/bin"
+	if [[ ":$PATH:" != *":$mise_bin:"* ]]; then
+		export PATH="$mise_bin:$PATH"
 	fi
+
+	log "Installing tools via mise..."
+	(cd "$REPO_ROOT" && mise install)
+
+	local shims_dir="$HOME/.local/share/mise/shims"
+	if [[ ":$PATH:" != *":$shims_dir:"* ]]; then
+		export PATH="$shims_dir:$PATH"
+	fi
+	if [[ -n ${ENV_FILE:-} ]]; then
+		echo "export PATH=\"$shims_dir:\$PATH\"" >>"$ENV_FILE"
+	fi
+
+	log "Installing helper scripts..."
+	bash "$SCRIPT_DIR/installers/helper-scripts.sh"
 
 	log "Tool installation completed"
 }
