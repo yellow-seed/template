@@ -25,6 +25,8 @@ echo "mise.sh" >>"$CALL_LOG"
 cat >"\$HOME/.local/bin/mise" <<'MISE'
 #!/bin/bash
 echo "mise \$*" >>"$CALL_LOG"
+echo "MISE_YES=\${MISE_YES:-}" >>"$CALL_LOG"
+echo "MISE_TRUSTED_CONFIG_PATHS=\${MISE_TRUSTED_CONFIG_PATHS:-}" >>"$CALL_LOG"
 MISE
 chmod +x "\$HOME/.local/bin/mise"
 SCRIPT
@@ -61,6 +63,17 @@ teardown() {
 	[ "$status" -eq 0 ]
 }
 
+@test "install-tools makes mise install non-interactive and trusts repo config" {
+	run bash "$WORK_DIR/scripts/install-tools.sh"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx "MISE_YES=1" "$CALL_LOG"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx "MISE_TRUSTED_CONFIG_PATHS=$WORK_DIR" "$CALL_LOG"
+	[ "$status" -eq 0 ]
+}
+
 @test "install-tools persists mise paths for later GitHub Actions steps" {
 	run bash "$WORK_DIR/scripts/install-tools.sh"
 	[ "$status" -eq 0 ]
@@ -69,6 +82,19 @@ teardown() {
 	[ "$status" -eq 0 ]
 
 	run grep -Fx "$HOME/.local/share/mise/shims" "$GITHUB_PATH"
+	[ "$status" -eq 0 ]
+}
+
+@test "install-tools can persist mise paths to bashrc for Codex cloud setup" {
+	export PERSIST_TO_BASHRC=true
+
+	run bash "$WORK_DIR/scripts/install-tools.sh"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.bashrc"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx 'export PATH="$HOME/.local/share/mise/shims:$PATH"' "$HOME/.bashrc"
 	[ "$status" -eq 0 ]
 }
 

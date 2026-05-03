@@ -1,12 +1,11 @@
 #!/usr/bin/env bats
 
-# Tests for .codex/hooks/codex-setup.sh – git remote removal
+# Tests for .codex/hooks/codex-setup.sh – profile branching and git remote removal
 
 REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
 SCRIPT="$REPO_ROOT/.codex/hooks/codex-setup.sh"
 
 setup() {
-  # Create a temporary workspace that mimics the repo directory structure
   export WORK_DIR
   WORK_DIR="$(mktemp -d)"
 
@@ -14,20 +13,25 @@ setup() {
   mkdir -p "$WORK_DIR/.claude/hooks"
   mkdir -p "$WORK_DIR/scripts"
 
-  # Copy the actual script under test
   cp "$SCRIPT" "$WORK_DIR/.codex/hooks/codex-setup.sh"
 
-  # Create no-op stubs for the other hooks so codex-setup.sh can run end-to-end
+  export CALL_LOG="$WORK_DIR/calls.log"
+  : >"$CALL_LOG"
+
   for stub in \
     "$WORK_DIR/.codex/hooks/gh-setup.sh" \
     "$WORK_DIR/.codex/hooks/env-setup.sh" \
+    "$WORK_DIR/.codex/hooks/bootstrap-dotenvx.sh" \
+    "$WORK_DIR/.codex/hooks/bootstrap-gh.sh" \
+    "$WORK_DIR/.codex/hooks/setup-remote-env.sh" \
     "$WORK_DIR/.claude/hooks/skills-setup.sh" \
-    "$WORK_DIR/scripts/setup-git-hooks.sh"; do
-    printf '#!/bin/bash\nexit 0\n' >"$stub"
+    "$WORK_DIR/scripts/setup-git-hooks.sh" \
+    "$WORK_DIR/scripts/install-tools.sh"; do
+    script_name="$(basename "$stub")"
+    printf '#!/bin/bash\necho "%s" >> "$CALL_LOG"\nexit 0\n' "$script_name" >"$stub"
     chmod +x "$stub"
   done
 
-  # Initialise a git repo with an origin remote
   git -C "$WORK_DIR" init --quiet
   git -C "$WORK_DIR" remote add origin https://example.com/repo.git
 }
@@ -36,47 +40,144 @@ teardown() {
   rm -rf "$WORK_DIR"
 }
 
+# --- static checks ---
+
 @test "codex-setup.sh contains CODEX_REMOTE-guarded git remote remove step" {
   grep -q 'CODEX_REMOTE' "$SCRIPT"
-  grep -q 'git -C "\$REPO_ROOT" remote remove origin' "$SCRIPT"
+  grep -q 'git -C "${REPO_ROOT}" remote remove origin' "$SCRIPT"
 }
 
-@test "codex-setup.sh removes origin when CODEX_REMOTE=true" {
-  # Verify remote exists before
+# --- default profile: origin removal ---
+
+@test "default profile removes origin when CODEX_REMOTE=true" {
   run git -C "$WORK_DIR" remote
   [[ "$output" == *"origin"* ]]
 
-  # Run the actual script with CODEX_REMOTE=true
   export CODEX_REMOTE=true
   run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
   [ "$status" -eq 0 ]
 
-  # Verify remote is gone
   run git -C "$WORK_DIR" remote
   [[ "$output" != *"origin"* ]]
 }
 
-@test "codex-setup.sh preserves origin when CODEX_REMOTE is not set" {
-  # Verify remote exists before
+@test "default profile preserves origin when CODEX_REMOTE is not set" {
   run git -C "$WORK_DIR" remote
   [[ "$output" == *"origin"* ]]
 
-  # Run the actual script without CODEX_REMOTE
   unset CODEX_REMOTE
   run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
   [ "$status" -eq 0 ]
 
-  # Verify remote still exists
   run git -C "$WORK_DIR" remote
   [[ "$output" == *"origin"* ]]
 }
 
-@test "codex-setup.sh is idempotent when origin is already absent" {
-  # Remove remote first
+@test "default profile is idempotent when origin is already absent" {
   git -C "$WORK_DIR" remote remove origin
 
-  # Run the actual script – should not error
   export CODEX_REMOTE=true
   run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
   [ "$status" -eq 0 ]
+}
+
+# --- default profile: script invocations ---
+
+@test "default profile calls bootstrap-dotenvx" {
+  export CODEX_REMOTE=true
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  grep -qx "bootstrap-dotenvx.sh" "$CALL_LOG"
+}
+
+@test "default profile calls bootstrap-gh" {
+  export CODEX_REMOTE=true
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  grep -qx "bootstrap-gh.sh" "$CALL_LOG"
+}
+
+@test "default profile calls setup-remote-env" {
+  export CODEX_REMOTE=true
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  grep -qx "setup-remote-env.sh" "$CALL_LOG"
+}
+
+@test "default profile calls gh-setup and skills-setup and git-hooks" {
+  export CODEX_REMOTE=true
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  grep -qx "gh-setup.sh" "$CALL_LOG"
+  grep -qx "skills-setup.sh" "$CALL_LOG"
+  grep -qx "setup-git-hooks.sh" "$CALL_LOG"
+}
+
+@test "default profile does not call install-tools" {
+  export CODEX_REMOTE=true
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  ! grep -qx "install-tools.sh" "$CALL_LOG"
+}
+
+# --- full profile ---
+
+@test "full profile calls install-tools in addition to default steps" {
+  export CODEX_SETUP_PROFILE=full
+  export CODEX_REMOTE=true
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  grep -qx "bootstrap-dotenvx.sh" "$CALL_LOG"
+  grep -qx "bootstrap-gh.sh" "$CALL_LOG"
+  grep -qx "setup-remote-env.sh" "$CALL_LOG"
+  grep -qx "install-tools.sh" "$CALL_LOG"
+}
+
+# --- session profile ---
+
+@test "session profile calls bootstrap-gh and setup-remote-env" {
+  export CODEX_SETUP_PROFILE=session
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  grep -qx "bootstrap-gh.sh" "$CALL_LOG"
+  grep -qx "setup-remote-env.sh" "$CALL_LOG"
+}
+
+@test "session profile calls skills-setup and git-hooks" {
+  export CODEX_SETUP_PROFILE=session
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  grep -qx "skills-setup.sh" "$CALL_LOG"
+  grep -qx "setup-git-hooks.sh" "$CALL_LOG"
+}
+
+@test "session profile does not call bootstrap-dotenvx" {
+  export CODEX_SETUP_PROFILE=session
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  ! grep -qx "bootstrap-dotenvx.sh" "$CALL_LOG"
+}
+
+@test "session profile does not call install-tools" {
+  export CODEX_SETUP_PROFILE=session
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  ! grep -qx "install-tools.sh" "$CALL_LOG"
+}
+
+@test "session profile does not remove git remote even when CODEX_REMOTE=true" {
+  export CODEX_SETUP_PROFILE=session
+  export CODEX_REMOTE=true
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -eq 0 ]
+  run git -C "$WORK_DIR" remote
+  [[ "$output" == *"origin"* ]]
+}
+
+# --- unknown profile ---
+
+@test "unknown profile exits with error" {
+  export CODEX_SETUP_PROFILE=unknown
+  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
+  [ "$status" -ne 0 ]
 }

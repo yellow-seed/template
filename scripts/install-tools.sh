@@ -6,6 +6,14 @@ source "$ORCHESTRATOR_DIR/installers/_common.sh"
 
 append_path() {
 	local path_entry="$1"
+	local bashrc_path_entry="$path_entry"
+
+	if [[ $path_entry == "$HOME" ]]; then
+		# shellcheck disable=SC2016
+		bashrc_path_entry='$HOME'
+	elif [[ $path_entry == "$HOME/"* ]]; then
+		bashrc_path_entry="\$HOME/${path_entry#"$HOME/"}"
+	fi
 
 	if [[ ":$PATH:" != *":$path_entry:"* ]]; then
 		export PATH="$path_entry:$PATH"
@@ -15,6 +23,13 @@ append_path() {
 	fi
 	if [[ -n ${GITHUB_PATH:-} ]]; then
 		echo "$path_entry" >>"$GITHUB_PATH"
+	fi
+	if [[ ${PERSIST_TO_BASHRC:-false} == "true" ]]; then
+		mkdir -p "$HOME"
+		touch "$HOME/.bashrc"
+		if ! grep -F "export PATH=\"${bashrc_path_entry}:\$PATH\"" "$HOME/.bashrc" >/dev/null 2>&1; then
+			echo "export PATH=\"${bashrc_path_entry}:\$PATH\"" >>"$HOME/.bashrc"
+		fi
 	fi
 }
 
@@ -35,7 +50,12 @@ run_step() {
 }
 
 install_mise_tools() {
-	(cd "$REPO_ROOT" && mise install)
+	(
+		cd "$REPO_ROOT"
+		export MISE_YES=1
+		export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:+${MISE_TRUSTED_CONFIG_PATHS}:}${REPO_ROOT}"
+		mise install
+	)
 }
 
 main() {
