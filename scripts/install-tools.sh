@@ -16,6 +16,13 @@ append_path() {
 	if [[ -n ${GITHUB_PATH:-} ]]; then
 		echo "$path_entry" >>"$GITHUB_PATH"
 	fi
+	if [[ ${PERSIST_TO_BASHRC:-false} == "true" ]]; then
+		mkdir -p "$HOME"
+		touch "$HOME/.bashrc"
+		if ! grep -F "export PATH=\"$path_entry:\$PATH\"" "$HOME/.bashrc" >/dev/null 2>&1; then
+			echo "export PATH=\"$path_entry:\$PATH\"" >>"$HOME/.bashrc"
+		fi
+	fi
 }
 
 run_step() {
@@ -35,7 +42,12 @@ run_step() {
 }
 
 install_mise_tools() {
-	(cd "$REPO_ROOT" && mise install)
+	(
+		cd "$REPO_ROOT"
+		export MISE_YES=1
+		export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:+${MISE_TRUSTED_CONFIG_PATHS}:}${REPO_ROOT}"
+		mise install
+	)
 }
 
 main() {
