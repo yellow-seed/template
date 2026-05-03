@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/installers/_common.sh"
+ORCHESTRATOR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$ORCHESTRATOR_DIR/installers/_common.sh"
 
 main() {
 	log "Installing mise..."
-	bash "$SCRIPT_DIR/installers/mise.sh"
+	bash "$ORCHESTRATOR_DIR/installers/mise.sh"
 
 	local mise_bin="$HOME/.local/bin"
 	if [[ ":$PATH:" != *":$mise_bin:"* ]]; then
@@ -25,7 +25,7 @@ main() {
 	fi
 
 	log "Installing helper scripts..."
-	bash "$SCRIPT_DIR/installers/helper-scripts.sh"
+	bash "$ORCHESTRATOR_DIR/installers/helper-scripts.sh"
 
 	log "Tool installation completed"
 }
