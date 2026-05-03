@@ -46,8 +46,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install bats tooling
-        run: SKIP_INSTALLERS=qlty STRICT_MODE=true bash scripts/install-tools.sh
+      - name: Install tools
+        run: |
+          bash scripts/install-tools.sh
 
       - name: Run bats tests
         run: bats tests/*.bats

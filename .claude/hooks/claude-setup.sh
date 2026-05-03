@@ -22,11 +22,11 @@ else
 	log "1/5 Skipping git remote removal (not a remote session)"
 fi
 
-log "2/5 Running gh CLI setup..."
-bash "$REPO_ROOT/.claude/hooks/gh-setup.sh"
-
-log "3/5 Running environment setup..."
+log "2/5 Running environment setup..."
 bash "$REPO_ROOT/.claude/hooks/env-setup.sh"
+
+log "3/5 Running gh CLI setup..."
+bash "$REPO_ROOT/.claude/hooks/gh-setup.sh"
 
 log "4/5 Syncing skills directory..."
 bash "$REPO_ROOT/.claude/hooks/skills-setup.sh"

@@ -1,65 +1,55 @@
-#!/bin/bash
-set -u
-set -o pipefail
+#!/usr/bin/env bash
+set -euo pipefail
 
-ORCHESTRATOR_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+ORCHESTRATOR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$ORCHESTRATOR_DIR/installers/_common.sh"
 
-SKIP_INSTALLERS="${SKIP_INSTALLERS:-}"
+append_path() {
+	local path_entry="$1"
 
-should_skip() {
-	local name="$1"
-	local token
+	if [[ ":$PATH:" != *":$path_entry:"* ]]; then
+		export PATH="$path_entry:$PATH"
+	fi
+	if [[ -n ${ENV_FILE:-} ]]; then
+		echo "export PATH=\"$path_entry:\$PATH\"" >>"$ENV_FILE"
+	fi
+	if [[ -n ${GITHUB_PATH:-} ]]; then
+		echo "$path_entry" >>"$GITHUB_PATH"
+	fi
+}
 
-	IFS=',' read -r -a skip_items <<<"$SKIP_INSTALLERS"
-	for token in "${skip_items[@]}"; do
-		token=$(trim "$token")
-		if [ "$token" = "$name" ]; then
-			return 0
-		fi
-	done
+run_step() {
+	local description="$1"
+	shift
 
-	return 1
+	log "$description"
+	if "$@"; then
+		return 0
+	fi
+
+	fail "$description failed"
+	if [[ $STRICT_MODE == "true" ]]; then
+		return 1
+	fi
+	return 0
+}
+
+install_mise_tools() {
+	(cd "$REPO_ROOT" && mise install)
 }
 
 main() {
-	local installers=(
-		mise
-		bats
-		dotenvx
-		qlty
-		terraform
-	)
-	local apt_stamp_dir
-	local had_failure=false
+	run_step "Installing mise..." bash "$ORCHESTRATOR_DIR/installers/mise.sh"
 
-	apt_stamp_dir=$(mktemp -d)
-	APT_UPDATE_STAMP="$apt_stamp_dir/apt-update.stamp"
-	export APT_UPDATE_STAMP
-	trap 'rm -rf "${APT_UPDATE_STAMP%/*}"' EXIT
+	local mise_bin="$HOME/.local/bin"
+	append_path "$mise_bin"
 
-	log "Starting tool installation"
-	ensure_path
+	run_step "Installing tools via mise..." install_mise_tools
 
-	for installer in "${installers[@]}"; do
-		if should_skip "$installer"; then
-			log "Skipping $installer (SKIP_INSTALLERS)"
-			continue
-		fi
+	local shims_dir="$HOME/.local/share/mise/shims"
+	append_path "$shims_dir"
 
-		if ! bash "$ORCHESTRATOR_DIR/installers/${installer}.sh"; then
-			had_failure=true
-			fail "Installer failed: $installer"
-			if [ "$STRICT_MODE" != "true" ]; then
-				log "Continuing after failure because STRICT_MODE=$STRICT_MODE"
-			fi
-		fi
-	done
-
-	if [ "$had_failure" = "true" ]; then
-		log "Tool installation completed with errors"
-		return 1
-	fi
+	run_step "Installing helper scripts..." bash "$ORCHESTRATOR_DIR/installers/helper-scripts.sh"
 
 	log "Tool installation completed"
 }
