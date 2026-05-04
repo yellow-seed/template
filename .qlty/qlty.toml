@@ -26,4 +26,4 @@ version = "3.6.2"
 
 [[exclude]]
 plugins = ["prettier"]
-file_patterns = [".github/skills/**", ".claude/skills/**", ".codex/skills/**"]
+file_patterns = [".github/skills/**", ".claude/skills/**", ".codex/skills/**", ".agents/skills/**"]
