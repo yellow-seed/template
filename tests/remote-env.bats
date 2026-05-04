@@ -203,3 +203,107 @@ teardown_remote_env() {
 
   teardown_remote_env
 }
+
+@test "setup-remote-env fails fast when dotenvx decryption hangs" {
+  setup_remote_env
+  touch "$WORK_DIR/repo/.env.remote"
+
+  cat >"$WORK_DIR/bin/dotenvx" <<'DOTENVX'
+#!/bin/bash
+sleep 5
+DOTENVX
+  chmod +x "$WORK_DIR/bin/dotenvx"
+
+  export SETUP_REMOTE_ENV_TIMEOUT_SECONDS=1
+
+  run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"timed out"* ]]
+
+  teardown_remote_env
+}
+
+@test "setup-remote-env writes bashrc source block that succeeds when .env is absent" {
+  setup_remote_env
+
+  run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+
+  run bash -c "set -e; source \"$HOME/.bashrc\""
+  [ "$status" -eq 0 ]
+
+  teardown_remote_env
+}
+
+# =====================================================================
+# .claude/hooks/setup-remote-env.sh
+# =====================================================================
+
+SCRIPT_CLAUDE_REMOTE_ENV="$REPO_ROOT/.claude/hooks/setup-remote-env.sh"
+
+setup_claude_remote_env() {
+  export WORK_DIR
+  WORK_DIR="$(mktemp -d)"
+
+  export HOME="$WORK_DIR/home"
+  mkdir -p "$HOME/.local/bin"
+
+  mkdir -p "$WORK_DIR/repo/.claude/hooks" "$WORK_DIR/bin"
+  cp "$SCRIPT_CLAUDE_REMOTE_ENV" "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+
+  make_dotenvx_stub "$WORK_DIR/bin"
+
+  export PATH="$WORK_DIR/bin:$PATH"
+  export DOTENV_PRIVATE_KEY_REMOTE="test-key"
+  export CLAUDE_ENV_FILE="$WORK_DIR/claude-env-file"
+}
+
+teardown_claude_remote_env() {
+  rm -rf "$WORK_DIR"
+}
+
+@test "claude setup-remote-env decrypts .env.remote into .env with only GH_TOKEN" {
+  setup_claude_remote_env
+  touch "$WORK_DIR/repo/.env.remote"
+
+  run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+
+  run cat "$WORK_DIR/repo/.env"
+  [ "$status" -eq 0 ]
+  [ "$output" = "GH_TOKEN=remote-token" ]
+
+  run grep -q "EXTRA_SECRET" "$WORK_DIR/repo/.env"
+  [ "$status" -eq 1 ]
+
+  teardown_claude_remote_env
+}
+
+@test "claude setup-remote-env persists PATH and .env source to CLAUDE_ENV_FILE" {
+  setup_claude_remote_env
+  touch "$WORK_DIR/repo/.env.remote"
+
+  run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+
+  run grep -F 'export PATH="$HOME/.local/bin:$PATH"' "$CLAUDE_ENV_FILE"
+  [ "$status" -eq 0 ]
+
+  run grep -F "$WORK_DIR/repo/.env" "$CLAUDE_ENV_FILE"
+  [ "$status" -eq 0 ]
+
+  teardown_claude_remote_env
+}
+
+@test "claude setup-remote-env does not duplicate CLAUDE_ENV_FILE entries on re-run" {
+  setup_claude_remote_env
+  touch "$WORK_DIR/repo/.env.remote"
+
+  bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+
+  count="$(grep -c 'export PATH="$HOME/.local/bin:$PATH"' "$CLAUDE_ENV_FILE" || true)"
+  [ "$count" -eq 1 ]
+
+  teardown_claude_remote_env
+}
