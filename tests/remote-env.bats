@@ -84,10 +84,27 @@ teardown_env_setup() {
   setup_env_setup
   touch "$WORK_DIR/repo/.env.remote"
   unset DOTENV_PRIVATE_KEY_REMOTE
+  unset DOTENV_PRIVATE_KEY
 
   run bash "$WORK_DIR/repo/scripts/env-setup.sh"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE not set"* ]]
+  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"* ]]
+
+  teardown_env_setup
+}
+
+@test "env-setup decrypts when only DOTENV_PRIVATE_KEY fallback is set" {
+  setup_env_setup
+  touch "$WORK_DIR/repo/.env.remote"
+  unset DOTENV_PRIVATE_KEY_REMOTE
+  export DOTENV_PRIVATE_KEY="fallback-key"
+
+  run bash "$WORK_DIR/repo/scripts/env-setup.sh"
+  [ "$status" -eq 0 ]
+
+  run cat "$WORK_DIR/repo/.env"
+  [ "$status" -eq 0 ]
+  [ "$output" = "GH_TOKEN=remote-token" ]
 
   teardown_env_setup
 }
@@ -157,10 +174,27 @@ teardown_remote_env() {
   setup_remote_env
   touch "$WORK_DIR/repo/.env.remote"
   unset DOTENV_PRIVATE_KEY_REMOTE
+  unset DOTENV_PRIVATE_KEY
 
   run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE not set"* ]]
+  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"* ]]
+
+  teardown_remote_env
+}
+
+@test "setup-remote-env decrypts when only DOTENV_PRIVATE_KEY fallback is set" {
+  setup_remote_env
+  touch "$WORK_DIR/repo/.env.remote"
+  unset DOTENV_PRIVATE_KEY_REMOTE
+  export DOTENV_PRIVATE_KEY="fallback-key"
+
+  run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+
+  run cat "$WORK_DIR/repo/.env"
+  [ "$status" -eq 0 ]
+  [ "$output" = "GH_TOKEN=remote-token" ]
 
   teardown_remote_env
 }
@@ -290,6 +324,22 @@ teardown_claude_remote_env() {
 
   run grep -F "$WORK_DIR/repo/.env" "$CLAUDE_ENV_FILE"
   [ "$status" -eq 0 ]
+
+  teardown_claude_remote_env
+}
+
+@test "claude setup-remote-env decrypts when only DOTENV_PRIVATE_KEY fallback is set" {
+  setup_claude_remote_env
+  touch "$WORK_DIR/repo/.env.remote"
+  unset DOTENV_PRIVATE_KEY_REMOTE
+  export DOTENV_PRIVATE_KEY="fallback-key"
+
+  run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+
+  run cat "$WORK_DIR/repo/.env"
+  [ "$status" -eq 0 ]
+  [ "$output" = "GH_TOKEN=remote-token" ]
 
   teardown_claude_remote_env
 }

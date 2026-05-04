@@ -25,8 +25,8 @@ setup_env_from_remote() {
 		return 0
 	fi
 
-	if [[ -z ${DOTENV_PRIVATE_KEY_REMOTE:-} ]]; then
-		log_info "DOTENV_PRIVATE_KEY_REMOTE not set, skipping env decryption"
+	if [[ -z ${DOTENV_PRIVATE_KEY_REMOTE:-} && -z ${DOTENV_PRIVATE_KEY:-} ]]; then
+		log_info "DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set, skipping env decryption"
 		return 0
 	fi
 

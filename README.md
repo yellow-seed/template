@@ -131,9 +131,10 @@ bats tests/*.bats
 ### dotenvx による GH_TOKEN 管理
 
 GitHub CLI 用の `GH_TOKEN` は、dotenvx で暗号化した `.env.local` / `.env.remote` と、Git 管理しない `secrets/.env.*.keys` で管理します。
-Remote では `scripts/setup-remote-env` で AI 用の `GH_TOKEN` だけを含む作業用 `.env` を生成し、`scripts/gh-remote` 経由で `gh` を実行できます。
+Codex Web では `CODEX_REMOTE=true` の環境で `.codex/hooks/codex-setup.sh` が bash のセットアップスクリプトを読みます。
+`.env.remote` と `DOTENV_PRIVATE_KEY_REMOTE`（または `DOTENV_PRIVATE_KEY`）があり、`dotenvx` を利用できる場合に、AI 用の `GH_TOKEN` だけを含む作業用 `.env` を生成します。
 
-詳細は [`docs/DOTENVX_GH_TOKEN.md`](docs/DOTENVX_GH_TOKEN.md) を参照してください。
+詳細は [`AGENTS.md`](AGENTS.md) の「Codex Web セットアップ確認」を参照してください。
 
 ### Git hooks のセットアップ
 
