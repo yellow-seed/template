@@ -10,12 +10,19 @@ make_dotenvx_stub() {
 #!/bin/bash
 set -euo pipefail
 
-if [ "$1" != "get" ] || [ "$2" != "GH_TOKEN" ] || [ "$3" != "-f" ] || [ "$4" != ".env.remote" ] || [ "$5" != "--strict" ] || [ "$6" != "--no-ops" ]; then
-  printf 'unexpected dotenvx args: %s\n' "$*" >&2
-  exit 2
+if [ "$#" -eq 6 ] && [ "$1" = "get" ] && [ "$2" = "GH_TOKEN" ] && [ "$3" = "-f" ] && [ "$4" = ".env.remote" ] && [ "$5" = "--strict" ] && [ "$6" = "--no-ops" ]; then
+  printf '%s\n' "remote-token"
+  exit 0
 fi
 
-printf '%s\n' "remote-token"
+if [ "$#" -eq 3 ] && [ "$1" = "decrypt" ] && [ "$2" = "-f" ] && [ "$3" = ".env.remote" ]; then
+  printf '%s\n' "GH_TOKEN=remote-token"
+  printf '%s\n' "EXTRA_SECRET=remote-extra"
+  exit 0
+fi
+
+  printf 'unexpected dotenvx args: %s\n' "$*" >&2
+  exit 2
 DOTENVX
   chmod +x "$bin_dir/dotenvx"
 }
@@ -136,7 +143,7 @@ teardown_remote_env() {
   rm -rf "$WORK_DIR"
 }
 
-@test "setup-remote-env decrypts .env.remote into .env with only GH_TOKEN" {
+@test "setup-remote-env decrypts all .env.remote entries into .env" {
   setup_remote_env
   touch "$WORK_DIR/repo/.env.remote"
 
@@ -145,10 +152,8 @@ teardown_remote_env() {
 
   run cat "$WORK_DIR/repo/.env"
   [ "$status" -eq 0 ]
-  [ "$output" = "GH_TOKEN=remote-token" ]
-
-  run grep -q "EXTRA_SECRET" "$WORK_DIR/repo/.env"
-  [ "$status" -eq 1 ]
+  [[ "$output" == *"GH_TOKEN=remote-token"* ]]
+  [[ "$output" == *"EXTRA_SECRET=remote-extra"* ]]
 
   if stat -c "%a" "$WORK_DIR/repo/.env" >/dev/null 2>&1; then
     mode="$(stat -c "%a" "$WORK_DIR/repo/.env")"
@@ -194,7 +199,8 @@ teardown_remote_env() {
 
   run cat "$WORK_DIR/repo/.env"
   [ "$status" -eq 0 ]
-  [ "$output" = "GH_TOKEN=remote-token" ]
+  [[ "$output" == *"GH_TOKEN=remote-token"* ]]
+  [[ "$output" == *"EXTRA_SECRET=remote-extra"* ]]
 
   teardown_remote_env
 }
@@ -219,6 +225,19 @@ teardown_remote_env() {
   [ "$status" -eq 0 ]
 
   run grep -F "$WORK_DIR/repo/.env" "$HOME/.bashrc"
+  [ "$status" -eq 0 ]
+
+  teardown_remote_env
+}
+
+@test "setup-remote-env syncs existing .env into ~/.bashrc" {
+  setup_remote_env
+  printf '%s\n' "GH_TOKEN=existing-token" >"$WORK_DIR/repo/.env"
+
+  run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+
+  run grep -F 'export GH_TOKEN="existing-token"' "$HOME/.bashrc"
   [ "$status" -eq 0 ]
 
   teardown_remote_env
@@ -295,7 +314,7 @@ teardown_claude_remote_env() {
   rm -rf "$WORK_DIR"
 }
 
-@test "claude setup-remote-env decrypts .env.remote into .env with only GH_TOKEN" {
+@test "claude setup-remote-env decrypts all .env.remote entries into .env" {
   setup_claude_remote_env
   touch "$WORK_DIR/repo/.env.remote"
 
@@ -304,10 +323,8 @@ teardown_claude_remote_env() {
 
   run cat "$WORK_DIR/repo/.env"
   [ "$status" -eq 0 ]
-  [ "$output" = "GH_TOKEN=remote-token" ]
-
-  run grep -q "EXTRA_SECRET" "$WORK_DIR/repo/.env"
-  [ "$status" -eq 1 ]
+  [[ "$output" == *"GH_TOKEN=remote-token"* ]]
+  [[ "$output" == *"EXTRA_SECRET=remote-extra"* ]]
 
   teardown_claude_remote_env
 }
@@ -315,6 +332,21 @@ teardown_claude_remote_env() {
 @test "claude setup-remote-env persists PATH and .env source to CLAUDE_ENV_FILE" {
   setup_claude_remote_env
   touch "$WORK_DIR/repo/.env.remote"
+
+  run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+
+  run grep -F 'export PATH="$HOME/.local/bin:$PATH"' "$CLAUDE_ENV_FILE"
+  [ "$status" -eq 0 ]
+
+  run grep -F "$WORK_DIR/repo/.env" "$CLAUDE_ENV_FILE"
+  [ "$status" -eq 0 ]
+
+  teardown_claude_remote_env
+}
+
+@test "claude setup-remote-env persists CLAUDE_ENV_FILE entries without .env.remote" {
+  setup_claude_remote_env
 
   run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
   [ "$status" -eq 0 ]
@@ -339,7 +371,24 @@ teardown_claude_remote_env() {
 
   run cat "$WORK_DIR/repo/.env"
   [ "$status" -eq 0 ]
-  [ "$output" = "GH_TOKEN=remote-token" ]
+  [[ "$output" == *"GH_TOKEN=remote-token"* ]]
+  [[ "$output" == *"EXTRA_SECRET=remote-extra"* ]]
+
+  teardown_claude_remote_env
+}
+
+@test "claude setup-remote-env syncs existing .env into ~/.bashrc and CLAUDE_ENV_FILE" {
+  setup_claude_remote_env
+  printf '%s\n' "GH_TOKEN=existing-token" >"$WORK_DIR/repo/.env"
+
+  run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+
+  run grep -F 'export GH_TOKEN="existing-token"' "$HOME/.bashrc"
+  [ "$status" -eq 0 ]
+
+  run grep -F "$WORK_DIR/repo/.env" "$CLAUDE_ENV_FILE"
+  [ "$status" -eq 0 ]
 
   teardown_claude_remote_env
 }
