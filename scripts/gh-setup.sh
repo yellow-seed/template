@@ -59,4 +59,10 @@ if ! command -v gh &>/dev/null; then
 fi
 
 log_info "gh CLI available: $(gh --version | head -1)"
+
+if [[ -z ${GH_TOKEN:-} ]]; then
+	log_info "GH_TOKEN is not set; skipping gh extension setup"
+	exit 0
+fi
+
 install_gh_extensions "gh"

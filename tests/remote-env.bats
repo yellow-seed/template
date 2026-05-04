@@ -84,10 +84,11 @@ teardown_env_setup() {
   setup_env_setup
   touch "$WORK_DIR/repo/.env.remote"
   unset DOTENV_PRIVATE_KEY_REMOTE
+  unset DOTENV_PRIVATE_KEY
 
   run bash "$WORK_DIR/repo/scripts/env-setup.sh"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE not set"* ]]
+  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"* ]]
 
   teardown_env_setup
 }
@@ -157,10 +158,11 @@ teardown_remote_env() {
   setup_remote_env
   touch "$WORK_DIR/repo/.env.remote"
   unset DOTENV_PRIVATE_KEY_REMOTE
+  unset DOTENV_PRIVATE_KEY
 
   run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE not set"* ]]
+  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"* ]]
 
   teardown_remote_env
 }

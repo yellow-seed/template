@@ -34,6 +34,7 @@ GH
   chmod +x "$WORK_DIR/bin/gh"
 
   export PATH="$WORK_DIR/bin:$PATH"
+  export GH_TOKEN="test-token"
   export REMOTE_ENV_VAR="TEST_REMOTE"
   export TEST_REMOTE=true
 }
