@@ -7,6 +7,10 @@ ENV_REMOTE="${REPO_ROOT}/.env.remote"
 ENV_FILE="${REPO_ROOT}/.env"
 CLAUDE_SESSION_ENV_FILE="${CLAUDE_ENV_FILE:-}"
 
+BASHRC="${HOME}/.bashrc"
+BASHRC_BEGIN_MARKER="# BEGIN CLAUDE_REMOTE_ENV"
+BASHRC_END_MARKER="# END CLAUDE_REMOTE_ENV"
+
 LOG_PREFIX="[setup-remote-env]"
 
 log_info() {
@@ -61,7 +65,74 @@ if [[ ":${PATH}:" != *":${LOCAL_BIN}:"* ]]; then
 	export PATH="${LOCAL_BIN}:${PATH}"
 fi
 
+# Write KEY=VALUE pairs from vars_file as export lines into a marked block in ~/.bashrc.
+# Replaces any existing block idempotently.
+write_env_to_bashrc() {
+	local vars_file="$1"
+
+	touch "${BASHRC}"
+
+	local new_block="${BASHRC_BEGIN_MARKER}"$'\n'
+	while IFS='=' read -r key value; do
+		[[ -z ${key} || ${key} == \#* ]] && continue
+		new_block+="export ${key}=\"${value}\""$'\n'
+	done <"${vars_file}"
+	new_block+="${BASHRC_END_MARKER}"
+
+	local tmp_file
+	tmp_file="$(mktemp)"
+
+	awk -v begin="${BASHRC_BEGIN_MARKER}" -v end="${BASHRC_END_MARKER}" '
+		$0 == begin { skip=1; next }
+		$0 == end   { skip=0; next }
+		!skip        { print }
+	' "${BASHRC}" >"${tmp_file}"
+
+	printf '\n%s\n' "${new_block}" >>"${tmp_file}"
+	mv "${tmp_file}" "${BASHRC}"
+
+	log_info "Wrote env vars to ${BASHRC}"
+}
+
+append_once() {
+	local target_file="$1"
+	local line="$2"
+
+	mkdir -p "$(dirname "${target_file}")"
+	touch "${target_file}"
+	if ! grep -qF "${line}" "${target_file}"; then
+		echo "${line}" >>"${target_file}"
+	fi
+}
+
+setup_bashrc_path() {
+	# shellcheck disable=SC2016
+	append_once "${BASHRC}" 'export PATH="$HOME/.local/bin:$PATH"'
+}
+
+write_env_source_to_bashrc() {
+	append_once "${BASHRC}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
+}
+
+write_env_source_to_claude_env_file() {
+	if [[ -z ${CLAUDE_SESSION_ENV_FILE} ]]; then
+		return 0
+	fi
+
+	# shellcheck disable=SC2016
+	append_once "${CLAUDE_SESSION_ENV_FILE}" 'export PATH="$HOME/.local/bin:$PATH"'
+	append_once "${CLAUDE_SESSION_ENV_FILE}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
+}
+
 decrypt_env() {
+	if [[ -s ${ENV_FILE} ]]; then
+		log_info "${ENV_FILE} already exists, syncing ${BASHRC} and skipping env decryption"
+		write_env_to_bashrc "${ENV_FILE}"
+		write_env_source_to_bashrc
+		write_env_source_to_claude_env_file
+		return 0
+	fi
+
 	if [[ ! -f ${ENV_REMOTE} ]]; then
 		log_info ".env.remote not found, skipping env decryption"
 		return 0
@@ -77,27 +148,39 @@ decrypt_env() {
 		return 0
 	fi
 
-	log_info "Decrypting .env.remote..."
+	log_info "Decrypting .env.remote to ${ENV_FILE}..."
 	cd "${REPO_ROOT}"
-	local gh_token
-	if ! gh_token="$(run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx get GH_TOKEN -f .env.remote --strict --no-ops)"; then
-		log_error "dotenvx decryption timed out or failed"
+	local decrypted_env
+	local status=0
+	set +e
+	decrypted_env="$(run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx decrypt -f .env.remote)"
+	status=$?
+	set -e
+	if [[ ${status} -ne 0 ]]; then
+		if [[ ${status} -eq 124 ]]; then
+			log_error "dotenvx decrypt timed out after ${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}s"
+		else
+			log_error "dotenvx decrypt failed with exit code ${status}"
+		fi
 		return 1
 	fi
 
-	if [[ -z ${gh_token} ]]; then
-		log_error "GH_TOKEN is empty in .env.remote"
+	if [[ -z ${decrypted_env} ]]; then
+		log_error "dotenvx decrypt returned empty output"
 		return 1
 	fi
 
 	umask 077
-	printf "GH_TOKEN=%s\n" "${gh_token}" >"${ENV_FILE}"
+	printf '%s\n' "${decrypted_env}" >"${ENV_FILE}"
 
 	if [[ ! -s ${ENV_FILE} ]]; then
-		log_error "failed to generate .env from .env.remote"
+		log_error "failed to generate ${ENV_FILE} from ${ENV_REMOTE}"
 		return 1
 	fi
 
+	write_env_to_bashrc "${ENV_FILE}"
+	write_env_source_to_bashrc
+	write_env_source_to_claude_env_file
 	log_info "Generated ${ENV_FILE}"
 }
 
@@ -113,40 +196,12 @@ source_env() {
 	log_info "Sourced ${ENV_FILE}"
 }
 
-append_once() {
-	local target_file="$1"
-	local line="$2"
-
-	mkdir -p "$(dirname "${target_file}")"
-	touch "${target_file}"
-	if ! grep -qF "${line}" "${target_file}"; then
-		echo "${line}" >>"${target_file}"
-	fi
-}
-
-setup_bashrc() {
-	local bashrc="${HOME}/.bashrc"
-
-	# shellcheck disable=SC2016
-	append_once "${bashrc}" 'export PATH="$HOME/.local/bin:$PATH"'
-	append_once "${bashrc}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
-}
-
-setup_claude_env_file() {
-	if [[ -z ${CLAUDE_SESSION_ENV_FILE} ]]; then
-		return 0
-	fi
-
-	# shellcheck disable=SC2016
-	append_once "${CLAUDE_SESSION_ENV_FILE}" 'export PATH="$HOME/.local/bin:$PATH"'
-	append_once "${CLAUDE_SESSION_ENV_FILE}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
-}
+setup_bashrc_path
 
 if ! decrypt_env; then
 	log_error "env decryption failed, continuing without remote env"
 fi
 source_env
-setup_bashrc
-setup_claude_env_file
+write_env_source_to_claude_env_file
 
 log_info "Remote env setup completed."

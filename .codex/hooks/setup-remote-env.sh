@@ -113,7 +113,9 @@ write_env_source_to_bashrc() {
 
 decrypt_env() {
 	if [[ -s ${ENV_FILE} ]]; then
-		log_info "${ENV_FILE} already exists, skipping env decryption"
+		log_info "${ENV_FILE} already exists, syncing ${BASHRC} and skipping env decryption"
+		write_env_to_bashrc "${ENV_FILE}"
+		write_env_source_to_bashrc
 		return 0
 	fi
 
@@ -132,24 +134,33 @@ decrypt_env() {
 		return 0
 	fi
 
-	log_info "Decrypting .env.remote..."
+	log_info "Decrypting .env.remote to ${ENV_FILE}..."
 	cd "${REPO_ROOT}"
-	local gh_token
-	if ! gh_token="$(run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx get GH_TOKEN -f .env.remote --strict --no-ops)"; then
-		log_error "dotenvx decryption timed out or failed"
+	local decrypted_env
+	local status=0
+	set +e
+	decrypted_env="$(run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx decrypt -f .env.remote)"
+	status=$?
+	set -e
+	if [[ ${status} -ne 0 ]]; then
+		if [[ ${status} -eq 124 ]]; then
+			log_error "dotenvx decrypt timed out after ${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}s"
+		else
+			log_error "dotenvx decrypt failed with exit code ${status}"
+		fi
 		return 1
 	fi
 
-	if [[ -z ${gh_token} ]]; then
-		log_error "GH_TOKEN is empty in .env.remote"
+	if [[ -z ${decrypted_env} ]]; then
+		log_error "dotenvx decrypt returned empty output"
 		return 1
 	fi
 
 	umask 077
-	printf "GH_TOKEN=%s\n" "${gh_token}" >"${ENV_FILE}"
+	printf '%s\n' "${decrypted_env}" >"${ENV_FILE}"
 
 	if [[ ! -s ${ENV_FILE} ]]; then
-		log_error "failed to generate .env from .env.remote"
+		log_error "failed to generate ${ENV_FILE} from ${ENV_REMOTE}"
 		return 1
 	fi
 
