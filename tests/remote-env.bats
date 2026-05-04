@@ -203,7 +203,7 @@ teardown_remote_env() {
   teardown_remote_env
 }
 
-@test "setup-remote-env fails fast when dotenvx decryption hangs" {
+@test "setup-remote-env logs warning and continues when dotenvx decryption times out" {
   setup_remote_env
   touch "$WORK_DIR/repo/.env.remote"
 
@@ -216,7 +216,7 @@ DOTENVX
   export SETUP_REMOTE_ENV_TIMEOUT_SECONDS=1
 
   run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
-  [ "$status" -ne 0 ]
+  [ "$status" -eq 0 ]
   [[ "$output" == *"timed out"* ]]
 
   teardown_remote_env

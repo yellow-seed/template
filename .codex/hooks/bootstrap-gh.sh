@@ -72,8 +72,8 @@ ARCHIVE="gh_${VERSION}_${OS}_${ARCH}.${EXT}"
 DOWNLOAD_URL="https://github.com/cli/cli/releases/download/v${VERSION}/${ARCHIVE}"
 
 if ! curl -sfLS "${DOWNLOAD_URL}" -o "${TMP_DIR}/${ARCHIVE}"; then
-	log_error "Failed to download gh from ${DOWNLOAD_URL}"
-	exit 1
+	log_error "Failed to download gh from ${DOWNLOAD_URL} (startup will continue without gh)"
+	exit 0
 fi
 
 if [[ ${EXT} == "zip" ]]; then
@@ -87,6 +87,6 @@ chmod +x "${INSTALL_DIR}/gh"
 if command -v gh >/dev/null 2>&1; then
 	log_info "gh installed: $(gh --version 2>&1 | head -1)"
 else
-	log_error "gh not found after install"
-	exit 1
+	log_error "gh not found after install (startup will continue without gh)"
+	exit 0
 fi
