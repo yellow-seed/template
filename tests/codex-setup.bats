@@ -23,6 +23,7 @@ setup() {
     "$WORK_DIR/.codex/hooks/env-setup.sh" \
     "$WORK_DIR/.codex/hooks/bootstrap-dotenvx.sh" \
     "$WORK_DIR/.codex/hooks/bootstrap-gh.sh" \
+    "$WORK_DIR/.codex/hooks/restore-env.sh" \
     "$WORK_DIR/.codex/hooks/setup-remote-env.sh" \
     "$WORK_DIR/.claude/hooks/skills-setup.sh" \
     "$WORK_DIR/scripts/setup-git-hooks.sh" \

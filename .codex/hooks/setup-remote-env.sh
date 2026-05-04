@@ -73,9 +73,9 @@ write_env_to_bashrc() {
 
 	local new_block="${BASHRC_BEGIN_MARKER}"$'\n'
 	while IFS='=' read -r key value; do
-		[[ -z "${key}" || "${key}" == \#* ]] && continue
+		[[ -z ${key} || ${key} == \#* ]] && continue
 		new_block+="export ${key}=\"${value}\""$'\n'
-	done < "${vars_file}"
+	done <"${vars_file}"
 	new_block+="${BASHRC_END_MARKER}"
 
 	local tmp_file
@@ -85,12 +85,30 @@ write_env_to_bashrc() {
 		$0 == begin { skip=1; next }
 		$0 == end   { skip=0; next }
 		!skip        { print }
-	' "${BASHRC}" > "${tmp_file}"
+	' "${BASHRC}" >"${tmp_file}"
 
-	printf '\n%s\n' "${new_block}" >> "${tmp_file}"
+	printf '\n%s\n' "${new_block}" >>"${tmp_file}"
 	mv "${tmp_file}" "${BASHRC}"
 
 	log_info "Wrote env vars to ${BASHRC}"
+}
+
+setup_bashrc_path() {
+	mkdir -p "${HOME}"
+	touch "${BASHRC}"
+	# shellcheck disable=SC2016
+	local path_line='export PATH="$HOME/.local/bin:$PATH"'
+	if ! grep -qF "${path_line}" "${BASHRC}"; then
+		printf '\n%s\n' "${path_line}" >>"${BASHRC}"
+		log_info "Added ~/.local/bin to PATH in ~/.bashrc"
+	fi
+}
+
+write_env_source_to_bashrc() {
+	if ! grep -qF "${ENV_FILE}" "${BASHRC}"; then
+		printf '\n[ -f %s ] && . %s\n' "${ENV_FILE}" "${ENV_FILE}" >>"${BASHRC}"
+		log_info "Added .env source to ~/.bashrc"
+	fi
 }
 
 decrypt_env() {
@@ -128,7 +146,7 @@ decrypt_env() {
 	fi
 
 	umask 077
-	printf "GH_TOKEN=%s\n" "${gh_token}" > "${ENV_FILE}"
+	printf "GH_TOKEN=%s\n" "${gh_token}" >"${ENV_FILE}"
 
 	if [[ ! -s ${ENV_FILE} ]]; then
 		log_error "failed to generate .env from .env.remote"
@@ -136,6 +154,7 @@ decrypt_env() {
 	fi
 
 	write_env_to_bashrc "${ENV_FILE}"
+	write_env_source_to_bashrc
 	log_info "Generated ${ENV_FILE}"
 }
 
@@ -150,6 +169,8 @@ source_env() {
 	set +a
 	log_info "Sourced ${ENV_FILE}"
 }
+
+setup_bashrc_path
 
 if ! decrypt_env; then
 	log_error "env decryption failed, continuing without remote env"
