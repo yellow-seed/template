@@ -22,6 +22,8 @@ setup() {
 	cat >"$WORK_DIR/scripts/installers/mise.sh" <<SCRIPT
 #!/bin/bash
 echo "mise.sh" >>"$CALL_LOG"
+echo "installer MISE_YES=\${MISE_YES:-}" >>"$CALL_LOG"
+echo "installer MISE_TRUSTED_CONFIG_PATHS=\${MISE_TRUSTED_CONFIG_PATHS:-}" >>"$CALL_LOG"
 cat >"\$HOME/.local/bin/mise" <<'MISE'
 #!/bin/bash
 echo "mise \$*" >>"$CALL_LOG"
@@ -63,8 +65,24 @@ teardown() {
 	[ "$status" -eq 0 ]
 }
 
+@test "install-tools trusts repo mise config before install" {
+	touch "$WORK_DIR/.mise.toml"
+
+	run bash "$WORK_DIR/scripts/install-tools.sh"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx "mise trust --yes $WORK_DIR/.mise.toml" "$CALL_LOG"
+	[ "$status" -eq 0 ]
+}
+
 @test "install-tools makes mise install non-interactive and trusts repo config" {
 	run bash "$WORK_DIR/scripts/install-tools.sh"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx "installer MISE_YES=1" "$CALL_LOG"
+	[ "$status" -eq 0 ]
+
+	run grep -Fx "installer MISE_TRUSTED_CONFIG_PATHS=$WORK_DIR" "$CALL_LOG"
 	[ "$status" -eq 0 ]
 
 	run grep -Fx "MISE_YES=1" "$CALL_LOG"

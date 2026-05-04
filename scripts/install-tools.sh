@@ -52,17 +52,31 @@ run_step() {
 install_mise_tools() {
 	(
 		cd "$REPO_ROOT"
-		export MISE_YES=1
-		export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:+${MISE_TRUSTED_CONFIG_PATHS}:}${REPO_ROOT}"
 		mise install
 	)
 }
 
+trust_mise_config() {
+	if [[ ! -f "$REPO_ROOT/.mise.toml" ]]; then
+		return 0
+	fi
+
+	(
+		cd "$REPO_ROOT"
+		mise trust --yes "$REPO_ROOT/.mise.toml"
+	)
+}
+
 main() {
+	export MISE_YES=1
+	export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:+${MISE_TRUSTED_CONFIG_PATHS}:}${REPO_ROOT}"
+
 	run_step "Installing mise..." bash "$ORCHESTRATOR_DIR/installers/mise.sh"
 
 	local mise_bin="$HOME/.local/bin"
 	append_path "$mise_bin"
+
+	run_step "Trusting mise config..." trust_mise_config
 
 	run_step "Installing tools via mise..." install_mise_tools
 
