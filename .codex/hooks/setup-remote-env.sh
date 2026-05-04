@@ -6,6 +6,10 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 ENV_REMOTE="${REPO_ROOT}/.env.remote"
 ENV_FILE="${REPO_ROOT}/.env"
 
+BASHRC="${HOME}/.bashrc"
+BASHRC_BEGIN_MARKER="# BEGIN CODEX_REMOTE_ENV"
+BASHRC_END_MARKER="# END CODEX_REMOTE_ENV"
+
 LOG_PREFIX="[setup-remote-env]"
 
 log_info() {
@@ -60,6 +64,75 @@ if [[ ":${PATH}:" != *":${LOCAL_BIN}:"* ]]; then
 	export PATH="${LOCAL_BIN}:${PATH}"
 fi
 
+# Extract KEY=VALUE lines from the CODEX_REMOTE_ENV block in ~/.bashrc.
+# Outputs nothing and returns 1 if the block is absent or empty.
+extract_env_from_bashrc() {
+	[[ ! -f "${BASHRC}" ]] && return 1
+
+	local in_block=0
+	local found=0
+	while IFS= read -r line; do
+		if [[ "${line}" == "${BASHRC_BEGIN_MARKER}" ]]; then
+			in_block=1
+			continue
+		fi
+		if [[ "${line}" == "${BASHRC_END_MARKER}" ]]; then
+			in_block=0
+			continue
+		fi
+		if [[ ${in_block} -eq 1 && "${line}" =~ ^export\ ([A-Z_]+)=\"(.*)\"$ ]]; then
+			printf '%s=%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
+			found=1
+		fi
+	done < "${BASHRC}"
+
+	[[ ${found} -eq 1 ]]
+}
+
+# Write KEY=VALUE pairs from vars_file as export lines into a marked block in ~/.bashrc.
+# Replaces any existing block idempotently.
+write_env_to_bashrc() {
+	local vars_file="$1"
+
+	touch "${BASHRC}"
+
+	local new_block="${BASHRC_BEGIN_MARKER}"$'\n'
+	while IFS='=' read -r key value; do
+		[[ -z "${key}" || "${key}" == \#* ]] && continue
+		new_block+="export ${key}=\"${value}\""$'\n'
+	done < "${vars_file}"
+	new_block+="${BASHRC_END_MARKER}"
+
+	local tmp_file
+	tmp_file="$(mktemp)"
+
+	awk -v begin="${BASHRC_BEGIN_MARKER}" -v end="${BASHRC_END_MARKER}" '
+		$0 == begin { skip=1; next }
+		$0 == end   { skip=0; next }
+		!skip        { print }
+	' "${BASHRC}" > "${tmp_file}"
+
+	printf '\n%s\n' "${new_block}" >> "${tmp_file}"
+	mv "${tmp_file}" "${BASHRC}"
+
+	log_info "Wrote env vars to ${BASHRC}"
+}
+
+# Try to restore .env from the CODEX_REMOTE_ENV block in ~/.bashrc.
+# Returns 1 if the block is absent or empty.
+restore_env_from_bashrc() {
+	local env_content
+	env_content="$(extract_env_from_bashrc)" || return 1
+
+	if [[ -z "${env_content}" ]]; then
+		return 1
+	fi
+
+	umask 077
+	printf '%s\n' "${env_content}" > "${ENV_FILE}"
+	log_info "Restored ${ENV_FILE} from ${BASHRC}"
+}
+
 decrypt_env() {
 	if [[ ! -f ${ENV_REMOTE} ]]; then
 		log_info ".env.remote not found, skipping env decryption"
@@ -90,13 +163,14 @@ decrypt_env() {
 	fi
 
 	umask 077
-	printf "GH_TOKEN=%s\n" "${gh_token}" >"${ENV_FILE}"
+	printf "GH_TOKEN=%s\n" "${gh_token}" > "${ENV_FILE}"
 
 	if [[ ! -s ${ENV_FILE} ]]; then
 		log_error "failed to generate .env from .env.remote"
 		return 1
 	fi
 
+	write_env_to_bashrc "${ENV_FILE}"
 	log_info "Generated ${ENV_FILE}"
 }
 
@@ -113,26 +187,24 @@ source_env() {
 }
 
 setup_bashrc() {
-	local bashrc="${HOME}/.bashrc"
 	mkdir -p "${HOME}"
-	touch "${bashrc}"
+	touch "${BASHRC}"
 
 	# shellcheck disable=SC2016
-	if ! grep -qF 'export PATH="$HOME/.local/bin:$PATH"' "${bashrc}"; then
+	if ! grep -qF 'export PATH="$HOME/.local/bin:$PATH"' "${BASHRC}"; then
 		# shellcheck disable=SC2016
-		echo 'export PATH="$HOME/.local/bin:$PATH"' >>"${bashrc}"
+		echo 'export PATH="$HOME/.local/bin:$PATH"' >> "${BASHRC}"
 		log_info "Added ~/.local/bin to PATH in ~/.bashrc"
-	fi
-
-	if ! grep -qF "${ENV_FILE}" "${bashrc}"; then
-		echo "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi" >>"${bashrc}"
-		log_info "Added .env source to ~/.bashrc"
 	fi
 }
 
-if ! decrypt_env; then
+# Restore from ~/.bashrc if possible; fall back to dotenvx decryption.
+if restore_env_from_bashrc; then
+	log_info "Restored env from ${BASHRC}"
+elif ! decrypt_env; then
 	log_error "env decryption failed, continuing without remote env"
 fi
+
 source_env
 setup_bashrc
 

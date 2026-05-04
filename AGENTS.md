@@ -65,8 +65,15 @@ Codex Web では `CODEX_REMOTE=true` の環境で `.codex/hooks/codex-setup.sh` 
 3. `.codex/hooks/setup-remote-env.sh`
 4. `.codex/hooks/gh-setup.sh`
 
-`setup-remote-env.sh` は `.env.remote` と `DOTENV_PRIVATE_KEY_REMOTE`（または `DOTENV_PRIVATE_KEY`）があり、`dotenvx` を利用できる場合に AI 作業用の `.env` を生成し、`GH_TOKEN` を source できる状態にします。
+`setup-remote-env.sh` は次の順序で環境変数を復元します。
+
+1. **`~/.bashrc` から復元（優先）**: `~/.bashrc` に `# BEGIN CODEX_REMOTE_ENV` ブロックがあれば、そこから `.env` を再生成します。2 回目以降のセッションではこのパスが使われます。
+2. **dotenvx で復号（フォールバック）**: ブロックがない場合、`.env.remote` と `DOTENV_PRIVATE_KEY_REMOTE`（または `DOTENV_PRIVATE_KEY`）を使って復号し、`.env` を生成します。復号後は `~/.bashrc` にもブロックとして書き込み、次回以降のセッションで使えるようにします。
+
 条件が揃わない場合は復号をスキップするため、Codex Web 側 secret / environment variable に remote 用の復号鍵が登録されていることを確認してください。
+
+`.env` が失われたが `~/.bashrc` にブロックが残っている場合は、`.codex/hooks/restore-env.sh` を直接実行して `.env` を復元できます。
+
 `gh-setup.sh` は、先に用意された `gh` と `GH_TOKEN` または認証済みの `gh` を前提に GitHub CLI extensions などを設定します。
 
 ## コーディング規約
