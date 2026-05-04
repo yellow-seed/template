@@ -37,8 +37,19 @@ setup_env_from_remote() {
 
 	log_info "Decrypting .env.remote..."
 	cd "${REPO_ROOT}"
-	# shellcheck disable=SC2016
-	dotenvx run -f .env.remote -- sh -c 'umask 077; printf "GH_TOKEN=%s\n" "$GH_TOKEN" > .env'
+	local gh_token
+	if ! gh_token="$(dotenvx get GH_TOKEN -f .env.remote --strict --no-ops)"; then
+		log_error "failed to read GH_TOKEN from .env.remote"
+		return 1
+	fi
+
+	if [[ -z ${gh_token} ]]; then
+		log_error "GH_TOKEN is empty in .env.remote"
+		return 1
+	fi
+
+	umask 077
+	printf "GH_TOKEN=%s\n" "${gh_token}" >"${env_file}"
 
 	if [[ ! -s ${env_file} ]]; then
 		log_error "failed to generate .env from .env.remote"

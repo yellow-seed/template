@@ -10,13 +10,12 @@ make_dotenvx_stub() {
 #!/bin/bash
 set -euo pipefail
 
-if [ "$1" != "run" ] || [ "$2" != "-f" ] || [ "$3" != ".env.remote" ] || [ "$4" != "--" ]; then
+if [ "$1" != "get" ] || [ "$2" != "GH_TOKEN" ] || [ "$3" != "-f" ] || [ "$4" != ".env.remote" ] || [ "$5" != "--strict" ] || [ "$6" != "--no-ops" ]; then
   printf 'unexpected dotenvx args: %s\n' "$*" >&2
   exit 2
 fi
 
-shift 4
-GH_TOKEN="remote-token" EXTRA_SECRET="hidden" "$@"
+printf '%s\n' "remote-token"
 DOTENVX
   chmod +x "$bin_dir/dotenvx"
 }

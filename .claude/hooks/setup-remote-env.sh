@@ -79,11 +79,19 @@ decrypt_env() {
 
 	log_info "Decrypting .env.remote..."
 	cd "${REPO_ROOT}"
-	# shellcheck disable=SC2016
-	if ! run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx run -f .env.remote -- sh -c 'umask 077; printf "GH_TOKEN=%s\n" "$GH_TOKEN" > .env'; then
+	local gh_token
+	if ! gh_token="$(run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx get GH_TOKEN -f .env.remote --strict --no-ops)"; then
 		log_error "dotenvx decryption timed out or failed"
 		return 1
 	fi
+
+	if [[ -z ${gh_token} ]]; then
+		log_error "GH_TOKEN is empty in .env.remote"
+		return 1
+	fi
+
+	umask 077
+	printf "GH_TOKEN=%s\n" "${gh_token}" >"${ENV_FILE}"
 
 	if [[ ! -s ${ENV_FILE} ]]; then
 		log_error "failed to generate .env from .env.remote"
