@@ -64,6 +64,9 @@ setup_env_from_remote() {
 	set +a
 }
 
+log_info "Installing tools..."
+bash "${SCRIPT_DIR}/install-tools.sh"
+
 log_info "Setting up environment from remote..."
 setup_env_from_remote
 

@@ -34,6 +34,21 @@ install_gh_extensions() {
 	install_gh_extension "${gh_cmd}" "harakeishi/gh-discussion"
 }
 
+can_install_gh_extensions() {
+	local gh_cmd="$1"
+
+	if [[ -n ${GH_TOKEN:-} ]]; then
+		return 0
+	fi
+
+	if "${gh_cmd}" auth status >/dev/null 2>&1; then
+		return 0
+	fi
+
+	log_info "GH_TOKEN is not set and gh is not authenticated; skipping gh extension setup"
+	return 1
+}
+
 if [[ -z ${REMOTE_ENV_VAR:-} ]]; then
 	log_info "REMOTE_ENV_VAR is not set, skipping gh setup"
 	exit 0
@@ -60,9 +75,6 @@ fi
 
 log_info "gh CLI available: $(gh --version | head -1)"
 
-if [[ -z ${GH_TOKEN:-} ]]; then
-	log_info "GH_TOKEN is not set; skipping gh extension setup"
-	exit 0
+if can_install_gh_extensions "gh"; then
+	install_gh_extensions "gh"
 fi
-
-install_gh_extensions "gh"

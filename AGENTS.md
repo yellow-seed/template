@@ -65,8 +65,9 @@ Codex Web では `CODEX_REMOTE=true` の環境で `.codex/hooks/codex-setup.sh` 
 3. `.codex/hooks/setup-remote-env.sh`
 4. `.codex/hooks/gh-setup.sh`
 
-`setup-remote-env.sh` は `.env.remote` から AI 作業用の `.env` を生成し、`GH_TOKEN` を source できる状態にします。
-`gh-setup.sh` は、先に用意された `gh` と `GH_TOKEN` を前提に GitHub CLI extensions などを設定します。
+`setup-remote-env.sh` は `.env.remote` と `DOTENV_PRIVATE_KEY_REMOTE`（または `DOTENV_PRIVATE_KEY`）があり、`dotenvx` を利用できる場合に AI 作業用の `.env` を生成し、`GH_TOKEN` を source できる状態にします。
+条件が揃わない場合は復号をスキップするため、Codex Web 側 secret / environment variable に remote 用の復号鍵が登録されていることを確認してください。
+`gh-setup.sh` は、先に用意された `gh` と `GH_TOKEN` または認証済みの `gh` を前提に GitHub CLI extensions などを設定します。
 
 ## コーディング規約
 
