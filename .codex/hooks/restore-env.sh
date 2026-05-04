@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Maintenance script: restore .env from the CODEX_REMOTE_ENV block in ~/.bashrc.
-# Use this on sessions where .env was lost but ~/.bashrc still has the env vars.
+# Restore .env from the CODEX_REMOTE_ENV block in ~/.bashrc.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -15,11 +14,6 @@ LOG_PREFIX="[restore-env]"
 log_info() {
 	local message="$1"
 	echo "${LOG_PREFIX} ${message}" >&2
-}
-
-log_error() {
-	local message="$1"
-	echo "${LOG_PREFIX} ERROR: ${message}" >&2
 }
 
 extract_env_from_bashrc() {
@@ -46,13 +40,13 @@ extract_env_from_bashrc() {
 }
 
 env_content="$(extract_env_from_bashrc)" || {
-	log_error "No CODEX_REMOTE_ENV block found in ${BASHRC}"
-	exit 1
+	log_info "No CODEX_REMOTE_ENV block found in ${BASHRC}, skipping restore"
+	exit 0
 }
 
 if [[ -z "${env_content}" ]]; then
-	log_error "CODEX_REMOTE_ENV block in ${BASHRC} is empty"
-	exit 1
+	log_info "CODEX_REMOTE_ENV block in ${BASHRC} is empty, skipping restore"
+	exit 0
 fi
 
 umask 077

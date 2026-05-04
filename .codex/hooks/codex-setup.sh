@@ -18,6 +18,19 @@ ensure_local_bin_in_path() {
 	fi
 }
 
+setup_bashrc_path() {
+	local bashrc="${HOME}/.bashrc"
+	mkdir -p "${HOME}"
+	touch "${bashrc}"
+
+	# shellcheck disable=SC2016
+	if ! grep -qF 'export PATH="$HOME/.local/bin:$PATH"' "${bashrc}"; then
+		# shellcheck disable=SC2016
+		echo 'export PATH="$HOME/.local/bin:$PATH"' >> "${bashrc}"
+		log_info "Added ~/.local/bin to PATH in ~/.bashrc"
+	fi
+}
+
 source_repo_env() {
 	local env_file="${REPO_ROOT}/.env"
 	if [[ -f ${env_file} ]]; then
@@ -28,11 +41,22 @@ source_repo_env() {
 	fi
 }
 
+setup_remote_env() {
+	log_info "Restoring remote environment from ~/.bashrc..."
+	bash "${REPO_ROOT}/.codex/hooks/restore-env.sh"
+
+	log_info "Setting up remote environment from dotenvx if needed..."
+	bash "${REPO_ROOT}/.codex/hooks/setup-remote-env.sh"
+	source_repo_env
+}
+
 setup_default() {
 	if [[ ${CODEX_REMOTE:-} == "true" ]]; then
 		log_info "Removing git remote origin..."
 		git -C "${REPO_ROOT}" remote remove origin 2>/dev/null || true
 	fi
+
+	setup_bashrc_path
 
 	log_info "Bootstrapping dotenvx..."
 	bash "${REPO_ROOT}/.codex/hooks/bootstrap-dotenvx.sh"
@@ -42,8 +66,7 @@ setup_default() {
 	ensure_local_bin_in_path
 
 	log_info "Setting up remote environment..."
-	bash "${REPO_ROOT}/.codex/hooks/setup-remote-env.sh"
-	source_repo_env
+	setup_remote_env
 
 	log_info "Running gh CLI setup..."
 	bash "${REPO_ROOT}/.codex/hooks/gh-setup.sh"
@@ -63,13 +86,14 @@ setup_full() {
 }
 
 setup_session() {
+	setup_bashrc_path
+
 	log_info "Bootstrapping gh..."
 	bash "${REPO_ROOT}/.codex/hooks/bootstrap-gh.sh"
 	ensure_local_bin_in_path
 
 	log_info "Setting up remote environment..."
-	bash "${REPO_ROOT}/.codex/hooks/setup-remote-env.sh"
-	source_repo_env
+	setup_remote_env
 
 	log_info "Syncing skills directory..."
 	bash "${REPO_ROOT}/.claude/hooks/skills-setup.sh"
