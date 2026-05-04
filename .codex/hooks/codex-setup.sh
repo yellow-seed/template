@@ -26,7 +26,7 @@ setup_bashrc_path() {
 	# shellcheck disable=SC2016
 	if ! grep -qF 'export PATH="$HOME/.local/bin:$PATH"' "${bashrc}"; then
 		# shellcheck disable=SC2016
-		echo 'export PATH="$HOME/.local/bin:$PATH"' >> "${bashrc}"
+		echo 'export PATH="$HOME/.local/bin:$PATH"' >>"${bashrc}"
 		log_info "Added ~/.local/bin to PATH in ~/.bashrc"
 	fi
 }

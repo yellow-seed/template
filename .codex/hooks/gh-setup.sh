@@ -4,7 +4,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ENV_FILE_PATH="${CODEX_ENV_FILE:-${REPO_ROOT}/.env}"
 
-if [[ -f "${ENV_FILE_PATH}" ]]; then
+if [[ -f ${ENV_FILE_PATH} ]]; then
 	set -a
 	# shellcheck source=/dev/null
 	. "${ENV_FILE_PATH}"
