@@ -6,6 +6,10 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 ENV_REMOTE="${REPO_ROOT}/.env.remote"
 ENV_FILE="${REPO_ROOT}/.env"
 
+BASHRC="${HOME}/.bashrc"
+BASHRC_BEGIN_MARKER="# BEGIN CODEX_REMOTE_ENV"
+BASHRC_END_MARKER="# END CODEX_REMOTE_ENV"
+
 LOG_PREFIX="[setup-remote-env]"
 
 log_info() {
@@ -60,7 +64,59 @@ if [[ ":${PATH}:" != *":${LOCAL_BIN}:"* ]]; then
 	export PATH="${LOCAL_BIN}:${PATH}"
 fi
 
+# Write KEY=VALUE pairs from vars_file as export lines into a marked block in ~/.bashrc.
+# Replaces any existing block idempotently.
+write_env_to_bashrc() {
+	local vars_file="$1"
+
+	touch "${BASHRC}"
+
+	local new_block="${BASHRC_BEGIN_MARKER}"$'\n'
+	while IFS='=' read -r key value; do
+		[[ -z ${key} || ${key} == \#* ]] && continue
+		new_block+="export ${key}=\"${value}\""$'\n'
+	done <"${vars_file}"
+	new_block+="${BASHRC_END_MARKER}"
+
+	local tmp_file
+	tmp_file="$(mktemp)"
+
+	awk -v begin="${BASHRC_BEGIN_MARKER}" -v end="${BASHRC_END_MARKER}" '
+		$0 == begin { skip=1; next }
+		$0 == end   { skip=0; next }
+		!skip        { print }
+	' "${BASHRC}" >"${tmp_file}"
+
+	printf '\n%s\n' "${new_block}" >>"${tmp_file}"
+	mv "${tmp_file}" "${BASHRC}"
+
+	log_info "Wrote env vars to ${BASHRC}"
+}
+
+setup_bashrc_path() {
+	mkdir -p "${HOME}"
+	touch "${BASHRC}"
+	# shellcheck disable=SC2016
+	local path_line='export PATH="$HOME/.local/bin:$PATH"'
+	if ! grep -qF "${path_line}" "${BASHRC}"; then
+		printf '\n%s\n' "${path_line}" >>"${BASHRC}"
+		log_info "Added ~/.local/bin to PATH in ~/.bashrc"
+	fi
+}
+
+write_env_source_to_bashrc() {
+	if ! grep -qF "${ENV_FILE}" "${BASHRC}"; then
+		printf '\n[ -f %s ] && . %s\n' "${ENV_FILE}" "${ENV_FILE}" >>"${BASHRC}"
+		log_info "Added .env source to ~/.bashrc"
+	fi
+}
+
 decrypt_env() {
+	if [[ -s ${ENV_FILE} ]]; then
+		log_info "${ENV_FILE} already exists, skipping env decryption"
+		return 0
+	fi
+
 	if [[ ! -f ${ENV_REMOTE} ]]; then
 		log_info ".env.remote not found, skipping env decryption"
 		return 0
@@ -97,6 +153,8 @@ decrypt_env() {
 		return 1
 	fi
 
+	write_env_to_bashrc "${ENV_FILE}"
+	write_env_source_to_bashrc
 	log_info "Generated ${ENV_FILE}"
 }
 
@@ -112,28 +170,12 @@ source_env() {
 	log_info "Sourced ${ENV_FILE}"
 }
 
-setup_bashrc() {
-	local bashrc="${HOME}/.bashrc"
-	mkdir -p "${HOME}"
-	touch "${bashrc}"
-
-	# shellcheck disable=SC2016
-	if ! grep -qF 'export PATH="$HOME/.local/bin:$PATH"' "${bashrc}"; then
-		# shellcheck disable=SC2016
-		echo 'export PATH="$HOME/.local/bin:$PATH"' >>"${bashrc}"
-		log_info "Added ~/.local/bin to PATH in ~/.bashrc"
-	fi
-
-	if ! grep -qF "${ENV_FILE}" "${bashrc}"; then
-		echo "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi" >>"${bashrc}"
-		log_info "Added .env source to ~/.bashrc"
-	fi
-}
+setup_bashrc_path
 
 if ! decrypt_env; then
 	log_error "env decryption failed, continuing without remote env"
 fi
+
 source_env
-setup_bashrc
 
 log_info "Remote env setup completed."

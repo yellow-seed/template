@@ -57,16 +57,16 @@ dotenvx の新規導入、環境変数の追加、値の変更、ローテーシ
 
 ### Codex Web セットアップ確認
 
-Codex Web では `CODEX_REMOTE=true` の環境で `.codex/hooks/codex-setup.sh` を起点に bash のセットアップスクリプトを読みます。
-`default` / `full` profile では、次の順序で remote 環境を準備します。
+Codex Cloud environment settings の setup script には、remote 環境に必要な処理だけを明示的に登録します。
 
-1. `.codex/hooks/bootstrap-dotenvx.sh`
-2. `.codex/hooks/bootstrap-gh.sh`
-3. `.codex/hooks/setup-remote-env.sh`
-4. `.codex/hooks/gh-setup.sh`
+```bash
+bash .codex/hooks/bootstrap-dotenvx.sh
+bash .codex/hooks/bootstrap-gh.sh
+bash .codex/hooks/restore-env.sh
+bash .codex/hooks/setup-remote-env.sh
+bash .codex/hooks/gh-setup.sh
+```
 
-`setup-remote-env.sh` は `.env.remote` と `DOTENV_PRIVATE_KEY_REMOTE`（または `DOTENV_PRIVATE_KEY`）があり、`dotenvx` を利用できる場合に AI 作業用の `.env` を生成し、`GH_TOKEN` を source できる状態にします。
-条件が揃わない場合は復号をスキップするため、Codex Web 側 secret / environment variable に remote 用の復号鍵が登録されていることを確認してください。
 `gh-setup.sh` は、先に用意された `gh` と `GH_TOKEN` または認証済みの `gh` を前提に GitHub CLI extensions などを設定します。
 
 ## コーディング規約
