@@ -130,7 +130,9 @@ setup_bashrc() {
 	fi
 }
 
-decrypt_env
+if ! decrypt_env; then
+	log_error "env decryption failed, continuing without remote env"
+fi
 source_env
 setup_bashrc
 

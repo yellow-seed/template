@@ -142,7 +142,9 @@ setup_claude_env_file() {
 	append_once "${CLAUDE_SESSION_ENV_FILE}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
 }
 
-decrypt_env
+if ! decrypt_env; then
+	log_error "env decryption failed, continuing without remote env"
+fi
 source_env
 setup_bashrc
 setup_claude_env_file
