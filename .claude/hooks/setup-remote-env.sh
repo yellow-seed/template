@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 ENV_REMOTE="${REPO_ROOT}/.env.remote"
 ENV_FILE="${REPO_ROOT}/.env"
+CLAUDE_SESSION_ENV_FILE="${CLAUDE_ENV_FILE:-}"
 
 LOG_PREFIX="[setup-remote-env]"
 
@@ -104,26 +105,38 @@ source_env() {
 	log_info "Sourced ${ENV_FILE}"
 }
 
+append_once() {
+	local target_file="$1"
+	local line="$2"
+
+	mkdir -p "$(dirname "${target_file}")"
+	touch "${target_file}"
+	if ! grep -qF "${line}" "${target_file}"; then
+		echo "${line}" >>"${target_file}"
+	fi
+}
+
 setup_bashrc() {
 	local bashrc="${HOME}/.bashrc"
-	mkdir -p "${HOME}"
-	touch "${bashrc}"
 
 	# shellcheck disable=SC2016
-	if ! grep -qF 'export PATH="$HOME/.local/bin:$PATH"' "${bashrc}"; then
-		# shellcheck disable=SC2016
-		echo 'export PATH="$HOME/.local/bin:$PATH"' >>"${bashrc}"
-		log_info "Added ~/.local/bin to PATH in ~/.bashrc"
+	append_once "${bashrc}" 'export PATH="$HOME/.local/bin:$PATH"'
+	append_once "${bashrc}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
+}
+
+setup_claude_env_file() {
+	if [[ -z ${CLAUDE_SESSION_ENV_FILE} ]]; then
+		return 0
 	fi
 
-	if ! grep -qF "${ENV_FILE}" "${bashrc}"; then
-		echo "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi" >>"${bashrc}"
-		log_info "Added .env source to ~/.bashrc"
-	fi
+	# shellcheck disable=SC2016
+	append_once "${CLAUDE_SESSION_ENV_FILE}" 'export PATH="$HOME/.local/bin:$PATH"'
+	append_once "${CLAUDE_SESSION_ENV_FILE}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
 }
 
 decrypt_env
 source_env
 setup_bashrc
+setup_claude_env_file
 
 log_info "Remote env setup completed."
