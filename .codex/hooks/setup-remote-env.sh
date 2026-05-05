@@ -17,6 +17,43 @@ log_error() {
 	echo "${LOG_PREFIX} ERROR: ${message}" >&2
 }
 
+run_with_timeout() {
+	local timeout_seconds="$1"
+	shift
+
+	if command -v timeout >/dev/null 2>&1; then
+		timeout --kill-after=1s "${timeout_seconds}" "$@"
+		return "$?"
+	fi
+
+	"$@" &
+	local command_pid="$!"
+
+	(
+		sleep "${timeout_seconds}"
+		if kill -0 "${command_pid}" 2>/dev/null; then
+			kill "${command_pid}" 2>/dev/null || true
+			sleep 1
+			kill -9 "${command_pid}" 2>/dev/null || true
+		fi
+	) &
+	local watchdog_pid="$!"
+
+	local status
+	set +e
+	wait "${command_pid}"
+	status="$?"
+	set -e
+
+	kill "${watchdog_pid}" 2>/dev/null || true
+	wait "${watchdog_pid}" 2>/dev/null || true
+
+	if [[ ${status} -eq 143 || ${status} -eq 137 ]]; then
+		return 124
+	fi
+	return "${status}"
+}
+
 LOCAL_BIN="${HOME}/.local/bin"
 if [[ ":${PATH}:" != *":${LOCAL_BIN}:"* ]]; then
 	export PATH="${LOCAL_BIN}:${PATH}"
@@ -35,11 +72,21 @@ fi
 if [[ -z ${DOTENV_PRIVATE_KEY_REMOTE:-} && -z ${DOTENV_PRIVATE_KEY:-} ]]; then
 	log_error "DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"
 	log_error "remote env must be loaded via dotenvx at command runtime"
-	exit 0
+	exit 1
 fi
 
-if ! (cd "${REPO_ROOT}" && dotenvx decrypt -f .env.remote >/dev/null); then
-	log_error "failed to decrypt .env.remote with current DOTENV_PRIVATE_KEY*"
+decrypt_status=0
+set +e
+(cd "${REPO_ROOT}" && run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx decrypt -f .env.remote >/dev/null)
+decrypt_status=$?
+set -e
+
+if [[ ${decrypt_status} -ne 0 ]]; then
+	if [[ ${decrypt_status} -eq 124 ]]; then
+		log_error "dotenvx decrypt timed out after ${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}s"
+	else
+		log_error "failed to decrypt .env.remote with current DOTENV_PRIVATE_KEY*"
+	fi
 	exit 1
 fi
 
