@@ -1,6 +1,6 @@
 ---
 name: openspec-propose
-description: Propose a new change with all artifacts generated in one step. Use when the user wants to quickly describe what they want to build and get a complete proposal with design, specs, and tasks ready for implementation.
+description: Propose a new change with schema-driven artifacts generated in one step. Use when the user wants to quickly describe what they want to build and get implementation-ready artifacts.
 license: MIT
 compatibility: Requires openspec CLI.
 metadata:
@@ -9,12 +9,11 @@ metadata:
   generatedBy: "1.2.0"
 ---
 
-Propose a new change - create the change and generate all artifacts in one step.
+Propose a new change - create the change and generate the artifacts required by the selected schema.
 
-I'll create a change with artifacts:
-- proposal.md (what & why)
-- design.md (how)
-- tasks.md (implementation steps)
+I'll create artifacts required by the selected schema:
+- rapid (default): proposal.md, tasks.md
+- spec-driven: includes design/spec artifacts in addition to tasks
 
 When ready to implement, run /opsx:apply
 

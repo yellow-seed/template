@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 jobs:
   archive:
@@ -34,7 +35,7 @@ jobs:
       - name: Create branch and commit
         if: steps.changes.outputs.changed == 'true'
         run: |
-          BRANCH="chore/openspec-archive-$(date +%Y-%m)"
+          BRANCH="chore/openspec-archive-$(date +%Y-%m)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b "${BRANCH}"
@@ -57,7 +58,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARCHIVED: ${{ steps.archive.outputs.archived }}
-          DELETED: ${{ steps.archive.outputs.deleted }}
         run: |
           MONTH="$(date +%Y-%m)"
           body_file="$(mktemp)"
@@ -68,7 +68,6 @@ jobs:
             echo "月次 OpenSpec アーカイブ処理を実行しました。"
             echo ""
             echo "- アーカイブした change: ${ARCHIVED} 件"
-            echo "- 削除した archive: ${DELETED} 件"
             echo ""
             echo "## Type of Change"
             echo ""
@@ -77,7 +76,6 @@ jobs:
             echo "## Changes Made"
             echo ""
             echo "- 完了済み change を \`openspec/changes/archive/\` へ移動"
-            echo "- 既存の archive を削除"
             echo ""
             echo "## Testing"
             echo ""
