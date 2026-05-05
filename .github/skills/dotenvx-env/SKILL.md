@@ -71,6 +71,7 @@ local 例（`値` の部分だけ書き換えて実行）:
 ```bash
  dotenvx set VARIABLE_NAME '値' -f .env.local
 ```
+
 ```bash
 mkdir -p secrets && mv .env.keys secrets/.env.local.keys && chmod 600 secrets/.env.local.keys
 ```
@@ -80,6 +81,7 @@ remote 例（`値` の部分だけ書き換えて実行）:
 ```bash
  dotenvx set VARIABLE_NAME '値' -f .env.remote
 ```
+
 ```bash
 mkdir -p secrets && mv .env.keys secrets/.env.remote.keys && chmod 600 secrets/.env.remote.keys
 ```
@@ -107,6 +109,7 @@ local 例（`値` の部分だけ書き換えて実行）:
 ```bash
 set -a; . secrets/.env.local.keys; set +a
 ```
+
 ```bash
  dotenvx set VARIABLE_NAME '値' -f .env.local
 ```
@@ -116,6 +119,7 @@ remote 例（`値` の部分だけ書き換えて実行）:
 ```bash
 set -a; . secrets/.env.remote.keys; set +a
 ```
+
 ```bash
  dotenvx set VARIABLE_NAME '値' -f .env.remote
 ```
@@ -155,17 +159,17 @@ git check-ignore secrets/.env.remote.keys
 git status --short
 ```
 
-Remote AI 環境では、PC(local) / PRD 用の鍵がないことと、必要な作業用 `.env` があることを確認する。
+Remote AI 環境では、PC(local) / PRD 用の鍵がないことと、`dotenvx run` 経由で必要な変数を参照できることを確認する。
 
 ```bash
 env | cut -d= -f1 | grep '^DOTENV_PRIVATE_KEY' || true
-test -s .env
+dotenvx run -f .env.remote -- sh -c 'test -n "${VARIABLE_NAME:-}"'
 ```
 
-変数の存在確認は値を表示しない形で行う。
+変数の存在確認は値を表示せず `dotenvx run` 経由で行う。
 
 ```bash
-grep -q '^VARIABLE_NAME=' .env
+dotenvx run -f .env.remote -- sh -c 'test -n "${VARIABLE_NAME:-}"'
 ```
 
 ## 返答方針
