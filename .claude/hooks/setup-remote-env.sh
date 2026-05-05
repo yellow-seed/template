@@ -4,12 +4,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 ENV_REMOTE="${REPO_ROOT}/.env.remote"
-ENV_FILE="${REPO_ROOT}/.env"
-CLAUDE_SESSION_ENV_FILE="${CLAUDE_ENV_FILE:-}"
-
-BASHRC="${HOME}/.bashrc"
-BASHRC_BEGIN_MARKER="# BEGIN CLAUDE_REMOTE_ENV"
-BASHRC_END_MARKER="# END CLAUDE_REMOTE_ENV"
 
 LOG_PREFIX="[setup-remote-env]"
 
@@ -65,143 +59,36 @@ if [[ ":${PATH}:" != *":${LOCAL_BIN}:"* ]]; then
 	export PATH="${LOCAL_BIN}:${PATH}"
 fi
 
-# Write KEY=VALUE pairs from vars_file as export lines into a marked block in ~/.bashrc.
-# Replaces any existing block idempotently.
-write_env_to_bashrc() {
-	local vars_file="$1"
-
-	touch "${BASHRC}"
-
-	local new_block="${BASHRC_BEGIN_MARKER}"$'\n'
-	while IFS='=' read -r key value; do
-		[[ -z ${key} || ${key} == \#* ]] && continue
-		new_block+="export ${key}=\"${value}\""$'\n'
-	done <"${vars_file}"
-	new_block+="${BASHRC_END_MARKER}"
-
-	local tmp_file
-	tmp_file="$(mktemp)"
-
-	awk -v begin="${BASHRC_BEGIN_MARKER}" -v end="${BASHRC_END_MARKER}" '
-		$0 == begin { skip=1; next }
-		$0 == end   { skip=0; next }
-		!skip        { print }
-	' "${BASHRC}" >"${tmp_file}"
-
-	printf '\n%s\n' "${new_block}" >>"${tmp_file}"
-	mv "${tmp_file}" "${BASHRC}"
-
-	log_info "Wrote env vars to ${BASHRC}"
-}
-
-append_once() {
-	local target_file="$1"
-	local line="$2"
-
-	mkdir -p "$(dirname "${target_file}")"
-	touch "${target_file}"
-	if ! grep -qF "${line}" "${target_file}"; then
-		echo "${line}" >>"${target_file}"
-	fi
-}
-
-setup_bashrc_path() {
-	# shellcheck disable=SC2016
-	append_once "${BASHRC}" 'export PATH="$HOME/.local/bin:$PATH"'
-}
-
-write_env_source_to_bashrc() {
-	append_once "${BASHRC}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
-}
-
-write_env_source_to_claude_env_file() {
-	if [[ -z ${CLAUDE_SESSION_ENV_FILE} ]]; then
-		return 0
-	fi
-
-	# shellcheck disable=SC2016
-	append_once "${CLAUDE_SESSION_ENV_FILE}" 'export PATH="$HOME/.local/bin:$PATH"'
-	append_once "${CLAUDE_SESSION_ENV_FILE}" "if [ -f \"${ENV_FILE}\" ]; then set -a; . \"${ENV_FILE}\"; set +a; fi"
-}
-
-decrypt_env() {
-	if [[ -s ${ENV_FILE} ]]; then
-		log_info "${ENV_FILE} already exists, syncing ${BASHRC} and skipping env decryption"
-		write_env_to_bashrc "${ENV_FILE}"
-		write_env_source_to_bashrc
-		write_env_source_to_claude_env_file
-		return 0
-	fi
-
-	if [[ ! -f ${ENV_REMOTE} ]]; then
-		log_info ".env.remote not found, skipping env decryption"
-		return 0
-	fi
-
-	if [[ -z ${DOTENV_PRIVATE_KEY_REMOTE:-} && -z ${DOTENV_PRIVATE_KEY:-} ]]; then
-		log_info "DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set, skipping env decryption"
-		return 0
-	fi
-
-	if ! command -v dotenvx >/dev/null 2>&1; then
-		log_info "dotenvx not found, skipping env decryption"
-		return 0
-	fi
-
-	log_info "Decrypting .env.remote to ${ENV_FILE}..."
-	cd "${REPO_ROOT}"
-	local decrypted_env
-	local status=0
-	set +e
-	decrypted_env="$(run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx decrypt -f .env.remote)"
-	status=$?
-	set -e
-	if [[ ${status} -ne 0 ]]; then
-		if [[ ${status} -eq 124 ]]; then
-			log_error "dotenvx decrypt timed out after ${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}s"
-		else
-			log_error "dotenvx decrypt failed with exit code ${status}"
-		fi
-		return 1
-	fi
-
-	if [[ -z ${decrypted_env} ]]; then
-		log_error "dotenvx decrypt returned empty output"
-		return 1
-	fi
-
-	umask 077
-	printf '%s\n' "${decrypted_env}" >"${ENV_FILE}"
-
-	if [[ ! -s ${ENV_FILE} ]]; then
-		log_error "failed to generate ${ENV_FILE} from ${ENV_REMOTE}"
-		return 1
-	fi
-
-	write_env_to_bashrc "${ENV_FILE}"
-	write_env_source_to_bashrc
-	write_env_source_to_claude_env_file
-	log_info "Generated ${ENV_FILE}"
-}
-
-source_env() {
-	if [[ ! -f ${ENV_FILE} ]]; then
-		return 0
-	fi
-
-	set -a
-	# shellcheck source=/dev/null
-	. "${ENV_FILE}"
-	set +a
-	log_info "Sourced ${ENV_FILE}"
-}
-
-setup_bashrc_path
-
-if ! decrypt_env; then
-	log_error "env decryption failed, continuing without remote env"
+if [[ ! -f ${ENV_REMOTE} ]]; then
+	log_info ".env.remote not found, skipping remote env setup"
+	exit 0
 fi
-source_env
-write_env_source_to_claude_env_file
 
-log_info "Remote env setup completed."
+if ! command -v dotenvx >/dev/null 2>&1; then
+	log_info "dotenvx not found, skipping remote env setup"
+	exit 0
+fi
+
+if [[ -z ${DOTENV_PRIVATE_KEY_REMOTE:-} && -z ${DOTENV_PRIVATE_KEY:-} ]]; then
+	log_info "DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set, skipping validation"
+	log_info "Use dotenvx run -f .env.remote -- <command> to load remote env at runtime"
+	exit 0
+fi
+
+decrypt_status=0
+set +e
+(cd "${REPO_ROOT}" && run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx decrypt -f .env.remote >/dev/null)
+decrypt_status=$?
+set -e
+
+if [[ ${decrypt_status} -ne 0 ]]; then
+	if [[ ${decrypt_status} -eq 124 ]]; then
+		log_error "dotenvx decrypt timed out after ${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}s"
+	else
+		log_error "failed to decrypt .env.remote with current DOTENV_PRIVATE_KEY*"
+	fi
+	exit 1
+fi
+
+log_info "Validated .env.remote decryption key"
+log_info "Use dotenvx run -f .env.remote -- <command> to load remote env"
