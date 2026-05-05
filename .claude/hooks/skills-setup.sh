@@ -5,20 +5,19 @@
 # This script provides a fallback for environments where symlinks are not supported
 # (e.g., Windows without admin privileges, Git with core.symlinks=false).
 #
-# If .claude/skills or .codex/skills are not directories (e.g., text files containing the symlink path),
-# this script will copy .github/skills to those directories.
+# If .claude/skills is not a directory (e.g., a text file containing the symlink path),
+# this script will copy .agents/skills to that directory.
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 CLAUDE_SKILLS="${REPO_ROOT}/.claude/skills"
-CODEX_SKILLS="${REPO_ROOT}/.codex/skills"
-GITHUB_SKILLS="${REPO_ROOT}/.github/skills"
+AGENTS_SKILLS="${REPO_ROOT}/.agents/skills"
 
-# Check if .github/skills exists
-if [ ! -d "${GITHUB_SKILLS}" ]; then
-	echo "✗ Error: .github/skills directory not found"
+# Check if .agents/skills exists
+if [ ! -d "${AGENTS_SKILLS}" ]; then
+	echo "✗ Error: .agents/skills directory not found"
 	exit 1
 fi
 
@@ -40,18 +39,17 @@ setup_skills_dir() {
 		rm -f "${target_dir}"
 	fi
 
-	# Copy .github/skills to target directory
-	echo "Copying .github/skills to ${dir_name}..."
-	cp -r "${GITHUB_SKILLS}" "${target_dir}"
+	# Copy .agents/skills to target directory
+	echo "Copying .agents/skills to ${dir_name}..."
+	cp -r "${AGENTS_SKILLS}" "${target_dir}"
 
 	echo "✓ Successfully set up ${dir_name}"
 }
 
-# Set up both .claude/skills and .codex/skills
+# Set up .claude/skills
 setup_skills_dir "${CLAUDE_SKILLS}" ".claude/skills"
-setup_skills_dir "${CODEX_SKILLS}" ".codex/skills"
 
 echo ""
-echo "Note: In environments with symlink support, .claude/skills and .codex/skills are symlinks to .github/skills."
+echo "Note: In environments with symlink support, .claude/skills is a symlink to .agents/skills."
 echo "In this environment, they have been created as copies."
-echo "Please ensure to manually sync changes between .github/skills and these directories if needed."
+echo "Please ensure to manually sync changes between .agents/skills and these directories if needed."
