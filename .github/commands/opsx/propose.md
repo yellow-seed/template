@@ -39,6 +39,13 @@ When ready to implement, run /opsx:apply
 
    This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`.
 
+   Default schema is **rapid** (proposal → tasks). For complex changes that need
+   specs and technical design, use `--schema spec-driven` explicitly:
+
+   ```bash
+   openspec new change --schema spec-driven "<name>"
+   ```
+
 3. **Get the artifact build order**
 
    ```bash
