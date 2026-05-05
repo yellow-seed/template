@@ -1,0 +1,91 @@
+name: OpenSpec Monthly Archive
+
+on:
+  schedule:
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  archive:
+    name: Archive completed changes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run archive script
+        id: archive
+        run: bash .github/scripts/openspec-archive.sh
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet HEAD; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create branch and commit
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          BRANCH="chore/openspec-archive-$(date +%Y-%m)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${BRANCH}"
+          git add -A
+          git commit -m "chore: openspec monthly archive $(date +%Y-%m)"
+          git push -u origin "${BRANCH}"
+
+      - name: Ensure openspec-archive label exists
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create "openspec-archive" \
+            --color "0075ca" \
+            --description "Automated OpenSpec archive operation" \
+            2>/dev/null || true
+
+      - name: Create pull request
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARCHIVED: ${{ steps.archive.outputs.archived }}
+          DELETED: ${{ steps.archive.outputs.deleted }}
+        run: |
+          MONTH="$(date +%Y-%m)"
+          gh pr create \
+            --title "chore: openspec monthly archive ${MONTH}" \
+            --label "openspec-archive" \
+            --body "$(cat <<EOF
+## Description
+
+月次 OpenSpec アーカイブ処理を実行しました。
+
+- アーカイブした change: ${ARCHIVED} 件
+- 削除した archive: ${DELETED} 件
+
+## Type of Change
+
+- [x] Documentation update
+
+## Changes Made
+
+- 完了済み change を \`openspec/changes/archive/\` へ移動
+- 既存の archive を削除
+
+## Testing
+
+- [x] 自動化された処理のため手動テスト不要
+
+## Checklist
+
+- [x] 自己レビューを実施しました
+EOF
+)"
