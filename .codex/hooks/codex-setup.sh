@@ -37,11 +37,6 @@ setup_remote_env() {
 }
 
 setup_default() {
-	if [[ ${CODEX_REMOTE:-} == "true" ]]; then
-		log_info "Removing git remote origin..."
-		git -C "${REPO_ROOT}" remote remove origin 2>/dev/null || true
-	fi
-
 	setup_bashrc_path
 
 	log_info "Bootstrapping dotenvx..."

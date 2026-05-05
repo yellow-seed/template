@@ -9,7 +9,7 @@ Issue #207 の方針として、OpenSpec をテンプレートへそのまま導
   - `.github/commands/opsx/explore.md`
   - `.github/commands/opsx/apply.md`
   - `.github/commands/opsx/archive.md`
-- Claude/Codex 共通スキル（`.github/skills/` 経由）
+- Claude/Codex 共通スキル（`.agents/skills/` 経由）
   - `openspec-propose`
   - `openspec-explore`
   - `openspec-apply-change`

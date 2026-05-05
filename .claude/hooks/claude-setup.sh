@@ -19,11 +19,6 @@ ensure_local_bin_in_path() {
 }
 
 setup_default() {
-	if [[ ${CLAUDE_CODE_REMOTE:-} == "true" ]]; then
-		log_info "Removing git remote origin..."
-		git -C "${REPO_ROOT}" remote remove origin 2>/dev/null || true
-	fi
-
 	log_info "Bootstrapping dotenvx..."
 	bash "${REPO_ROOT}/.claude/hooks/bootstrap-dotenvx.sh"
 
