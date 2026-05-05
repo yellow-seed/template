@@ -18,16 +18,6 @@ ensure_local_bin_in_path() {
 	fi
 }
 
-source_repo_env() {
-	local env_file="${REPO_ROOT}/.env"
-	if [[ -f ${env_file} ]]; then
-		set -a
-		# shellcheck source=/dev/null
-		. "${env_file}"
-		set +a
-	fi
-}
-
 setup_default() {
 	if [[ ${CLAUDE_CODE_REMOTE:-} == "true" ]]; then
 		log_info "Removing git remote origin..."
@@ -43,7 +33,6 @@ setup_default() {
 
 	log_info "Setting up remote environment..."
 	bash "${REPO_ROOT}/.claude/hooks/setup-remote-env.sh"
-	source_repo_env
 
 	log_info "Running gh CLI setup..."
 	bash "${REPO_ROOT}/.claude/hooks/gh-setup.sh"
@@ -69,7 +58,6 @@ setup_session() {
 
 	log_info "Setting up remote environment..."
 	bash "${REPO_ROOT}/.claude/hooks/setup-remote-env.sh"
-	source_repo_env
 
 	log_info "Syncing skills directory..."
 	bash "${REPO_ROOT}/.claude/hooks/skills-setup.sh"

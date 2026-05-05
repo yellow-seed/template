@@ -31,23 +31,9 @@ setup_bashrc_path() {
 	fi
 }
 
-source_repo_env() {
-	local env_file="${REPO_ROOT}/.env"
-	if [[ -f ${env_file} ]]; then
-		set -a
-		# shellcheck source=/dev/null
-		. "${env_file}"
-		set +a
-	fi
-}
-
 setup_remote_env() {
-	log_info "Restoring remote environment from ~/.bashrc..."
-	bash "${REPO_ROOT}/.codex/hooks/restore-env.sh"
-
 	log_info "Setting up remote environment from dotenvx if needed..."
 	bash "${REPO_ROOT}/.codex/hooks/setup-remote-env.sh"
-	source_repo_env
 }
 
 setup_default() {
