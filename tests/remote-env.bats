@@ -81,14 +81,14 @@ teardown_remote_env_fixture() {
   teardown_remote_env_fixture
 }
 
-@test "codex setup-remote-env fails when DOTENV_PRIVATE_KEY variables are missing" {
+@test "codex setup-remote-env skips validation when DOTENV_PRIVATE_KEY variables are missing" {
   setup_remote_env_fixture
   touch "$WORK_DIR/repo/.env.remote"
   unset DOTENV_PRIVATE_KEY_REMOTE
   unset DOTENV_PRIVATE_KEY
 
   run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
-  [ "$status" -eq 1 ]
+  [ "$status" -eq 0 ]
   [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"* ]]
 
   teardown_remote_env_fixture
@@ -141,14 +141,14 @@ DOTENVX
   teardown_remote_env_fixture
 }
 
-@test "claude setup-remote-env fails when DOTENV_PRIVATE_KEY variables are missing" {
+@test "claude setup-remote-env skips validation when DOTENV_PRIVATE_KEY variables are missing" {
   setup_remote_env_fixture
   touch "$WORK_DIR/repo/.env.remote"
   unset DOTENV_PRIVATE_KEY_REMOTE
   unset DOTENV_PRIVATE_KEY
 
   run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
-  [ "$status" -eq 1 ]
+  [ "$status" -eq 0 ]
   [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"* ]]
 
   teardown_remote_env_fixture

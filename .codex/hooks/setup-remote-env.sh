@@ -70,9 +70,9 @@ if ! command -v dotenvx >/dev/null 2>&1; then
 fi
 
 if [[ -z ${DOTENV_PRIVATE_KEY_REMOTE:-} && -z ${DOTENV_PRIVATE_KEY:-} ]]; then
-	log_error "DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"
-	log_error "remote env must be loaded via dotenvx at command runtime"
-	exit 1
+	log_info "DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set, skipping validation"
+	log_info "Use dotenvx run -f .env.remote -- <command> to load remote env at runtime"
+	exit 0
 fi
 
 decrypt_status=0
