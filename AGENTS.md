@@ -83,10 +83,10 @@ bash .codex/hooks/gh-setup.sh
 
 ### スキーマの使い分け
 
-| スキーマ | 用途 | コマンド |
-| --- | --- | --- |
-| `rapid`（デフォルト） | 小〜中規模の変更 | `openspec new change "<name>"` |
-| `spec-driven` | 仕様書・設計書が必要な大規模変更 | `openspec new change --schema spec-driven "<name>"` |
+| スキーマ              | 用途                             | コマンド                                            |
+| --------------------- | -------------------------------- | --------------------------------------------------- |
+| `rapid`（デフォルト） | 小〜中規模の変更                 | `openspec new change "<name>"`                      |
+| `spec-driven`         | 仕様書・設計書が必要な大規模変更 | `openspec new change --schema spec-driven "<name>"` |
 
 詳細は [docs/OPENSPEC.md](docs/OPENSPEC.md) を参照してください。
 

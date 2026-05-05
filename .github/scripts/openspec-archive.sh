@@ -17,10 +17,10 @@ done < <(find "${ARCHIVE_DIR}" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/nu
 # Step 2: Archive completed changes (all tasks checked off)
 while IFS= read -r -d '' change_dir; do
 	name="$(basename "${change_dir}")"
-	[[ "${name}" == "archive" ]] && continue
+	[[ ${name} == "archive" ]] && continue
 
 	tasks_file="${change_dir}/tasks.md"
-	[[ ! -f "${tasks_file}" ]] && continue
+	[[ ! -f ${tasks_file} ]] && continue
 
 	# Skip if any incomplete tasks remain
 	if grep -q '^- \[ \]' "${tasks_file}"; then
@@ -31,7 +31,7 @@ while IFS= read -r -d '' change_dir; do
 	archived=$((archived + 1))
 done < <(find "${CHANGES_DIR}" -mindepth 1 -maxdepth 1 -type d -print0)
 
-if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+if [[ -n ${GITHUB_OUTPUT:-} ]]; then
 	echo "archived=${archived}" >>"${GITHUB_OUTPUT}"
 	echo "deleted=${deleted}" >>"${GITHUB_OUTPUT}"
 fi
