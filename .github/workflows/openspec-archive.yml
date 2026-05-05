@@ -60,32 +60,34 @@ jobs:
           DELETED: ${{ steps.archive.outputs.deleted }}
         run: |
           MONTH="$(date +%Y-%m)"
+          body_file="$(mktemp)"
+          trap 'rm -f "${body_file}"' EXIT
+          {
+            echo "## Description"
+            echo ""
+            echo "月次 OpenSpec アーカイブ処理を実行しました。"
+            echo ""
+            echo "- アーカイブした change: ${ARCHIVED} 件"
+            echo "- 削除した archive: ${DELETED} 件"
+            echo ""
+            echo "## Type of Change"
+            echo ""
+            echo "- [x] Documentation update"
+            echo ""
+            echo "## Changes Made"
+            echo ""
+            echo "- 完了済み change を \`openspec/changes/archive/\` へ移動"
+            echo "- 既存の archive を削除"
+            echo ""
+            echo "## Testing"
+            echo ""
+            echo "- [x] 自動化された処理のため手動テスト不要"
+            echo ""
+            echo "## Checklist"
+            echo ""
+            echo "- [x] 自己レビューを実施しました"
+          } >"${body_file}"
           gh pr create \
             --title "chore: openspec monthly archive ${MONTH}" \
             --label "openspec-archive" \
-            --body "$(cat <<EOF
-## Description
-
-月次 OpenSpec アーカイブ処理を実行しました。
-
-- アーカイブした change: ${ARCHIVED} 件
-- 削除した archive: ${DELETED} 件
-
-## Type of Change
-
-- [x] Documentation update
-
-## Changes Made
-
-- 完了済み change を \`openspec/changes/archive/\` へ移動
-- 既存の archive を削除
-
-## Testing
-
-- [x] 自動化された処理のため手動テスト不要
-
-## Checklist
-
-- [x] 自己レビューを実施しました
-EOF
-)"
+            --body-file "${body_file}"
