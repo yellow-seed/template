@@ -8,8 +8,9 @@ make_dotenvx_stub() {
 #!/bin/bash
 set -euo pipefail
 
-if [ "$#" -eq 3 ] && [ "$1" = "decrypt" ] && [ "$2" = "-f" ] && [ "$3" = ".env.remote" ]; then
-  printf '%s\n' "GH_TOKEN=remote-token"
+if [ "$1" = "run" ] && [ "$2" = "-f" ] && [ "$3" = ".env.remote" ] && [ "$4" = "--" ]; then
+  shift 4
+  GH_TOKEN="remote-token" "$@"
   exit 0
 fi
 
@@ -48,7 +49,7 @@ teardown_remote_env_fixture() {
 
   run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Validated .env.remote decryption key"* ]]
+  [[  "$output" == *"Validated .env.remote decryption key"* ]]
   [[ "$output" == *"dotenvx run -f .env.remote -- <command>"* ]]
 
   [ ! -f "$WORK_DIR/repo/.env" ]
@@ -94,7 +95,7 @@ teardown_remote_env_fixture() {
   teardown_remote_env_fixture
 }
 
-@test "codex setup-remote-env fails when dotenvx decrypt fails" {
+@test "codex setup-remote-env fails when dotenvx run fails" {
   setup_remote_env_fixture
   touch "$WORK_DIR/repo/.env.remote"
   export DOTENV_PRIVATE_KEY_REMOTE="test-key"
@@ -107,7 +108,7 @@ DOTENVX
 
   run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"failed to decrypt .env.remote"* ]]
+  [[ "$output" == *"failed to load .env.remote"* ]]
 
   teardown_remote_env_fixture
 }
@@ -154,7 +155,7 @@ DOTENVX
   teardown_remote_env_fixture
 }
 
-@test "claude setup-remote-env fails when dotenvx decrypt fails" {
+@test "claude setup-remote-env fails when dotenvx run fails" {
   setup_remote_env_fixture
   touch "$WORK_DIR/repo/.env.remote"
   export DOTENV_PRIVATE_KEY_REMOTE="test-key"
@@ -167,7 +168,7 @@ DOTENVX
 
   run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"failed to decrypt .env.remote"* ]]
+  [[ "$output" == *"failed to load .env.remote"* ]]
 
   teardown_remote_env_fixture
 }

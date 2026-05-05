@@ -77,15 +77,15 @@ fi
 
 decrypt_status=0
 set +e
-(cd "${REPO_ROOT}" && run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx decrypt -f .env.remote >/dev/null)
+(cd "${REPO_ROOT}" && run_with_timeout "${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}" dotenvx run -f .env.remote -- true) >/dev/null 2>&1
 decrypt_status=$?
 set -e
 
 if [[ ${decrypt_status} -ne 0 ]]; then
 	if [[ ${decrypt_status} -eq 124 ]]; then
-		log_error "dotenvx decrypt timed out after ${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}s"
+		log_error "dotenvx run timed out after ${SETUP_REMOTE_ENV_TIMEOUT_SECONDS:-60}s"
 	else
-		log_error "failed to decrypt .env.remote with current DOTENV_PRIVATE_KEY*"
+		log_error "failed to load .env.remote with current DOTENV_PRIVATE_KEY*"
 	fi
 	exit 1
 fi
