@@ -1,17 +1,16 @@
 ---
 name: "OPSX: Propose"
-description: Propose a new change - create it and generate all artifacts in one step
+description: Propose a new change - create it and generate schema-driven artifacts
 category: Workflow
 tags: [workflow, artifacts, experimental]
 ---
 
-Propose a new change - create the change and generate all artifacts in one step.
+Propose a new change - create the change and generate the artifacts required by the selected schema.
 
-I'll create a change with artifacts:
+I'll create artifacts required by the selected schema:
 
-- proposal.md (what & why)
-- design.md (how)
-- tasks.md (implementation steps)
+- rapid (default): proposal.md, tasks.md
+- spec-driven: includes design/spec artifacts in addition to tasks
 
 When ready to implement, run /opsx:apply
 
@@ -38,6 +37,13 @@ When ready to implement, run /opsx:apply
    ```
 
    This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`.
+
+   Default schema is **rapid** (proposal → tasks). For complex changes that need
+   specs and technical design, use `--schema spec-driven` explicitly:
+
+   ```bash
+   openspec new change --schema spec-driven "<name>"
+   ```
 
 3. **Get the artifact build order**
 

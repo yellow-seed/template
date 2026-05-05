@@ -71,6 +71,25 @@ bash .codex/hooks/gh-setup.sh
 
 `gh-setup.sh` は、先に用意された `gh` と `GH_TOKEN` または認証済みの `gh` を前提に GitHub CLI extensions などを設定します。
 
+## 変更管理ワークフロー（OpenSpec）
+
+このプロジェクトでは、AIエージェントへの**すべての実装依頼に OpenSpec ワークフローを使用します**。実装を始める前に必ず change を作成し、proposal.md と tasks.md を用意してください。
+
+### 基本フロー
+
+1. **提案** (`/opsx:propose`): `proposal.md`（なぜやるか＋Ref）と `tasks.md`（実装TODO）を生成
+2. **実装** (`/opsx:apply`): `tasks.md` のタスクを順に実装・チェックオフ
+3. **アーカイブ** (`/opsx:archive`): 完了した変更をアーカイブ（月次 GitHub Actions でも自動実行）
+
+### スキーマの使い分け
+
+| スキーマ              | 用途                             | コマンド                                            |
+| --------------------- | -------------------------------- | --------------------------------------------------- |
+| `rapid`（デフォルト） | 小〜中規模の変更                 | `openspec new change "<name>"`                      |
+| `spec-driven`         | 仕様書・設計書が必要な大規模変更 | `openspec new change --schema spec-driven "<name>"` |
+
+詳細は [docs/OPENSPEC.md](docs/OPENSPEC.md) を参照してください。
+
 ## コーディング規約
 
 <!-- プロジェクトで使用しているコーディング規約を記述してください -->

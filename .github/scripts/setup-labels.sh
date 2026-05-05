@@ -43,6 +43,7 @@ declare -a LABELS=(
 	"bug|d73a4a|Something isn't working"
 	"enhancement|a2eeef|New feature or request"
 	"todo|0e8a16|Task or future work item"
+	"openspec-archive|0075ca|Automated OpenSpec archive operation"
 )
 
 # ラベルの作成または更新

@@ -97,6 +97,7 @@ teardown() {
     assert_output --partial "bug"
     assert_output --partial "enhancement"
     assert_output --partial "todo"
+    assert_output --partial "openspec-archive"
 }
 
 @test "既存のラベルを更新する" {
@@ -148,6 +149,7 @@ EOF
     assert_output --partial "d73a4a"  # bug の色
     assert_output --partial "a2eeef"  # enhancement の色
     assert_output --partial "0e8a16"  # todo の色
+    assert_output --partial "0075ca"  # openspec-archive の色
 }
 
 @test "gh repo viewが失敗した場合にgit configから取得する" {
