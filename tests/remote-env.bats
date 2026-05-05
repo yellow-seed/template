@@ -81,14 +81,14 @@ teardown_remote_env_fixture() {
   teardown_remote_env_fixture
 }
 
-@test "codex setup-remote-env warns when DOTENV_PRIVATE_KEY variables are missing" {
+@test "codex setup-remote-env fails when DOTENV_PRIVATE_KEY variables are missing" {
   setup_remote_env_fixture
   touch "$WORK_DIR/repo/.env.remote"
   unset DOTENV_PRIVATE_KEY_REMOTE
   unset DOTENV_PRIVATE_KEY
 
   run bash "$WORK_DIR/repo/.codex/hooks/setup-remote-env.sh"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq 1 ]
   [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"* ]]
 
   teardown_remote_env_fixture
@@ -126,6 +126,48 @@ DOTENVX
   [ ! -f "$WORK_DIR/repo/.env" ]
   [ ! -f "$CLAUDE_ENV_FILE" ]
   [ ! -f "$HOME/.bashrc" ]
+
+  teardown_remote_env_fixture
+}
+
+@test "claude setup-remote-env exits successfully when .env.remote is missing" {
+  setup_remote_env_fixture
+  export DOTENV_PRIVATE_KEY_REMOTE="test-key"
+
+  run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *".env.remote not found"* ]]
+
+  teardown_remote_env_fixture
+}
+
+@test "claude setup-remote-env fails when DOTENV_PRIVATE_KEY variables are missing" {
+  setup_remote_env_fixture
+  touch "$WORK_DIR/repo/.env.remote"
+  unset DOTENV_PRIVATE_KEY_REMOTE
+  unset DOTENV_PRIVATE_KEY
+
+  run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"DOTENV_PRIVATE_KEY_REMOTE / DOTENV_PRIVATE_KEY not set"* ]]
+
+  teardown_remote_env_fixture
+}
+
+@test "claude setup-remote-env fails when dotenvx decrypt fails" {
+  setup_remote_env_fixture
+  touch "$WORK_DIR/repo/.env.remote"
+  export DOTENV_PRIVATE_KEY_REMOTE="test-key"
+
+  cat >"$WORK_DIR/bin/dotenvx" <<'DOTENVX'
+#!/bin/bash
+exit 1
+DOTENVX
+  chmod +x "$WORK_DIR/bin/dotenvx"
+
+  run bash "$WORK_DIR/repo/.claude/hooks/setup-remote-env.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"failed to decrypt .env.remote"* ]]
 
   teardown_remote_env_fixture
 }
