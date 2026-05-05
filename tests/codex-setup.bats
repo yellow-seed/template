@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-# Tests for .codex/hooks/codex-setup.sh – profile branching and git remote removal
+# Tests for .codex/hooks/codex-setup.sh – profile branching.
 
 REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
 SCRIPT="$REPO_ROOT/.codex/hooks/codex-setup.sh"
@@ -43,26 +43,12 @@ teardown() {
 
 # --- static checks ---
 
-@test "codex-setup.sh contains CODEX_REMOTE-guarded git remote remove step" {
-  grep -q 'CODEX_REMOTE' "$SCRIPT"
-  grep -q 'git -C "${REPO_ROOT}" remote remove origin' "$SCRIPT"
+@test "codex-setup.sh does not remove git remote origin" {
+  ! grep -q 'remote remove origin' "$SCRIPT"
 }
 
-# --- default profile: origin removal ---
-
-@test "default profile removes origin when CODEX_REMOTE=true" {
-  run git -C "$WORK_DIR" remote
-  [[ "$output" == *"origin"* ]]
-
+@test "default profile preserves origin regardless of CODEX_REMOTE" {
   export CODEX_REMOTE=true
-  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
-  [ "$status" -eq 0 ]
-
-  run git -C "$WORK_DIR" remote
-  [[ "$output" != *"origin"* ]]
-}
-
-@test "default profile preserves origin when CODEX_REMOTE is not set" {
   run git -C "$WORK_DIR" remote
   [[ "$output" == *"origin"* ]]
 
@@ -72,14 +58,6 @@ teardown() {
 
   run git -C "$WORK_DIR" remote
   [[ "$output" == *"origin"* ]]
-}
-
-@test "default profile is idempotent when origin is already absent" {
-  git -C "$WORK_DIR" remote remove origin
-
-  export CODEX_REMOTE=true
-  run bash "$WORK_DIR/.codex/hooks/codex-setup.sh"
-  [ "$status" -eq 0 ]
 }
 
 # --- default profile: script invocations ---

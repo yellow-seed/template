@@ -27,7 +27,7 @@ project/
 
 ### スキルディレクトリのセットアップ（Windows環境など）
 
-このリポジトリでは、`.claude/skills` と `.codex/skills` は `.github/skills` へのシンボリックリンクとして構成されています。
+このリポジトリでは、`.claude/skills` は `.agents/skills` へのシンボリックリンクとして構成されています。
 
 **シンボリックリンクが機能しない環境**（Windows管理者権限なし、`core.symlinks=false`など）では、以下のスクリプトを実行してください：
 
@@ -35,13 +35,13 @@ project/
 bash .claude/hooks/skills-setup.sh
 ```
 
-このスクリプトは`.github/skills`を`.claude/skills`と`.codex/skills`にコピーします。
+このスクリプトは`.agents/skills`を`.claude/skills`にコピーします。
 
 **注意事項**:
 
 - シンボリックリンク環境では、すべてのディレクトリは自動的に同期されます
-- コピー環境では、`.github/skills`を変更した場合、再度`skills-setup.sh`を実行して同期する必要があります
-- 新しいスキルを追加する際は、必ず`.github/skills/`に配置してください
+- コピー環境では、`.agents/skills`を変更した場合、再度`skills-setup.sh`を実行して同期する必要があります
+- 新しいスキルを追加する際は、必ず`.agents/skills/`に配置してください
 
 ### dotenvx による環境変数管理
 

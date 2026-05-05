@@ -46,18 +46,8 @@ teardown() {
   ! grep -q './.claude/hooks/gh-setup.sh' "$SETTINGS"
 }
 
-@test "default profile removes origin when CLAUDE_CODE_REMOTE=true" {
+@test "default profile preserves origin even when CLAUDE_CODE_REMOTE=true" {
   export CLAUDE_CODE_REMOTE=true
-
-  run bash "$WORK_DIR/.claude/hooks/claude-setup.sh"
-  [ "$status" -eq 0 ]
-
-  run git -C "$WORK_DIR" remote
-  [[ "$output" != *"origin"* ]]
-}
-
-@test "default profile preserves origin when CLAUDE_CODE_REMOTE is not set" {
-  unset CLAUDE_CODE_REMOTE
 
   run bash "$WORK_DIR/.claude/hooks/claude-setup.sh"
   [ "$status" -eq 0 ]
