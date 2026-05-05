@@ -27,7 +27,7 @@ project/
 
 ### スキルディレクトリのセットアップ（Windows環境など）
 
-このリポジトリでは、`.claude/skills` と `.codex/skills` は `.agents/skills` へのシンボリックリンクとして構成されています。
+このリポジトリでは、`.claude/skills` は `.agents/skills` へのシンボリックリンクとして構成されています。
 
 **シンボリックリンクが機能しない環境**（Windows管理者権限なし、`core.symlinks=false`など）では、以下のスクリプトを実行してください：
 
@@ -35,7 +35,7 @@ project/
 bash .claude/hooks/skills-setup.sh
 ```
 
-このスクリプトは`.agents/skills`を`.claude/skills`と`.codex/skills`にコピーします。
+このスクリプトは`.agents/skills`を`.claude/skills`にコピーします。
 
 **注意事項**:
 

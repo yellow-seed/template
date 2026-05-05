@@ -5,15 +5,14 @@
 # This script provides a fallback for environments where symlinks are not supported
 # (e.g., Windows without admin privileges, Git with core.symlinks=false).
 #
-# If .claude/skills or .codex/skills are not directories (e.g., text files containing the symlink path),
-# this script will copy .agents/skills to those directories.
+# If .claude/skills is not a directory (e.g., a text file containing the symlink path),
+# this script will copy .agents/skills to that directory.
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 CLAUDE_SKILLS="${REPO_ROOT}/.claude/skills"
-CODEX_SKILLS="${REPO_ROOT}/.codex/skills"
 GITHUB_SKILLS="${REPO_ROOT}/.agents/skills"
 
 # Check if .agents/skills exists
@@ -47,11 +46,10 @@ setup_skills_dir() {
 	echo "✓ Successfully set up ${dir_name}"
 }
 
-# Set up both .claude/skills and .codex/skills
+# Set up .claude/skills
 setup_skills_dir "${CLAUDE_SKILLS}" ".claude/skills"
-setup_skills_dir "${CODEX_SKILLS}" ".codex/skills"
 
 echo ""
-echo "Note: In environments with symlink support, .claude/skills and .codex/skills are symlinks to .agents/skills."
+echo "Note: In environments with symlink support, .claude/skills is a symlink to .agents/skills."
 echo "In this environment, they have been created as copies."
 echo "Please ensure to manually sync changes between .agents/skills and these directories if needed."
