@@ -140,6 +140,7 @@ What would you like to do?
 ```
 
 **Guardrails**
+- Before starting implementation, always create a branch first. Follow the branch strategy defined in [../git-branch-worktree/SKILL.md](../git-branch-worktree/SKILL.md)
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing
