@@ -82,47 +82,16 @@ require_jq() {
 	fi
 }
 
-apply_repository_settings() {
-	local repo="$1"
-
-	log_info "Repository 基本設定を適用中..."
-	run_gh gh api "repos/$repo" \
-		--method PATCH \
-		--field description="Template for AI era Develop" \
-		--field homepage="" \
-		--field has_issues=true \
-		--field has_projects=true \
-		--field has_wiki=true \
-		--field has_discussions=false \
-		--field is_template=true \
-		--field allow_squash_merge=true \
-		--field allow_merge_commit=true \
-		--field allow_rebase_merge=true \
-		--field allow_auto_merge=false \
-		--field delete_branch_on_merge=true \
-		--field allow_update_branch=false \
-		--field squash_merge_commit_title=COMMIT_OR_PR_TITLE \
-		--field squash_merge_commit_message=COMMIT_MESSAGES \
-		--field merge_commit_title=MERGE_MESSAGE \
-		--field merge_commit_message=PR_TITLE \
-		--field web_commit_signoff_required=false \
-		--silent
-}
-
 apply_security_settings() {
 	local repo="$1"
 
+	# vulnerability_alerts / secret_scanning / secret_scanning_push_protection は
+	# .github/terraform/repository-settings/main.tf で管理する
 	log_info "Security 設定を適用中..."
-	run_gh gh api "repos/$repo/vulnerability-alerts" \
-		--method PUT \
-		--silent
-
 	run_gh gh api "repos/$repo" \
 		--method PATCH \
 		--field 'security_and_analysis[dependabot_security_updates][status]=enabled' \
-		--field 'security_and_analysis[secret_scanning][status]=enabled' \
 		--field 'security_and_analysis[secret_scanning_non_provider_patterns][status]=disabled' \
-		--field 'security_and_analysis[secret_scanning_push_protection][status]=disabled' \
 		--field 'security_and_analysis[secret_scanning_validity_checks][status]=disabled' \
 		--silent
 }
@@ -199,7 +168,6 @@ main() {
 	log_info "リポジトリ: $repo"
 	echo ""
 
-	apply_repository_settings "$repo"
 	apply_security_settings "$repo"
 	apply_actions_settings "$repo"
 	apply_environment_settings "$repo"

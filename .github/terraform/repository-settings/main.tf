@@ -21,12 +21,15 @@ resource "github_repository" "template" {
   homepage_url = ""
   visibility   = "public"
   is_template  = true
+  archived     = false
+  topics       = []
 
   has_issues      = true
   has_projects    = true
   has_wiki        = true
   has_discussions = false
 
+  allow_forking          = true
   allow_merge_commit     = true
   allow_squash_merge     = true
   allow_rebase_merge     = true
@@ -40,5 +43,18 @@ resource "github_repository" "template" {
   merge_commit_message        = "PR_TITLE"
 
   web_commit_signoff_required = false
-  vulnerability_alerts        = true
+
+  security_and_analysis {
+    secret_scanning {
+      status = "enabled"
+    }
+    secret_scanning_push_protection {
+      status = "disabled"
+    }
+  }
+}
+
+resource "github_repository_vulnerability_alerts" "template" {
+  repository = var.repository_name
+  enabled    = true
 }
