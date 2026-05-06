@@ -72,6 +72,8 @@ jobs:
   DockerfilePin:
     name: dockerfile-pin check
     runs-on: ubuntu-24.04
+    env:
+      AQUA_POLICY_CONFIG: aqua-policy.yaml
     permissions:
       contents: read
 
@@ -80,12 +82,10 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install dockerfile-pin
-        run: |
-          curl -sL "https://github.com/azu/dockerfile-pin/releases/latest/download/dockerfile-pin_linux_amd64.tar.gz" | tar xz -C /tmp
+        uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
+        with:
+          aqua_version: v2.57.1
+          policy_allow: "true"
 
       - name: Check digest pinning
-        run: /tmp/dockerfile-pin check
-
-      - name: Cleanup
-        if: always()
-        run: rm -f /tmp/dockerfile-pin
+        run: dockerfile-pin check

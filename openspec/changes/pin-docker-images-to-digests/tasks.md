@@ -8,7 +8,7 @@
 
 - [x] 2.1 `.github/workflows/`に`dockerfile-pin check`を実行するworkflowを追加
 - [x] 2.2 workflowはPR時に実行され、全イメージがdigestでピン留めされていることを検証
-- [x] 2.3 dockerfile-pinはworkflow内でcurlでインストールし、実行後に削除
+- [x] 2.3 dockerfile-pinはaquaでインストールし、ツールのバージョン更新に追随しやすくする
 
 ## 3. 後片付け
 
