@@ -67,6 +67,14 @@ trust_mise_config() {
 	)
 }
 
+setup_worktrunk_shell() {
+	if ! command -v wt >/dev/null 2>&1; then
+		return 0
+	fi
+
+	wt config shell install 2>/dev/null || true
+}
+
 main() {
 	export MISE_YES=1
 	export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:+${MISE_TRUSTED_CONFIG_PATHS}:}${REPO_ROOT}"
@@ -84,6 +92,8 @@ main() {
 	append_path "$shims_dir"
 
 	run_step "Installing helper scripts..." bash "$ORCHESTRATOR_DIR/installers/helper-scripts.sh"
+
+	run_step "Setting up Worktrunk shell integration..." setup_worktrunk_shell
 
 	log "Tool installation completed"
 }

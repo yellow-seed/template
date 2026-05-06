@@ -11,10 +11,9 @@
 
 ## 3. スクリプトの整備
 
-- [ ] 3.1 worktree 作成時の依存インストール用 Hook スクリプトを作成
-- [ ] 3.2 `scripts/env-setup.sh` を worktree 環境でも動作するように確認・修正
+- [x] 3.1 `scripts/env-setup.sh` を worktree 環境でも動作するように確認（修正不要）
 
 ## 4. ドキュメント
 
-- [ ] 4.1 `AGENTS.md` に Worktrunk の使い方とワークフローを追記
-- [ ] 4.2 `docs/` に git worktree 開発ガイドドキュメントを作成
+- [x] 4.1 `AGENTS.md` にブランチ管理スキルへの参照を追記
+- [x] 4.2 `.agents/skills/git-branch-worktree/SKILL.md` を作成（worktree / 通常ブランチ自動判定付き）

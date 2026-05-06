@@ -66,18 +66,19 @@ Implement tasks from an OpenSpec change.
 
 6. **Implement tasks (loop until done or blocked)**
 
-   For each pending task:
-   - Show which task is being worked on
-   - Make the code changes required
-   - Keep changes minimal and focused
-   - Mark task complete in the tasks file: `- [ ]` → `- [x]`
-   - Continue to next task
+    For each pending task:
+    - Show which task is being worked on
+    - **For code changes: follow `.agents/skills/test-driven-development/SKILL.md` (Red-Green-Refactor)**
+    - **For docs/config only**: Make the changes directly
+    - Keep changes minimal and focused
+    - Mark task complete in the tasks file: `- [ ]` → `- [x]`
+    - Continue to next task
 
-   **Pause if:**
-   - Task is unclear → ask for clarification
-   - Implementation reveals a design issue → suggest updating artifacts
-   - Error or blocker encountered → report and wait for guidance
-   - User interrupts
+    **Pause if:**
+    - Task is unclear → ask for clarification
+    - Implementation reveals a design issue → suggest updating artifacts
+    - Error or blocker encountered → report and wait for guidance
+    - User interrupts
 
 7. **On completion or pause, show status**
 

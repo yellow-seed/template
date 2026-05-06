@@ -29,6 +29,7 @@ worktree-path = "{{ repo_path }}/.worktrees/{{ branch | sanitize }}"
 - デメリット: リポジトリディレクトリ内に大量のサブディレクトリが物理的に存在する
 
 このリポジトリでは **案A** を推奨する。理由：
+
 1. `~/Documents/GitHub/` は開発者が頻繁にアクセスする場所であり、散らからない方がよい
 2. Worktrunk の `wt list` / `wt switch` で管理するため、パスを手で意識する機会は少ない
 3. 複数リポジトリを横断して worktree を管理する場合も一箇所に集約される
