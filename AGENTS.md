@@ -71,6 +71,11 @@ bash .codex/hooks/gh-setup.sh
 
 `gh-setup.sh` は、先に用意された `gh` と `GH_TOKEN` または認証済みの `gh` を前提に GitHub CLI extensions などを設定します。
 
+### ブランチ管理（Worktree / 通常ブランチ）
+
+ブランチの作成・切り替え・削除は [.agents/skills/git-branch-worktree/SKILL.md](.agents/skills/git-branch-worktree/SKILL.md) に集約している。
+`*_REMOTE` 環境変数の有無に応じて、worktree（ローカルPC）または通常ブランチ（Web環境）を自動選択する。
+
 ## 変更管理ワークフロー（OpenSpec）
 
 このプロジェクトでは、AIエージェントへの**すべての実装依頼に OpenSpec ワークフローを使用します**。実装を始める前に必ず change を作成し、proposal.md と tasks.md を用意してください。

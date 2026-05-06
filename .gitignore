@@ -24,6 +24,7 @@ Thumbs.db
 *.gem
 *.rbc
 /.config
+!/.config/wt.toml
 /coverage/
 /InstalledFiles
 /pkg/
