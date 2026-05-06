@@ -14,10 +14,10 @@ permissions:
 
 jobs:
   setup:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check user permission
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const { data: repo } = await github.rest.repos.get({
@@ -44,11 +44,11 @@ jobs:
             console.log('✓ Permission check passed');
 
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup GitHub CLI
         run: |
-          # GitHub CLI is pre-installed on ubuntu-latest runners
+          # GitHub CLI is pre-installed on ubuntu-24.04 runners
           gh --version
 
       - name: Run setup script

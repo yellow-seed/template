@@ -14,15 +14,15 @@ permissions:
 jobs:
   validate:
     name: terraform validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: .github/terraform/repository-settings
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
 
       - name: terraform fmt
         run: terraform fmt -check -recursive
@@ -33,7 +33,7 @@ jobs:
       - name: terraform validate
         run: terraform validate
 
-      - uses: terraform-linters/setup-tflint@v4
+      - uses: terraform-linters/setup-tflint@90f302c255ef959cbfb4bd10581afecdb7ece3e6 # v4.1.1
 
       - name: tflint init
         run: tflint --init
@@ -44,16 +44,16 @@ jobs:
   plan:
     name: terraform plan
     needs: [validate]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.event.pull_request.head.repo.full_name == github.repository
     defaults:
       run:
         working-directory: .github/terraform/repository-settings
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
 
       - name: Set repository name
         run: echo "TF_VAR_repository_name=${GITHUB_REPOSITORY##*/}" >> "$GITHUB_ENV"
@@ -79,7 +79,7 @@ jobs:
           set -e
 
       - name: Post plan to PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         if: always()
         env:
           PLAN_EXIT_CODE: ${{ steps.plan.outputs.exit_code }}
