@@ -5,8 +5,8 @@
 
 ## 2. プロジェクト設定
 
-- [ ] 2.1 `.config/wt.toml` を作成（worktree パス、Hook 設定）
-- [ ] 2.2 `.gitignore` を修正（`.config/wt.toml` をリポジトリ管理対象に含める）
+- [ ] 2.1 `.config/wt.toml` を作成（worktree パスは `~/worktrees/{{ repo }}/{{ branch | sanitize }}` を採用）
+- [ ] 2.2 `.gitignore` を修正（`.config/wt.toml` をリポジトリ管理対象に含めるため `/ .config` パターンの調整）
 - [ ] 2.3 `.worktreeinclude` を作成（`.env` ファイルのコピー用）
 
 ## 3. スクリプトの整備
