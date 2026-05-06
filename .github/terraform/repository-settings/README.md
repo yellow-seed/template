@@ -19,10 +19,12 @@
 - `allow_update_branch = false`
 - squash / merge commit message 設定
 - `web_commit_signoff_required = false`
-- `vulnerability_alerts = true`
+- `security_and_analysis` の secret scanning 設定
+- `github_repository_vulnerability_alerts` による Dependabot alerts 設定
 
-`security_and_analysis`、Actions 権限、Environment、Actions secrets の存在確認は
-`.github/scripts/setup-repository-settings.sh` で管理します。
+Dependabot security updates、secret scanning の追加オプション、Actions 権限、
+Environment、Actions secrets の存在確認は `.github/scripts/setup-repository-settings.sh`
+で管理します。
 
 ## 使い方
 
@@ -36,7 +38,7 @@ terraform init
 ```bash
 export TF_VAR_github_owner="yellow-seed"
 export TF_VAR_repository_name="template"
-export TF_VAR_github_token="<PAT>"
+export TF_VAR_github_token="<repository-admin PAT>"
 ```
 
 既存リポジトリを import します。

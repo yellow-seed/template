@@ -11,7 +11,7 @@ services:
     working_dir: /workspace
 
   terraform:
-    image: hashicorp/terraform:latest
+    image: hashicorp/terraform:1.9.5
     working_dir: /workspace/.github/terraform/repository-settings
     volumes:
       - .:/workspace

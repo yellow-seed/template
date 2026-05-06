@@ -4,10 +4,11 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - '.github/terraform/**'
+      - ".github/terraform/**"
 
 permissions:
   contents: read
+  issues: write
   pull-requests: write
 
 jobs:
@@ -44,6 +45,7 @@ jobs:
     name: terraform plan
     needs: [validate]
     runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
     defaults:
       run:
         working-directory: .github/terraform/repository-settings
@@ -62,14 +64,14 @@ jobs:
       - name: terraform import
         env:
           TF_VAR_github_owner: ${{ github.repository_owner }}
-          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
         run: terraform import github_repository.template "${TF_VAR_repository_name}"
 
       - name: terraform plan
         id: plan
         env:
           TF_VAR_github_owner: ${{ github.repository_owner }}
-          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
         run: |
           set +e
           terraform plan -no-color 2>&1 | tee "$GITHUB_WORKSPACE/plan_output.txt"
@@ -84,7 +86,10 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let output = fs.readFileSync(process.env.GITHUB_WORKSPACE + '/plan_output.txt', 'utf8');
+            const planPath = `${process.env.GITHUB_WORKSPACE}/plan_output.txt`;
+            let output = fs.existsSync(planPath)
+              ? fs.readFileSync(planPath, 'utf8')
+              : 'terraform plan did not produce output. Check earlier workflow steps such as init or import.';
             const MAX = 60000;
             if (output.length > MAX) output = output.slice(0, MAX) + '\n... (truncated)';
 

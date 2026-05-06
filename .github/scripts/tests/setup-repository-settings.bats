@@ -99,7 +99,7 @@ teardown() {
 @test "ghコマンドが見つからない場合にエラーを表示する" {
     rm -f "$TEST_DIR/gh"
 
-    run bash "$SCRIPT_DIR/setup-repository-settings.sh"
+    run env PATH="$TEST_DIR" /bin/bash "$SCRIPT_DIR/setup-repository-settings.sh"
     assert_failure
     assert_output --partial "GitHub CLI (gh) がインストールされていません"
 }
@@ -109,7 +109,6 @@ teardown() {
 
     run bash "$SCRIPT_DIR/setup-repository-settings.sh"
     assert_success
-    assert_output --partial "allow_update_branch=false"
     assert_output --partial "actions/permissions/workflow"
     assert_output --partial "environments/copilot"
     assert_output --partial "ADD_TO_PROJECT_PAT"
@@ -120,9 +119,6 @@ teardown() {
     assert_success
 
     run grep -q "repos/test-owner/test-repo --method PATCH" "$GH_CALL_LOG"
-    assert_success
-
-    run grep -q "repos/test-owner/test-repo/vulnerability-alerts --method PUT" "$GH_CALL_LOG"
     assert_success
 
     run grep -q "repos/test-owner/test-repo/actions/permissions/workflow --method PUT" "$GH_CALL_LOG"

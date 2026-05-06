@@ -2,7 +2,7 @@ name: Terraform Drift Detection
 
 on:
   schedule:
-    - cron: '0 9 * * 1-5'
+    - cron: "0 9 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -30,12 +30,12 @@ jobs:
       - name: terraform import
         env:
           TF_VAR_github_owner: ${{ github.repository_owner }}
-          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
         run: terraform import github_repository.template "${TF_VAR_repository_name}"
 
       - name: terraform plan (drift check)
         env:
           TF_VAR_github_owner: ${{ github.repository_owner }}
-          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
         run: |
           terraform plan -detailed-exitcode -no-color
