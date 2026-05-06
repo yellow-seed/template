@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install pinact
-        uses: suzuki-shunsuke/pinact-action@b6a5f966d4504893b2aeb60cf2b0de8946e48504 # v0.5.0
+        uses: suzuki-shunsuke/pinact-action@8d45b04987e4b9610bb29fbed6548832f4dee978 # v2.0.0
         with:
           pinact_version: v3.9.2
 

@@ -48,7 +48,7 @@ jobs:
 
       - name: Setup GitHub CLI
         run: |
-          # GitHub CLI is pre-installed on ubuntu-latest runners
+          # GitHub CLI is pre-installed on ubuntu-24.04 runners
           gh --version
 
       - name: Run setup script
