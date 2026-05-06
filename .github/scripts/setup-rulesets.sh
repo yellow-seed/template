@@ -69,6 +69,7 @@ echo ""
 RULESET_FILES=(
 	"$RULESETS_DIR/branch-protection-ruleset.json"
 	"$RULESETS_DIR/feature-branch-ruleset.json"
+	"$RULESETS_DIR/default-ruleset.json"
 )
 
 # 各 Ruleset を適用

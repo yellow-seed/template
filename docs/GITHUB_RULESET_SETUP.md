@@ -73,7 +73,8 @@ chmod +x .github/scripts/setup-rulesets.sh
 
 #### リポジトリ基本設定（Terraform 管理）
 
-`delete_branch_on_merge` と `allow_update_branch` は Terraform で管理します。
+Repository / Actions / security / environment 設定は
+`.github/scripts/setup-repository-settings.sh` と Terraform で管理します。
 手順は `.github/terraform/repository-settings/README.md` を参照してください。
 
 ## Ruleset テンプレートのカスタマイズ
