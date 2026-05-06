@@ -8,7 +8,7 @@ on:
 jobs:
   add-to-project:
     name: Add issue to project
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       issues: write
@@ -63,7 +63,7 @@ jobs:
 
       - name: Add to project
         id: add-to-project
-        uses: actions/add-to-project@v1.0.2
+        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2
         with:
           project-url: ${{ secrets.PROJECT_URL }}
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}

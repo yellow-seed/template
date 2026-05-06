@@ -22,29 +22,29 @@ on:
 jobs:
   Lint:
     name: qlty Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install qlty
-        uses: qltysh/qlty-action/install@v1
+        uses: qltysh/qlty-action/install@a2277a908db90c4c868832fb9204521fb940fdb4 # v1
 
       - name: Run checks
         run: scripts/run-checks.sh
 
   Test:
     name: bats Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install tools
         run: |
@@ -52,3 +52,21 @@ jobs:
 
       - name: Run bats tests
         run: bats tests/*.bats
+
+  Pinact:
+    name: pinact verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install pinact
+        uses: suzuki-shunsuke/pinact-action@b6a5f966d4504893b2aeb60cf2b0de8946e48504 # v0.5.0
+        with:
+          pinact_version: v3.9.2
+
+      - name: Verify actions are pinned
+        run: pinact run --check

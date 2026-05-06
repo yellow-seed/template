@@ -11,15 +11,15 @@ permissions:
 jobs:
   drift:
     name: detect drift
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: .github/terraform/repository-settings
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
 
       - name: Set repository name
         run: echo "TF_VAR_repository_name=${GITHUB_REPOSITORY##*/}" >> "$GITHUB_ENV"
