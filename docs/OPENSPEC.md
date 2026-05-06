@@ -36,6 +36,6 @@ Issue #207 の方針として、OpenSpec をテンプレートへそのまま導
 OpenSpec CLI をローカルで使う場合の例:
 
 ```bash
-npx @fission-ai/openspec list --json
-npx @fission-ai/openspec status --change <change-name> --json
+openspec list --json
+openspec status --change <change-name> --json
 ```

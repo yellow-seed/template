@@ -1,55 +1,38 @@
-## Description
+## Summary
 
-<!-- 変更内容の説明を記述してください -->
-
-## Type of Change
-
-<!-- 該当するものを選択してください -->
-
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
-- [ ] Refactoring (no functional changes)
-- [ ] Performance improvement
-- [ ] Test update
+<!-- proposal.md の「なぜやるか」を基に、背景・目的・今回の到達点を 2-3 文で記述してください -->
 
 ## Related Issues
 
-<!-- 関連するIssueがあれば記述してください -->
-<!-- 例: Closes #123, Fixes #456 -->
+<!-- proposal.md の Ref や関連Issueがあれば記述してください -->
+<!-- 例: Closes #123, Fixes #456, Related to #789 -->
+
+## OpenSpec
+
+<!-- OpenSpec を使っていない場合は Change: なし と記述してください -->
+
+- Change:
+- Proposal:
+- Tasks:
 
 ## Changes Made
 
-<!-- 具体的な変更内容を記述してください -->
+<!-- tasks.md の完了タスクと git diff を基に、具体的な変更内容を記述してください -->
 
--
 -
 
 ## Testing
 
-<!-- テスト方法や確認事項を記述してください -->
+<!-- tasks.md の検証タスクと実際に実行したコマンドを記述してください -->
 
-- [ ] テストを追加/更新しました
-- [ ] 既存のテストがすべて通過します
-- [ ] 手動で動作確認しました
+- [ ] `openspec status --change <change-name> --json` (OpenSpec利用時のみ。未使用時はN/A)
+- [ ] Tests / checks:
+- [ ] Manual verification:
 
-## Checklist
+## Review Notes
 
-<!-- 提出前に確認してください -->
+<!-- レビュアーに見てほしい点、未完了タスク、未実施検証、既知リスクがあれば記述してください -->
 
-- [ ] コードはプロジェクトのスタイルガイドに従っています
-- [ ] 自己レビューを実施しました
-- [ ] コメントを適切に追加しました（特に複雑な部分）
-- [ ] 関連するドキュメントを更新しました
-- [ ] 変更によって新しい警告は発生していません
-- [ ] テストを追加/更新しました
-- [ ] すべてのテストが通過します
+## Evidence (if applicable)
 
-## Screenshots (if applicable)
-
-<!-- UI変更がある場合はスクリーンショットを追加してください -->
-
-## Additional Notes
-
-<!-- その他の注意事項があれば記述してください -->
+<!-- UI変更はスクリーンショット、CLI変更は実行ログ、API変更はリクエスト/レスポンス例など、レビュー判断に使える証跡を記述してください -->

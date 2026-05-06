@@ -171,23 +171,30 @@ This fix ensures all resources are cleaned up correctly.
 
 ### CI 必要検証
 
-CI で必要なツールは `shell-dev` コンテナに揃えています。
-ローカル環境に `bats` / `qlty` などが無い場合でも、「確認できない」とせず、原則として次の Docker Compose 経由で検証します。
+CI で必要なツールは `tool-sidecar` コンテナに揃えています。
+このコンテナはアプリケーションそのものを動かすためではなく、`bats` / `qlty` など、アプリケーションの実行状態に左右されない検証・整形・補助ツールを実行するための sidecar です。
+ローカル環境に必要なツールが無い場合でも、「確認できない」とせず、原則として次の Docker Compose 経由で検証します。
+
+まず sidecar を起動し、以降は `docker compose exec` で同じコンテナを使い回します。
+作業が終わったら `docker compose down` で片付けます。
 
 ```bash
-docker compose run --rm shell-dev scripts/run-checks.sh
-docker compose run --rm shell-dev bats tests/*.bats
+docker compose up -d tool-sidecar
+docker compose exec tool-sidecar scripts/run-checks.sh
+docker compose exec tool-sidecar bats tests/*.bats
+docker compose down
 ```
 
 ### ドキュメント/設定ファイルのフォーマット
 
 - qltyでMarkdown/YAML/JSONをフォーマットします
 - ローカル実行:
-  - `npm install`
   - `qlty check --all` (チェック)
   - `qlty fmt --all` (自動フォーマット)
 - Docker実行:
-  - `docker compose run --rm shell-dev qlty check --all`
+  - `docker compose up -d tool-sidecar`
+  - `docker compose exec tool-sidecar qlty check --all`
+  - `docker compose down`
 
 ## Pull Request 作成
 
