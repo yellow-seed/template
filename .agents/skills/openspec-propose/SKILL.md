@@ -108,6 +108,7 @@ After completing all artifacts, summarize:
   - These guide what you write, but should never appear in the output
 
 **Guardrails**
+- Before starting implementation, always create a branch first. Follow the branch strategy defined in [.agents/skills/git-branch-worktree/SKILL.md](.agents/skills/git-branch-worktree/SKILL.md)
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
