@@ -67,6 +67,5 @@ jobs:
         uses: suzuki-shunsuke/pinact-action@8d45b04987e4b9610bb29fbed6548832f4dee978 # v2.0.0
         with:
           pinact_version: v3.9.2
-
-      - name: Verify actions are pinned
-        run: pinact run --check
+          skip_push: "true"
+          verify: "true"
