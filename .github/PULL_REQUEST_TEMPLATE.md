@@ -25,7 +25,7 @@
 
 <!-- tasks.md の検証タスクと実際に実行したコマンドを記述してください -->
 
-- [ ] `openspec status --change <change-name> --json`
+- [ ] `openspec status --change <change-name> --json` (OpenSpec利用時のみ。未使用時はN/A)
 - [ ] Tests / checks:
 - [ ] Manual verification:
 

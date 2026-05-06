@@ -1,5 +1,5 @@
-# Shell Development Environment
-# This Dockerfile provides a complete shell script development environment
+# Tool Sidecar Environment
+# This Dockerfile provides a tool sidecar for repository checks and setup tasks
 # with mise-managed tools (bats, dotenvx, gh, node, openspec, prettier, qlty, terraform).
 
 FROM ubuntu:22.04
