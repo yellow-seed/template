@@ -76,6 +76,25 @@ bash .codex/hooks/gh-setup.sh
 ブランチの作成・切り替え・削除は [.agents/skills/git-branch-worktree/SKILL.md](.agents/skills/git-branch-worktree/SKILL.md) に集約している。
 `*_REMOTE` 環境変数の有無に応じて、worktree（ローカルPC）または通常ブランチ（Web環境）を自動選択する。
 
+### リポジトリの棚卸し
+
+ローカルブランチ・worktree・リモートブランチ・Issue の不要リソースを棚卸し・クリーンアップする場合は [.agents/skills/git-cleanup-audit/SKILL.md](.agents/skills/git-cleanup-audit/SKILL.md) を参照する。
+責務ごとに4つのスクリプトに分割している。
+
+```bash
+# ローカルブランチ
+bash scripts/cleanup-local-branches.sh --dry-run
+
+# Worktree
+bash scripts/cleanup-worktrees.sh --dry-run
+
+# リモートブランチ
+bash scripts/cleanup-remote-branches.sh --dry-run
+
+# Issue 棚卸し
+bash scripts/audit-issues.sh --dry-run
+```
+
 ## 変更管理ワークフロー（OpenSpec）
 
 このプロジェクトでは、AIエージェントへの**すべての実装依頼に OpenSpec ワークフローを使用します**。実装を始める前に必ず change を作成し、proposal.md と tasks.md を用意してください。
