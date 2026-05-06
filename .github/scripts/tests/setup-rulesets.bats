@@ -18,6 +18,19 @@ elif [ -f "/opt/homebrew/lib/bats/bats-support/load" ]; then
     load "/opt/homebrew/lib/bats/bats-assert/load"
 fi
 
+if ! declare -F assert_success >/dev/null; then
+    assert() { "$@"; }
+    assert_success() { [ "$status" -eq 0 ]; }
+    assert_failure() { [ "$status" -ne 0 ]; }
+    assert_output() {
+        if [ "${1:-}" = "--partial" ]; then
+            [[ "$output" == *"$2"* ]]
+        else
+            [ "$output" = "$1" ]
+        fi
+    }
+fi
+
 setup() {
     # テスト用の一時ディレクトリを作成
     TEST_DIR=$(mktemp -d)
@@ -26,7 +39,7 @@ setup() {
     RULESETS_DIR="$SCRIPT_DIR/../rulesets"
 
     # モック用のパスを設定
-    export PATH="$TEST_DIR:$PATH"
+    export PATH="$TEST_DIR:/usr/bin:/bin"
     
     # モックのghコマンドを作成
     cat > "$TEST_DIR/gh" <<'EOF'
@@ -79,6 +92,11 @@ teardown() {
 @test "setup-rulesets.sh が正しいshebangを持っている" {
     run head -n 1 "$SCRIPT_DIR/setup-rulesets.sh"
     assert_output "#!/bin/bash"
+}
+
+@test "setup-rulesets.sh がdefault-ruleset.jsonを含む" {
+    run grep -q "default-ruleset.json" "$SCRIPT_DIR/setup-rulesets.sh"
+    assert_success
 }
 
 @test "ghコマンドが見つからない場合にエラーを表示する" {

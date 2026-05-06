@@ -154,7 +154,8 @@ bash scripts/setup-git-hooks.sh
 
 ブランチ保護などの設定を適用する場合、以下のいずれかの方法で実行できます。
 
-> **補足**: `delete_branch_on_merge` / `allow_update_branch` は Terraform で管理します。
+> **補足**: Repository / Actions / security / environment 設定は
+> `.github/scripts/setup-repository-settings.sh` と
 > `.github/terraform/repository-settings/README.md` を参照してください。
 
 #### 方法1: GitHub Actions で実行（推奨）
@@ -184,8 +185,8 @@ chmod +x .github/scripts/setup-all.sh
 chmod +x .github/scripts/setup-rulesets.sh
 ./.github/scripts/setup-rulesets.sh
 
-chmod +x .github/scripts/setup-branch-auto-delete.sh
-./.github/scripts/setup-branch-auto-delete.sh
+chmod +x .github/scripts/setup-repository-settings.sh
+./.github/scripts/setup-repository-settings.sh
 
 chmod +x .github/scripts/setup-github-project.sh
 ./.github/scripts/setup-github-project.sh

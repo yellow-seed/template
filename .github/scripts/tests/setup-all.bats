@@ -18,13 +18,26 @@ elif [ -f "/opt/homebrew/lib/bats/bats-support/load" ]; then
     load "/opt/homebrew/lib/bats/bats-assert/load"
 fi
 
+if ! declare -F assert_success >/dev/null; then
+    assert() { "$@"; }
+    assert_success() { [ "$status" -eq 0 ]; }
+    assert_failure() { [ "$status" -ne 0 ]; }
+    assert_output() {
+        if [ "${1:-}" = "--partial" ]; then
+            [[ "$output" == *"$2"* ]]
+        else
+            [ "$output" = "$1" ]
+        fi
+    }
+fi
+
 setup() {
     # テスト用の一時ディレクトリを作成
     TEST_DIR=$(mktemp -d)
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    SCRIPT_DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
     
     # モック用のパスを設定
-    export PATH="$TEST_DIR:$PATH"
+    export PATH="$TEST_DIR:/usr/bin:/bin"
 }
 
 teardown() {
@@ -46,40 +59,16 @@ teardown() {
 }
 
 @test "setup-all.sh が他のスクリプトを呼び出す" {
-    # モックスクリプトを作成
-    cat > "$TEST_DIR/setup-rulesets.sh" <<'EOF'
-#!/bin/bash
-echo "setup-rulesets.sh called"
-EOF
-    chmod +x "$TEST_DIR/setup-rulesets.sh"
-
-    cat > "$TEST_DIR/setup-branch-auto-delete.sh" <<'EOF'
-#!/bin/bash
-echo "setup-branch-auto-delete.sh called"
-EOF
-    chmod +x "$TEST_DIR/setup-branch-auto-delete.sh"
-
-    cat > "$TEST_DIR/setup-labels.sh" <<'EOF'
-#!/bin/bash
-echo "setup-labels.sh called"
-EOF
-    chmod +x "$TEST_DIR/setup-labels.sh"
-
-    cat > "$TEST_DIR/setup-github-project.sh" <<'EOF'
-#!/bin/bash
-echo "setup-github-project.sh called"
-EOF
-    chmod +x "$TEST_DIR/setup-github-project.sh"
-
-    # スクリプトを実行（実際のスクリプトは呼ばれないようにモックを使用）
-    run bash "$SCRIPT_DIR/setup-all.sh"
-
-    # 実際のスクリプトはモックを呼び出すため、エラーになる可能性がある
-    # このテストはスクリプトの構造を確認するだけ
-    assert_success || assert_failure  # どちらでもOK（モックのため）
+    run grep -E "setup-(rulesets|repository-settings|labels|github-project)\\.sh" "$SCRIPT_DIR/setup-all.sh"
+    assert_success
 }
 
 @test "setup-all.sh がsetup-github-project.shを含む" {
     run grep -q "setup-github-project.sh" "$SCRIPT_DIR/setup-all.sh"
+    assert_success
+}
+
+@test "setup-all.sh がsetup-repository-settings.shを含む" {
+    run grep -q "setup-repository-settings.sh" "$SCRIPT_DIR/setup-all.sh"
     assert_success
 }

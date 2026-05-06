@@ -36,11 +36,12 @@ run_script() {
 }
 
 run_script "1" "Ruleset のセットアップ" "$SCRIPT_DIR/setup-rulesets.sh"
-run_script "2" "ラベルの設定" "$SCRIPT_DIR/setup-labels.sh"
-run_script "3" "GitHub Project のセットアップ" "$SCRIPT_DIR/setup-github-project.sh"
+run_script "2" "Repository settings のセットアップ" "$SCRIPT_DIR/setup-repository-settings.sh"
+run_script "3" "ラベルの設定" "$SCRIPT_DIR/setup-labels.sh"
+run_script "4" "GitHub Project のセットアップ" "$SCRIPT_DIR/setup-github-project.sh"
 
-echo "※ ブランチ自動削除と PR ブランチ更新提案は Terraform で管理します"
-echo "   .github/terraform/repository-settings/README.md を参照してください"
+echo "※ Secrets の値はスクリプトに保存しません"
+echo "   setup-repository-settings.sh の確認結果に従って GitHub UI または gh secret set で登録してください"
 echo ""
 
 echo "=============================="

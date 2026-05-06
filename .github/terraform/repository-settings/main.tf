@@ -17,6 +17,28 @@ provider "github" {
 resource "github_repository" "template" {
   name = var.repository_name
 
+  description  = "Template for AI era Develop"
+  homepage_url = ""
+  visibility   = "public"
+  is_template  = true
+
+  has_issues      = true
+  has_projects    = true
+  has_wiki        = true
+  has_discussions = false
+
+  allow_merge_commit     = true
+  allow_squash_merge     = true
+  allow_rebase_merge     = true
+  allow_auto_merge       = false
   delete_branch_on_merge = true
-  allow_update_branch    = true
+  allow_update_branch    = false
+
+  squash_merge_commit_title   = "COMMIT_OR_PR_TITLE"
+  squash_merge_commit_message = "COMMIT_MESSAGES"
+  merge_commit_title          = "MERGE_MESSAGE"
+  merge_commit_message        = "PR_TITLE"
+
+  web_commit_signoff_required = false
+  vulnerability_alerts        = true
 }
