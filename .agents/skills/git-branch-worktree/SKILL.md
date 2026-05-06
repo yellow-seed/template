@@ -128,7 +128,7 @@ git branch -a
 
 worktree の配置先は Worktrunk の user config で定義する。
 `.config/wt.toml` は project config であり、hooks や list 表示などチーム共有の設定に使う。
-`worktree-path` は `.config/wt.toml` に書かず、`~/.config/worktrunk/config.toml` に書く。
+`worktree-path` は `.config/wt.toml` に書かず、user config（デフォルト: `~/.config/worktrunk/config.toml`）に書く。
 
 ```toml
 worktree-path = "~/worktrees/{{ repo }}/{{ branch | sanitize }}"

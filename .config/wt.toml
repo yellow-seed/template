@@ -1,5 +1,5 @@
 # Project-level Worktrunk settings live here.
 #
 # Do not configure worktree paths in this file. Worktrunk reads worktree-path
-# from the user config at ~/.config/worktrunk/config.toml, or from the
-# WORKTRUNK_WORKTREE_PATH environment variable.
+# from the user config at ${XDG_CONFIG_HOME:-~/.config}/worktrunk/config.toml,
+# or from the WORKTRUNK_WORKTREE_PATH environment variable.

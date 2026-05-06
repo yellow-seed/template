@@ -92,7 +92,7 @@ setup_worktrunk_config() {
 
 	{
 		echo ""
-		echo "# Default worktree location for this template repository."
+		echo "# Default worktree location for repositories using this template."
 		echo 'worktree-path = "~/worktrees/{{ repo }}/{{ branch | sanitize }}"'
 	} >>"$config_file"
 }
