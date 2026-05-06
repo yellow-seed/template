@@ -9,3 +9,15 @@ services:
       - .:/workspace
       - /workspace/secrets
     working_dir: /workspace
+
+  terraform:
+    image: hashicorp/terraform:latest
+    working_dir: /workspace/.github/terraform/repository-settings
+    volumes:
+      - .:/workspace
+    environment:
+      - TF_VAR_github_owner
+      - TF_VAR_github_token
+      - TF_VAR_repository_name
+    profiles:
+      - terraform
