@@ -8,7 +8,7 @@ node = "22"
 "npm:prettier" = "3.6.2"
 pinact = "3.9.2"
 terraform = "1.11.4"
-worktrunk = "latest"
+"github:max-sixty/worktrunk" = "latest"
 
 [env]
 OPENSPEC_TELEMETRY = "0"

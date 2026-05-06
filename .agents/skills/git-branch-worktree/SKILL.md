@@ -48,10 +48,24 @@ Issue 番号を付ける場合は `{type}/{issue}-{description}` も許容する
 **ローカル環境（worktree）**
 
 ```bash
-wt create <branch-name>
+wt switch --create <branch-name>
 ```
 
-worktree は `~/Documents/worktrees/{{ repo }}/{{ branch | sanitize }}` に作成される。作成後は `bash scripts/env-setup.sh` で依存インストールと環境セットアップを実行。
+worktree は Worktrunk の user config にある `worktree-path` に従って作成される。
+このテンプレートの標準配置は `~/worktrees/{{ repo }}/{{ branch | sanitize }}`。
+`scripts/install-tools.sh` は user config が未設定の場合に次を追加する。
+
+```toml
+worktree-path = "~/worktrees/{{ repo }}/{{ branch | sanitize }}"
+```
+
+作成後は worktree 側で `bash scripts/env-setup.sh` を実行し、依存インストールと環境セットアップを行う。
+
+一時的に別の配置先を指定したい場合は、`WORKTRUNK_WORKTREE_PATH` を使う。
+
+```bash
+WORKTRUNK_WORKTREE_PATH="/path/to/worktrees/{{ repo }}/{{ branch | sanitize }}" wt switch --create <branch-name>
+```
 
 **Web環境（通常ブランチ）**
 
@@ -79,7 +93,7 @@ git checkout <branch-name>
 **ローカル環境（worktree）**
 
 ```bash
-wt delete <branch-name>
+wt remove <branch-name>
 ```
 
 **Web環境（通常ブランチ）**
@@ -112,14 +126,17 @@ git branch -a
 
 ## Worktrunk 設定
 
-worktree の設定は `.config/wt.toml` で定義されている。
+worktree の配置先は Worktrunk の user config で定義する。
+`.config/wt.toml` は project config であり、hooks や list 表示などチーム共有の設定に使う。
+`worktree-path` は `.config/wt.toml` に書かず、user config（デフォルト: `~/.config/worktrunk/config.toml`）に書く。
 
 ```toml
-[worktree]
-path = "~/Documents/worktrees/{{ repo }}/{{ branch | sanitize }}"
+worktree-path = "~/worktrees/{{ repo }}/{{ branch | sanitize }}"
 ```
 
 ## 注意事項
 
 - worktree 削除時には、そのブランチの変更は失われるため、事前にコミットまたはプッシュ
 - Web環境では `wt` コマンドは使用しない
+- Worktrunk の作成コマンドは `wt switch --create`。`wt create` は使用しない
+- Worktrunk の削除コマンドは `wt remove`。`wt delete` は使用しない
