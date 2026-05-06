@@ -2,7 +2,7 @@
 # This Dockerfile provides a tool sidecar for repository checks and setup tasks
 # with mise-managed tools (bats, dotenvx, gh, node, openspec, prettier, qlty, terraform).
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b
 
 # Avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
