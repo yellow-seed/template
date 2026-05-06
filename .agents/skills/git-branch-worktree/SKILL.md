@@ -21,7 +21,36 @@ is_remote_env() {
 | 環境 | 判定 | ブランチ方式 |
 |------|------|-------------|
 | ローカルPC | `*_REMOTE` なし | git worktree + Worktrunk |
+| ローカルPC（簡易） | `*_REMOTE` なし | 通常 git branch（worktree 不要時） |
 | Claude Code Web / Codex Web | `*_REMOTE=true` | 通常 git branch |
+
+## 簡易ブランチ移動（worktree なし）
+
+worktree を使わず、同一ディレクトリ内で単純にブランチを切り替える場合の手順。
+**Agent はブランチ移動を忘れやすいため、必ず実行すること。**
+
+### 簡易ブランチ作成
+
+```bash
+git checkout -b <branch-name>
+git push -u origin <branch-name>
+```
+
+作成後は `git branch --show-current` で現在のブランチを確認し、目的のブランチにいることを確認する。
+
+### 簡易ブランチ切り替え
+
+```bash
+git checkout <branch-name>
+```
+
+切り替え後は `git branch --show-current` で現在のブランチを確認する。
+
+### 注意事項
+
+- 簡易ブランチ移動は、並列開発が必要ない場合や、一時的な確認用途に限定する
+- 本格的な開発では worktree を推奨
+- **ブランチ切り替えを忘れると、意図しないブランチで作業してしまうため必ず確認する**
 
 ## ワークフロー
 
@@ -61,11 +90,31 @@ worktree-path = "~/worktrees/{{ repo }}/{{ branch | sanitize }}"
 
 作成後は worktree 側で `bash scripts/env-setup.sh` を実行し、依存インストールと環境セットアップを行う。
 
+**worktree 作成後にカレントディレクトリを移動する**
+
+`wt switch --create` は worktree を作成するが、シェルのカレントディレクトリは移動しない。
+Agent の表示と実態を一致させるため、作成後に必ず worktree 内に移動する。
+
+```bash
+# worktree パスを自動取得して移動
+worktree_path=$(git worktree list --porcelain | grep -B1 "branch <branch-name>" | head -1 | awk '{print $2}')
+if [ -n "$worktree_path" ]; then
+  cd "$worktree_path"
+else
+  # フォールバック: 標準配置から推測
+  repo_name=$(basename "$(git rev-parse --show-toplevel)")
+  branch_sanitized=$(echo "<branch-name>" | tr '/' '-')
+  cd "$HOME/worktrees/$repo_name/$branch_sanitized"
+fi
+```
+
 一時的に別の配置先を指定したい場合は、`WORKTRUNK_WORKTREE_PATH` を使う。
 
 ```bash
 WORKTRUNK_WORKTREE_PATH="/path/to/worktrees/{{ repo }}/{{ branch | sanitize }}" wt switch --create <branch-name>
 ```
+
+この場合も同様に `cd "$WORKTRUNK_WORKTREE_PATH/{{ branch | sanitize }}"` で移動する。
 
 **Web環境（通常ブランチ）**
 
@@ -80,6 +129,16 @@ git push -u origin <branch-name>
 
 ```bash
 wt switch <branch-name>
+```
+
+既存 worktree への切り替え時も、カレントディレクトリを worktree 内に移動する。
+
+```bash
+# worktree パスを自動取得して移動
+worktree_path=$(git worktree list --porcelain | grep -B1 "branch <branch-name>" | head -1 | awk '{print $2}')
+if [ -n "$worktree_path" ]; then
+  cd "$worktree_path"
+fi
 ```
 
 **Web環境（通常ブランチ）**
