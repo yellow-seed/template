@@ -75,6 +75,28 @@ setup_worktrunk_shell() {
 	wt config shell install 2>/dev/null || true
 }
 
+setup_worktrunk_config() {
+	if ! command -v wt >/dev/null 2>&1; then
+		return 0
+	fi
+
+	local config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/worktrunk"
+	local config_file="$config_dir/config.toml"
+
+	mkdir -p "$config_dir"
+	touch "$config_file"
+
+	if grep -Eq '^[[:space:]]*worktree-path[[:space:]]*=' "$config_file"; then
+		return 0
+	fi
+
+	{
+		echo ""
+		echo "# Default worktree location for this template repository."
+		echo 'worktree-path = "~/worktrees/{{ repo }}/{{ branch | sanitize }}"'
+	} >>"$config_file"
+}
+
 main() {
 	export MISE_YES=1
 	export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:+${MISE_TRUSTED_CONFIG_PATHS}:}${REPO_ROOT}"
@@ -92,6 +114,8 @@ main() {
 	append_path "$shims_dir"
 
 	run_step "Installing helper scripts..." bash "$ORCHESTRATOR_DIR/installers/helper-scripts.sh"
+
+	run_step "Configuring Worktrunk worktree path..." setup_worktrunk_config
 
 	run_step "Setting up Worktrunk shell integration..." setup_worktrunk_shell
 
