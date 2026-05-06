@@ -1,8 +1,10 @@
 services:
-  shell-dev:
+  tool-sidecar:
     build:
       context: .
       dockerfile: Dockerfile
+    command: ["sleep", "infinity"]
+    init: true
     volumes:
       - .:/workspace
       - /workspace/secrets

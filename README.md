@@ -116,7 +116,7 @@ eval "$(mise activate zsh)"    # zsh の場合
 
 ### 開発ツールのインストール
 
-テストやlintで利用するツール（`mise` / `bats` / `dotenvx` / `qlty` / `terraform`）は、以下で一括インストールできます。
+テストやlintで利用するツール（`mise` / `bats` / `dotenvx` / `node` / `openspec` / `prettier` / `qlty` / `terraform`）は、以下で一括インストールできます。
 
 ```bash
 bash scripts/install-tools.sh

@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "format": "npx --no-install prettier --write \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\" \".github/**/*.json\""
-  },
-  "devDependencies": {
-    "prettier": "3.6.2"
+    "format": "prettier --write \"README.md\" \"AGENTS.md\" \"CLAUDE.md\" \"docs/**/*.md\" \".github/**/*.md\" \"compose.yml\" \"codecov.yml\" \".github/**/*.{yml,yaml}\" \".github/**/*.json\""
   }
 }
