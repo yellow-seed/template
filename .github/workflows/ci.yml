@@ -68,3 +68,24 @@ jobs:
         with:
           skip_push: "true"
           verify: "true"
+
+  DockerfilePin:
+    name: dockerfile-pin check
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install dockerfile-pin
+        run: |
+          curl -sL "https://github.com/azu/dockerfile-pin/releases/latest/download/dockerfile-pin_linux_amd64.tar.gz" | tar xz -C /tmp
+
+      - name: Check digest pinning
+        run: /tmp/dockerfile-pin check
+
+      - name: Cleanup
+        if: always()
+        run: rm -f /tmp/dockerfile-pin
