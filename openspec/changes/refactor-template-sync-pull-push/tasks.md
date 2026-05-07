@@ -1,0 +1,14 @@
+## 1. スキル本文のリファクタ
+
+- [x] 1.1 frontmatter の `description` を Pull / Push 両対応である旨に更新する
+- [x] 1.2 「同期の向き（Pull / Push）」を追加し、それぞれのゴールと前提（どちらがソースか）を述べる
+- [x] 1.3 共通原則・対象パターン・同期タイプ早見を冗長さを抑えて再構成する（A〜G の長大な重複を整理）
+- [x] 1.4 Pull 型: 差分取得・選択適用・コミット・リモート除去までを短い手順にまとめる
+- [x] 1.5 Push 型: template リポジトリ（`yellow-seed/template`）への **GitHub Issue** による還流テンプレートと受け入れ条件（汎用化・秘密情報排除・出典の明示）を追加する
+- [x] 1.6 ドキュメント／CI 構造同期・README バッジ・トラブルシュート・他スキル連携を必要最小限に圧縮する
+- [x] 1.7 重複シナリオ長文・反復コマンド例を削除または参照1箇所に集約する
+
+## 2. 仕上げ
+
+- [x] 2.1 `mise exec -- openspec status --change refactor-template-sync-pull-push` で artifacts が完了することを確認する
+- [x] 2.2 変更をコミットする（メッセージは日本語・Conventional Commits）
